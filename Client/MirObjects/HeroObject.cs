@@ -6,32 +6,20 @@ namespace Client.MirObjects
 {
     public class HeroObject : PlayerObject
     {
-        public override ObjectType Race
-        {
-            get { return ObjectType.Hero; }
-        }
+        public override ObjectType Race => ObjectType.Hero;
 
         public string OwnerName;
         public MirLabel OwnerLabel;
 
-        public override bool ShouldDrawHealth()
-        {
-            if (GroupDialog.GroupList.Contains(OwnerName) || OwnerName == User.Name)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+        public override bool ShouldDrawHealth() {
+            return GroupDialog.GroupList.Contains(OwnerName) || OwnerName == User.Name;
         }
 
         public HeroObject(uint objectID) : base(objectID)
         {
         }
 
-        public void Load(S.ObjectHero info)
-        {
+        public void Load(S.ObjectHero info) {
             Load((S.ObjectPlayer)info);
             OwnerName = info.OwnerName;
 

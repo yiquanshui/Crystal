@@ -178,6 +178,7 @@ namespace Launcher
 
         private int error_count = 0;
 
+        //TODO : implement true multi download
         private void DownloadFile(Download dl) {
             FileInformation info = dl.Info;
             string name = info.FileName.Replace(@"\", "/");

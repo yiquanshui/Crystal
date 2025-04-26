@@ -715,16 +715,8 @@ namespace Client.MirObjects
         }
 
 
-        public ClientMagic GetMagic(Spell spell)
-        {
-            for (int i = 0; i < Magics.Count; i++)
-            {
-                ClientMagic magic = Magics[i];
-                if (magic.Spell != spell) continue;
-                return magic;
-            }
-
-            return null;
+        public ClientMagic? GetMagic(Spell spell) {
+            return Magics.FirstOrDefault(magic => magic.Spell == spell);
         }
 
 

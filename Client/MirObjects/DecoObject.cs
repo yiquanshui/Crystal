@@ -6,46 +6,39 @@ namespace Client.MirObjects
 {
     public class DecoObject : MapObject
     {
-        public override ObjectType Race
-        {
-            get { return ObjectType.Deco; }
-        }
+        public override ObjectType Race => ObjectType.Deco;
 
-        public override bool Blocking
-        {
-            get { return false; }
-        }
+        public override bool Blocking => false;
 
-        public int Image;
+        public int Image1 { get; set; }
+
 
         public DecoObject(uint objectID)
             : base(objectID)
         {
         }
 
-        public void Load(S.ObjectDeco info)
-        {
+        public void Load(S.ObjectDeco info) {
             CurrentLocation = info.Location;
             MapLocation = info.Location;
             GameScene.Scene.MapControl.AddObject(this);
-            Image = info.Image;
-
+            Image1 = info.Image;
             BodyLibrary = Libraries.Deco;
         }
-        public override void Process()
-        {
-            DrawLocation = new Point((CurrentLocation.X - User.Movement.X + MapControl.OffSetX) * MapControl.CellWidth, (CurrentLocation.Y - User.Movement.Y + MapControl.OffSetY) * MapControl.CellHeight);
+        
+        
+        public override void Process() {
+            DrawLocation = new Point((CurrentLocation.X - User!.Movement.X + MapControl.OffSetX) * MapControl.CellWidth, (CurrentLocation.Y - User.Movement.Y + MapControl.OffSetY) * MapControl.CellHeight);
             DrawLocation.Offset(GlobalDisplayLocationOffset);
             DrawLocation.Offset(User.OffSetMove);
         }
 
-        public override void Draw()
-        {
-            BodyLibrary.Draw(Image, DrawLocation, DrawColour, true);
+        
+        public override void Draw() {
+            BodyLibrary.Draw(Image1, DrawLocation, DrawColour, true);
         }
 
-        public override bool MouseOver(Point p)
-        {
+        public override bool MouseOver(Point p) {
             return false;
         }
 

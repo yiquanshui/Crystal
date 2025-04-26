@@ -6,61 +6,44 @@ using Client.MirControls;
 using S = ServerPackets;
 using C = ClientPackets;
 using Client.MirScenes.Dialogs;
-using System.Reflection;
 
 namespace Client.MirObjects
 {
     public class PlayerObject : MapObject
     {
-        public override ObjectType Race
-        {
-            get { return ObjectType.Player; }
-        }
+        public override ObjectType Race => ObjectType.Player;
 
-        public override bool Blocking
-        {
-            get { return !Dead; }
-        }
+        public override bool Blocking => !Dead;
 
         public MirGender Gender;
         public MirClass Class;
         public byte Hair;
         public ushort Level;
 
-        public MLibrary WeaponLibrary1, WeaponEffectLibrary1, WeaponLibrary2, HairLibrary, WingLibrary, MountLibrary;
+        public MLibrary? WeaponLibrary1;
+        public MLibrary? WeaponEffectLibrary1;
+        public MLibrary? WeaponLibrary2;
+        public MLibrary? HairLibrary;
+        public MLibrary? WingLibrary;
+        public MLibrary? MountLibrary;
         public int Armour, Weapon, WeaponEffect, ArmourOffSet, HairOffSet, WeaponOffSet, WingOffset, MountOffset;
 
         public int DieSound, FlinchSound, AttackSound;
 
 
         public FrameSet Frames;
-        public Frame Frame, WingFrame;
+        public Frame? Frame, WingFrame;
         public int FrameIndex, FrameInterval, EffectFrameIndex, EffectFrameInterval, SlowFrameIndex;
         public byte SkipFrameUpdate = 0;
 
-        public bool HasClassWeapon
-        {
-            get
-            {
-                switch (Weapon / Globals.ClassWeaponCount)
-                {
-                    default:
-                        return Class == MirClass.Wizard || Class == MirClass.Warrior || Class == MirClass.Taoist;
-                    case 1:
-                        return Class == MirClass.Assassin;
-                    case 2:
-                        return Class == MirClass.Archer;
-                }
-            }
-        }
+        public bool HasClassWeapon =>
+            (Weapon / Globals.ClassWeaponCount) switch {
+                1 => Class == MirClass.Assassin,
+                2 => Class == MirClass.Archer,
+                _ => Class is MirClass.Wizard or MirClass.Warrior or MirClass.Taoist
+            };
 
-        public bool HasFishingRod
-        {
-            get
-            {
-                return Globals.FishingRodShapes.Contains(Weapon);
-            }
-        }
+        public bool HasFishingRod => Globals.FishingRodShapes.Contains(Weapon);
 
         public Spell Spell;
         public byte SpellLevel;
@@ -70,10 +53,10 @@ namespace Client.MirObjects
         public Point TargetPoint;
 
         public bool MagicShield;
-        public Effect ShieldEffect;
+        public Effect? ShieldEffect;
 
         public bool ElementalBarrier;
-        public Effect ElementalBarrierEffect;
+        public Effect? ElementalBarrierEffect;
 
         public byte WingEffect;
         private short StanceDelay = 2500;
@@ -106,13 +89,14 @@ namespace Client.MirObjects
         public LevelEffects LevelEffects;
 
         public PlayerObject() { }
+        
         public PlayerObject(uint objectID) : base(objectID)
         {
             Frames = FrameSet.Player;
         }
 
-        public void Load(S.ObjectPlayer info)
-        {
+        
+        public void Load(S.ObjectPlayer info) {
             Name = info.Name;
             NameColour = info.NameColour;
             GuildName = info.GuildName;
@@ -129,8 +113,8 @@ namespace Client.MirObjects
             Hair = info.Hair;
 
             Weapon = info.Weapon;
-			WeaponEffect = info.WeaponEffect;
-			Armour = info.Armour;
+            WeaponEffect = info.WeaponEffect;
+            Armour = info.Armour;
             Light = info.Light;
 
             Poison = info.Poison;
@@ -167,11 +151,12 @@ namespace Client.MirObjects
 
             SetEffects();
         }
-        public void Update(S.PlayerUpdate info)
-        {
+        
+        
+        public void Update(S.PlayerUpdate info) {
             Weapon = info.Weapon;
-			WeaponEffect = info.WeaponEffect;
-			Armour = info.Armour;
+            WeaponEffect = info.WeaponEffect;
+            Armour = info.Armour;
             Light = info.Light;
             WingEffect = info.WingEffect;
 
@@ -179,28 +164,18 @@ namespace Client.MirObjects
             SetEffects();
         }
 
-        public override bool ShouldDrawHealth()
-        {
-            if (GroupDialog.GroupList.Contains(Name) || this == User)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
+        
+        public override bool ShouldDrawHealth() {
+            return GroupDialog.GroupList.Contains(Name) || this == User;
+        }
+
+        public void ProcessBuffs() {
+            foreach (BuffType buff in Buffs) {
+                AddBuffEffect(buff);
             }
         }
 
-        public void ProcessBuffs()
-        {
-            for (int i = 0; i < Buffs.Count; i++)
-            {
-                AddBuffEffect(Buffs[i]);
-            }
-        }
-
-        public void MountUpdate(S.MountUpdate info)
-        {
+        public void MountUpdate(S.MountUpdate info) {
             MountType = info.MountType;
             RidingMount = info.RidingMount;
 
@@ -218,19 +193,16 @@ namespace Client.MirObjects
             PlayMountSound();
         }
 
-        public void FishingUpdate(S.FishingUpdate p)
-        {
-            if (Fishing != p.Fishing)
-            {
+        
+        public void FishingUpdate(S.FishingUpdate p) {
+            if (Fishing != p.Fishing) {
                 MirDirection dir = Functions.DirectionFromPoint(CurrentLocation, p.FishingPoint);
 
-                if (p.Fishing)
-                {        
+                if (p.Fishing) {        
                     QueuedAction action = new QueuedAction { Action = MirAction.FishingCast, Direction = dir, Location = CurrentLocation };
                     ActionFeed.Add(action);
                 }
-                else
-                {
+                else {
                     QueuedAction action = new QueuedAction { Action = MirAction.FishingReel, Direction = dir, Location = CurrentLocation };
                     ActionFeed.Add(action);
                 }
@@ -239,8 +211,7 @@ namespace Client.MirObjects
                 SetLibraries();
             }
 
-            if (!HasFishingRod)
-            {
+            if (!HasFishingRod) {
                 GameScene.Scene.FishingDialog.Hide();
             }          
 
@@ -249,8 +220,7 @@ namespace Client.MirObjects
         }
 
 
-        public virtual void SetLibraries()
-        {
+        public virtual void SetLibraries() {
             //fishing broken
             //10
             //11
@@ -269,12 +239,10 @@ namespace Client.MirObjects
             bool showMount = true;
             bool showFishing = true;
 
-            if (TransformType > -1)
-            {
+            if (TransformType > -1) {
                 #region Transform
                 
-                switch (TransformType)
-                {
+                switch (TransformType) {
                     case 4:
                     case 5:
                     case 7:
@@ -302,19 +270,18 @@ namespace Client.MirObjects
                         break;
                 }
 
-                switch (CurrentAction)
-                {
+                switch (CurrentAction) {
                     case MirAction.Standing:
                     case MirAction.Jump:
-                        Frames.TryGetValue(MirAction.Standing, out Frame);
+                        Frame = Frames.GetValueOrDefault(MirAction.Standing);
                         break;
                     case MirAction.Walking:
                     case MirAction.WalkingBow:
-                        Frames.TryGetValue(MirAction.Walking, out Frame);
+                        Frame = Frames.GetValueOrDefault(MirAction.Attack1);
                         break;
                     case MirAction.Running:
                     case MirAction.RunningBow:
-                        Frames.TryGetValue(MirAction.Running, out Frame);
+                        Frame = Frames.GetValueOrDefault(MirAction.Attack1);
                         break;
                     case MirAction.Attack1:
                     case MirAction.Attack2:
@@ -323,17 +290,15 @@ namespace Client.MirObjects
                     case MirAction.AttackRange1:
                     case MirAction.AttackRange2:
                     case MirAction.AttackRange3:
-                        Frames.TryGetValue(MirAction.Attack1, out Frame);
+                        Frame = Frames.GetValueOrDefault(MirAction.Attack1);
                         break;
                 }
 
-                if (MountType > 6 && RidingMount)
-                {
+                if (MountType > 6 && RidingMount) {
                     ArmourOffSet = -416;
                     BodyLibrary = TransformType < Libraries.TransformMounts.Length ? Libraries.TransformMounts[TransformType] : Libraries.TransformMounts[0];
                 }
-                else
-                {
+                else {
                     ArmourOffSet = 0;
                     BodyLibrary = TransformType < Libraries.Transform.Length ? Libraries.Transform[TransformType] : Libraries.Transform[0];
                 }
@@ -342,13 +307,11 @@ namespace Client.MirObjects
                 WeaponLibrary1 = null;
                 WeaponLibrary2 = null;
 
-                if (TransformType == 19)
-                {
+                if (TransformType == 19) {
                     WingEffect = 2;
                     WingLibrary = WingEffect - 1 < Libraries.TransformEffect.Length ? Libraries.TransformEffect[WingEffect - 1] : null;
                 }
-                else
-                {
+                else {
                     WingLibrary = null;
                 }
 
@@ -359,26 +322,14 @@ namespace Client.MirObjects
 
                 #endregion
             }
-            else
-            {
+            else {
 
-                switch (Class)
-                {
+                switch (Class) {
                     #region Archer
                     case MirClass.Archer:
-
                         #region WeaponType
-                        if (HasClassWeapon)
-                        {
-                            switch (CurrentAction)
-                            {
-                                case MirAction.Walking:
-                                case MirAction.Running:
-                                case MirAction.AttackRange1:
-                                case MirAction.AttackRange2:
-                                    altAnim = true;
-                                    break;
-                            }
+                        if (HasClassWeapon) {
+                            if (CurrentAction is MirAction.Walking or MirAction.Running or MirAction.AttackRange1 or MirAction.AttackRange2) altAnim = true;
                         }
 
                         if (CurrentAction == MirAction.Jump) altAnim = true;
@@ -386,23 +337,19 @@ namespace Client.MirObjects
                         #endregion
 
                         #region Armours
-                        if (altAnim)
-                        {
+                        if (altAnim) {
                             BodyLibrary = Armour < Libraries.ARArmours.Length ? Libraries.ARArmours[Armour] : Libraries.ARArmours[0];
                             HairLibrary = Hair < Libraries.ARHair.Length ? Libraries.ARHair[Hair] : null;
                         }
-                        else
-                        {
+                        else {
                             BodyLibrary = Armour < Libraries.CArmours.Length ? Libraries.CArmours[Armour] : Libraries.CArmours[0];
                             HairLibrary = Hair < Libraries.CHair.Length ? Libraries.CHair[Hair] : null;
                         }
                         #endregion
 
                         #region Weapons
-                        if (HasClassWeapon)
-                        {
+                        if (HasClassWeapon) {
                             int Index = Weapon - 200;
-
                             if (altAnim)
                                 WeaponLibrary2 = Index < Libraries.ARWeaponsS.Length ? Libraries.ARWeaponsS[Index] : null;
                             else
@@ -410,34 +357,30 @@ namespace Client.MirObjects
 
                             WeaponLibrary1 = null;
                         }
-                        else
-                        {
-							if (Weapon >= 0)
-							{
-								WeaponLibrary1 = Weapon < Libraries.CWeapons.Length ? Libraries.CWeapons[Weapon] : null;
-								if (WeaponEffect > 0)
-									WeaponEffectLibrary1 = WeaponEffect < Libraries.CWeaponEffect.Length ? Libraries.CWeaponEffect[WeaponEffect] : null;
-								else
-									WeaponEffectLibrary1 = null;
+                        else {
+                            if (Weapon >= 0) {
+                                WeaponLibrary1 = Weapon < Libraries.CWeapons.Length ? Libraries.CWeapons[Weapon] : null;
+                                if (WeaponEffect > 0)
+                                    WeaponEffectLibrary1 = WeaponEffect < Libraries.CWeaponEffect.Length ? Libraries.CWeaponEffect[WeaponEffect] : null;
+                                else
+                                    WeaponEffectLibrary1 = null;
 
                                 WeaponLibrary2 = null;
                             }
-							else
-							{
-								WeaponLibrary1 = null;
-								WeaponEffectLibrary1 = null;
-								WeaponLibrary2 = null;
-							}
-						}
+                            else {
+                                WeaponLibrary1 = null;
+                                WeaponEffectLibrary1 = null;
+                                WeaponLibrary2 = null;
+                            }
+                        }
                         #endregion
 
                         #region WingEffects
-                        if (WingEffect > 0 && WingEffect < 100)
-                        {
+                        if (WingEffect is > 0 and < 100) {
                             if (altAnim)
-                                WingLibrary = (WingEffect - 1) < Libraries.ARHumEffect.Length ? Libraries.ARHumEffect[WingEffect - 1] : null;
+                                WingLibrary = WingEffect - 1 < Libraries.ARHumEffect.Length ? Libraries.ARHumEffect[WingEffect - 1] : null;
                             else
-                                WingLibrary = (WingEffect - 1) < Libraries.CHumEffect.Length ? Libraries.CHumEffect[WingEffect - 1] : null;
+                                WingLibrary = WingEffect - 1 < Libraries.CHumEffect.Length ? Libraries.CHumEffect[WingEffect - 1] : null;
                         }
                         #endregion
 
@@ -457,74 +400,51 @@ namespace Client.MirObjects
                     case MirClass.Assassin:
 
                         #region WeaponType
-                        if (HasClassWeapon || Weapon < 0)
-                        {
-                            switch (CurrentAction)
-                            {
-                                case MirAction.Standing:
-                                case MirAction.Stance:
-                                case MirAction.Walking:
-                                case MirAction.Running:
-                                case MirAction.Die:
-                                case MirAction.Struck:
-                                case MirAction.Attack1:
-                                case MirAction.Attack2:
-                                case MirAction.Attack3:
-                                case MirAction.Attack4:
-                                case MirAction.Sneek:
-                                case MirAction.Spell:
-                                case MirAction.DashAttack:
-                                    altAnim = true;
-                                    break;
-                            }
+                        if (HasClassWeapon || Weapon < 0) {
+                            if (CurrentAction is MirAction.Standing or MirAction.Stance or MirAction.Walking or MirAction.Running or MirAction.Die or MirAction.Struck or MirAction.Attack1
+                                or MirAction.Attack2 or MirAction.Attack3 or MirAction.Attack4 or MirAction.Sneek or MirAction.Spell or MirAction.DashAttack)
+                                altAnim = true;
                         }
                         #endregion
 
                         #region Armours
-                        if (altAnim)
-                        {
+                        if (altAnim) {
                             BodyLibrary = Armour < Libraries.AArmours.Length ? Libraries.AArmours[Armour] : Libraries.AArmours[0];
                             HairLibrary = Hair < Libraries.AHair.Length ? Libraries.AHair[Hair] : null;
                         }
-                        else
-                        {
+                        else {
                             BodyLibrary = Armour < Libraries.CArmours.Length ? Libraries.CArmours[Armour] : Libraries.CArmours[0];
                             HairLibrary = Hair < Libraries.CHair.Length ? Libraries.CHair[Hair] : null;
                         }
                         #endregion
 
                         #region Weapons
-                        if (HasClassWeapon)
-                        {
+                        if (HasClassWeapon) {
                             int Index = Weapon - 100;
 
                             WeaponLibrary1 = Index < Libraries.AWeaponsL.Length ? Libraries.AWeaponsR[Index] : null;
                             WeaponLibrary2 = Index < Libraries.AWeaponsR.Length ? Libraries.AWeaponsL[Index] : null;
                         }
-                        else
-                        {
-							if (Weapon >= 0)
-							{
-								WeaponLibrary1 = Weapon < Libraries.CWeapons.Length ? Libraries.CWeapons[Weapon] : null;
-								if (WeaponEffect > 0)
-									WeaponEffectLibrary1 = WeaponEffect < Libraries.CWeaponEffect.Length ? Libraries.CWeaponEffect[WeaponEffect] : null;
-								else
-									WeaponEffectLibrary1 = null;
+                        else {
+                            if (Weapon >= 0) {
+                                WeaponLibrary1 = Weapon < Libraries.CWeapons.Length ? Libraries.CWeapons[Weapon] : null;
+                                if (WeaponEffect > 0)
+                                    WeaponEffectLibrary1 = WeaponEffect < Libraries.CWeaponEffect.Length ? Libraries.CWeaponEffect[WeaponEffect] : null;
+                                else
+                                    WeaponEffectLibrary1 = null;
 
                                 WeaponLibrary2 = null;
                             }
-							else
-							{
-								WeaponLibrary1 = null;
-								WeaponEffectLibrary1 = null;
-								WeaponLibrary2 = null;
-							}
-						}
+                            else {
+                                WeaponLibrary1 = null;
+                                WeaponEffectLibrary1 = null;
+                                WeaponLibrary2 = null;
+                            }
+                        }
                         #endregion
 
                         #region WingEffects
-                        if (WingEffect > 0 && WingEffect < 100)
-                        {
+                        if (WingEffect is > 0 and < 100) {
                             if (altAnim)
                                 WingLibrary = (WingEffect - 1) < Libraries.AHumEffect.Length ? Libraries.AHumEffect[WingEffect - 1] : null;
                             else
@@ -552,30 +472,27 @@ namespace Client.MirObjects
                         #region Armours
                         BodyLibrary = Armour < Libraries.CArmours.Length ? Libraries.CArmours[Armour] : Libraries.CArmours[0];
                         HairLibrary = Hair < Libraries.CHair.Length ? Libraries.CHair[Hair] : null;
-						#endregion
+                        #endregion
 
-						#region Weapons
+                        #region Weapons
 
-						if (Weapon >= 0)
-						{
-							WeaponLibrary1 = Weapon < Libraries.CWeapons.Length ? Libraries.CWeapons[Weapon] : null;
-							if (WeaponEffect > 0)
-								WeaponEffectLibrary1 = WeaponEffect < Libraries.CWeaponEffect.Length ? Libraries.CWeaponEffect[WeaponEffect] : null;
-							else
-								WeaponEffectLibrary1 = null;
-						}
-						else
-						{
-							WeaponLibrary1 = null;
-							WeaponEffectLibrary1 = null;
-							WeaponLibrary2 = null;
-						}
+                        if (Weapon >= 0) {
+                            WeaponLibrary1 = Weapon < Libraries.CWeapons.Length ? Libraries.CWeapons[Weapon] : null;
+                            if (WeaponEffect > 0)
+                                WeaponEffectLibrary1 = WeaponEffect < Libraries.CWeaponEffect.Length ? Libraries.CWeaponEffect[WeaponEffect] : null;
+                            else
+                                WeaponEffectLibrary1 = null;
+                        }
+                        else {
+                            WeaponLibrary1 = null;
+                            WeaponEffectLibrary1 = null;
+                            WeaponLibrary2 = null;
+                        }
 
-						#endregion
+                        #endregion
 
-						#region WingEffects
-						if (WingEffect > 0 && WingEffect < 100)
-                        {
+                        #region WingEffects
+                        if (WingEffect is > 0 and < 100) {
                             WingLibrary = (WingEffect - 1) < Libraries.CHumEffect.Length ? Libraries.CHumEffect[WingEffect - 1] : null;
                         }
                         #endregion
@@ -595,26 +512,21 @@ namespace Client.MirObjects
 
             #region Common
             //Harvest
-            if (CurrentAction == MirAction.Harvest && TransformType < 0)
-            {
+            if (CurrentAction == MirAction.Harvest && TransformType < 0) {
                 WeaponLibrary1 = 1 < Libraries.CWeapons.Length ? Libraries.CWeapons[1] : null;
             }
 
             //Mounts
-            if (MountType > -1 && RidingMount && showMount)
-            {
+            if (MountType > -1 && RidingMount && showMount) {
                 MountLibrary = MountType < Libraries.Mounts.Length ? Libraries.Mounts[MountType] : null;
             }
-            else
-            {
+            else {
                 MountLibrary = null;
             }
 
             //Fishing
-            if (HasFishingRod && showFishing)
-            {
-                if (CurrentAction == MirAction.FishingCast || CurrentAction == MirAction.FishingWait || CurrentAction == MirAction.FishingReel)
-                {
+            if (HasFishingRod && showFishing) {
+                if (CurrentAction is MirAction.FishingCast or MirAction.FishingWait or MirAction.FishingReel) {
                     WeaponLibrary1 = 0 < Libraries.Fishing.Length ? Libraries.Fishing[Weapon - 49] : null;
                     WeaponLibrary2 = null;
                     WeaponOffSet = -632;
@@ -626,19 +538,16 @@ namespace Client.MirObjects
             #endregion
         }
 
-        public virtual void SetEffects()
-        {
-            for (int i = Effects.Count - 1; i >= 0; i--)
-            {
-                if (Effects[i] is SpecialEffect) Effects[i].Remove();
+        
+        public virtual void SetEffects() {
+            for (int i = Effects.Count - 1; i >= 0; i--) {
+                if (Effects[i] is SpecialEffect effect) effect.Remove();
             }
 
             if (RidingMount) return;
 
-            if (CurrentEffect == SpellEffect.MagicShieldUp)
-            {
-                if (ShieldEffect != null)
-                {
+            if (CurrentEffect == SpellEffect.MagicShieldUp) {
+                if (ShieldEffect != null) {
                     ShieldEffect.Clear();
                     ShieldEffect.Remove();
                 }
@@ -647,102 +556,83 @@ namespace Client.MirObjects
                 Effects.Add(ShieldEffect = new Effect(Libraries.Magic, 3890, 3, 600, this) { Repeat = true });
             }
 
-            if (WingEffect >= 100)
-            {
-                switch(WingEffect)
-                {
+            if (WingEffect >= 100) {
+                switch(WingEffect) {
                     case 100: //Oma King Robe effect
                         Effects.Add(new SpecialEffect(Libraries.Effect, 352, 33, 3600, this, true, false, 0) { Repeat = true });
                         break;
-						case 101://Black Dragon Armour  Fire effect
-                        Effects.Add(new SpecialEffect(Libraries.CHumEffect[4], 0, 10, 1500, this, true, false, 0u)
-                       {
-                        Repeat = true
+                    case 101://Black Dragon Armour  Fire effect
+                        Effects.Add(new SpecialEffect(Libraries.CHumEffect[4], 0, 10, 1500, this, true, false, 0u) {
+                            Repeat = true
                         });
-                      break;
+                        break;
                 }
             }
 
-			long delay = 5000;
+            const long delay = 5000;
 
             if (LevelEffects == LevelEffects.None) return;
 
             //Effects dependant on flags
-            if (LevelEffects.HasFlag(LevelEffects.BlueDragon))
-            {
+            if (LevelEffects.HasFlag(LevelEffects.BlueDragon)) {
                 Effects.Add(new SpecialEffect(Libraries.Effect, 1210, 20, 3200, this, true, true, 1) { Repeat = true });
                 SpecialEffect effect = new SpecialEffect(Libraries.Effect, 1240, 32, 4200, this, true, false, 1) { Repeat = true };
                 effect.SetStart(CMain.Time);
                 Effects.Add(effect);
             }
 
-            if (LevelEffects.HasFlag(LevelEffects.RedDragon))
-            {
+            if (LevelEffects.HasFlag(LevelEffects.RedDragon)) {
                 Effects.Add(new SpecialEffect(Libraries.Effect, 990, 20, 3200, this, true, true, 1) { Repeat = true });
                 SpecialEffect effect = new SpecialEffect(Libraries.Effect, 1020, 32, 4200, this, true, false, 1) { Repeat = true, Delay = delay };
                 effect.SetStart(CMain.Time + delay);
                 Effects.Add(effect);
             }
 
-            if (LevelEffects.HasFlag(LevelEffects.Mist))
-            {
+            if (LevelEffects.HasFlag(LevelEffects.Mist)) {
                 Effects.Add(new SpecialEffect(Libraries.Effect, 296, 32, 3600, this, true, false, 1) { Repeat = true });
             }
 
-            if (LevelEffects.HasFlag(LevelEffects.Rebirth1))
-            {
+            if (LevelEffects.HasFlag(LevelEffects.Rebirth1)) {
                 Effects.Add(new SpecialEffect(Libraries.Magic3, 6800, 20, 3600, this, true, false, 1) { Repeat = true });
-
-
             }
 
-            if (LevelEffects.HasFlag(LevelEffects.Rebirth2))
-            {
+            if (LevelEffects.HasFlag(LevelEffects.Rebirth2)) {
                 Effects.Add(new SpecialEffect(Libraries.Magic3, 6870, 19, 3600, this, true, true, 1) { Repeat = true });
                 SpecialEffect effect = new SpecialEffect(Libraries.Magic3, 6840, 22, 3600, this, true, false, 1) { Repeat = true, Delay = delay };
                 effect.SetStart(CMain.Time + delay);
                 Effects.Add(effect);
             }
 
-            if (LevelEffects.HasFlag(LevelEffects.Rebirth3))
-            {
+            if (LevelEffects.HasFlag(LevelEffects.Rebirth3)) {
                 Effects.Add(new SpecialEffect(Libraries.Magic3, 6906, 19, 3600, this, true, false, 1) { Repeat = true, Delay = delay });
                 SpecialEffect effect = new SpecialEffect(Libraries.Magic3, 6930, 29, 3600, this, true, true, 1) { Repeat = true };
-
                 Effects.Add(effect);
             }
 
-            if (LevelEffects.HasFlag(LevelEffects.NewBlue))
-            {
+            if (LevelEffects.HasFlag(LevelEffects.NewBlue)) {
                 Effects.Add(new SpecialEffect(Libraries.Magic3, 7040, 31, 3600, this, true, false, 1) { Repeat = true, Delay = delay });
                 SpecialEffect effect = new SpecialEffect(Libraries.Magic3,7080, 24, 3600, this, true, true, 1) { Repeat = true };
-
                 Effects.Add(effect);
             }
 
-            if (LevelEffects.HasFlag(LevelEffects.YellowDragon))
-            {
+            if (LevelEffects.HasFlag(LevelEffects.YellowDragon)) {
                 Effects.Add(new SpecialEffect(Libraries.Magic3, 7120, 31, 3600, this, true, false, 1) { Repeat = true, Delay = delay });
                 SpecialEffect effect = new SpecialEffect(Libraries.Magic3, 7160, 24, 3600, this, true, true, 1) { Repeat = true };
-
                 Effects.Add(effect);
             }
 
-            if (LevelEffects.HasFlag(LevelEffects.Phoenix))
-            {
+            if (LevelEffects.HasFlag(LevelEffects.Phoenix)) {
                 Effects.Add(new SpecialEffect(Libraries.Magic3, 6970, 26, 3600, this, true, false, 1) { Repeat = true, Delay = delay });
                 SpecialEffect effect = new SpecialEffect(Libraries.Magic3, 7000, 21, 3600, this, true, true, 1) { Repeat = true };
-
                 Effects.Add(effect);
             }
         }
 
-        public override void Process()
-        {
+        
+        public override void Process() {
             bool update = CMain.Time >= NextMotion || GameScene.CanMove;
 
-            if (this == User)
-            {
+            if (this == User) {
                 if (CMain.Time - GameScene.LastRunTime > 899)
                     GameScene.CanRun = false;
             }
@@ -751,21 +641,18 @@ namespace Client.MirObjects
 
             ProcessFrames();
 
-            if (Frame == null)
-            {
+            if (Frame == null) {
                 DrawFrame = 0;
                 DrawWingFrame = 0;
             }
-            else
-            {
+            else {
                 DrawFrame = Frame.Start + (Frame.OffSet * (byte)Direction) + FrameIndex;
                 DrawWingFrame = Frame.EffectStart + (Frame.EffectOffSet * (byte)Direction) + EffectFrameIndex;
             }
 
             #region Moving OffSet
 
-            switch (CurrentAction)
-            {
+            switch (CurrentAction) {
                 case MirAction.Walking:
                 case MirAction.Running:
                 case MirAction.MountWalking:
@@ -776,60 +663,41 @@ namespace Client.MirObjects
                 case MirAction.Sneek:
                 case MirAction.Jump:
                 case MirAction.DashAttack:
-                    if (Frame == null)
-                    {
+                    if (Frame == null) {
                         OffSetMove = Point.Empty;
                         Movement = CurrentLocation;
                         break;
                     }
 
-                    var i = 0;
-                    if (CurrentAction == MirAction.MountRunning) i = 3;
-                    else if (CurrentAction == MirAction.Running) 
-                        i = (Sprint && !Sneaking ? 3 : 2);
-                    else i = 1;
-
-                    if (CurrentAction == MirAction.Jump) i = -JumpDistance;
-                    if (CurrentAction == MirAction.DashAttack) i = JumpDistance;
+                    int i = CurrentAction switch {
+                        MirAction.MountRunning => 3,
+                        MirAction.Running => (Sprint && !Sneaking ? 3 : 2),
+                        MirAction.Jump => -JumpDistance,
+                        MirAction.DashAttack => JumpDistance,
+                        _ => 1
+                    };
 
                     Movement = Functions.PointMove(CurrentLocation, Direction, CurrentAction == MirAction.Pushed ? 0 : -i);
 
                     int count = Frame.Count;
                     int index = FrameIndex;
 
-                    if (CurrentAction == MirAction.DashR || CurrentAction == MirAction.DashL)
-                    {
+                    if (CurrentAction is MirAction.DashR or MirAction.DashL) {
                         count = 3;
                         index %= 3;
                     }
 
-                    switch (Direction)
-                    {
-                        case MirDirection.Up:
-                            OffSetMove = new Point(0, (int)((MapControl.CellHeight * i / (float)(count)) * (index + 1)));
-                            break;
-                        case MirDirection.UpRight:
-                            OffSetMove = new Point((int)((-MapControl.CellWidth * i / (float)(count)) * (index + 1)), (int)((MapControl.CellHeight * i / (float)(count)) * (index + 1)));
-                            break;
-                        case MirDirection.Right:
-                            OffSetMove = new Point((int)((-MapControl.CellWidth * i / (float)(count)) * (index + 1)), 0);
-                            break;
-                        case MirDirection.DownRight:
-                            OffSetMove = new Point((int)((-MapControl.CellWidth * i / (float)(count)) * (index + 1)), (int)((-MapControl.CellHeight * i / (float)(count)) * (index + 1)));
-                            break;
-                        case MirDirection.Down:
-                            OffSetMove = new Point(0, (int)((-MapControl.CellHeight * i / (float)(count)) * (index + 1)));
-                            break;
-                        case MirDirection.DownLeft:
-                            OffSetMove = new Point((int)((MapControl.CellWidth * i / (float)(count)) * (index + 1)), (int)((-MapControl.CellHeight * i / (float)(count)) * (index + 1)));
-                            break;
-                        case MirDirection.Left:
-                            OffSetMove = new Point((int)((MapControl.CellWidth * i / (float)(count)) * (index + 1)), 0);
-                            break;
-                        case MirDirection.UpLeft:
-                            OffSetMove = new Point((int)((MapControl.CellWidth * i / (float)(count)) * (index + 1)), (int)((MapControl.CellHeight * i / (float)(count)) * (index + 1)));
-                            break;
-                    }
+                    OffSetMove = Direction switch {
+                        MirDirection.Up => new Point(0, (int)((MapControl.CellHeight * i / (float)(count)) * (index + 1))),
+                        MirDirection.UpRight => new Point((int)((-MapControl.CellWidth * i / (float)(count)) * (index + 1)), (int)((MapControl.CellHeight * i / (float)(count)) * (index + 1))),
+                        MirDirection.Right => new Point((int)((-MapControl.CellWidth * i / (float)(count)) * (index + 1)), 0),
+                        MirDirection.DownRight => new Point((int)((-MapControl.CellWidth * i / (float)(count)) * (index + 1)), (int)((-MapControl.CellHeight * i / (float)(count)) * (index + 1))),
+                        MirDirection.Down => new Point(0, (int)((-MapControl.CellHeight * i / (float)(count)) * (index + 1))),
+                        MirDirection.DownLeft => new Point((int)((MapControl.CellWidth * i / (float)(count)) * (index + 1)), (int)((-MapControl.CellHeight * i / (float)(count)) * (index + 1))),
+                        MirDirection.Left => new Point((int)((MapControl.CellWidth * i / (float)(count)) * (index + 1)), 0),
+                        MirDirection.UpLeft => new Point((int)((MapControl.CellWidth * i / (float)(count)) * (index + 1)), (int)((MapControl.CellHeight * i / (float)(count)) * (index + 1))),
+                        _ => OffSetMove
+                    };
 
                     OffSetMove = new Point(OffSetMove.X % 2 + OffSetMove.X, OffSetMove.Y % 2 + OffSetMove.Y);
                     break;
@@ -847,23 +715,20 @@ namespace Client.MirObjects
             DrawLocation = new Point((Movement.X - User.Movement.X + MapControl.OffSetX) * MapControl.CellWidth, (Movement.Y - User.Movement.Y + MapControl.OffSetY) * MapControl.CellHeight);
             DrawLocation.Offset(GlobalDisplayLocationOffset);
 
-            if (this != User)
-            {
+            if (this != User) {
                 DrawLocation.Offset(User.OffSetMove);
                 DrawLocation.Offset(-OffSetMove.X, -OffSetMove.Y);
             }
 
-            if (BodyLibrary != null && update)
-            {
+            if (BodyLibrary != null && update) {
                 FinalDrawLocation = DrawLocation.Add(BodyLibrary.GetOffSet(DrawFrame));
                 DisplayRectangle = new Rectangle(DrawLocation, BodyLibrary.GetTrueSize(DrawFrame));
             }
 
-            for (int i = 0; i < Effects.Count; i++)
-                Effects[i].Process();
+            foreach (Effect effect in Effects)
+                effect.Process();
 
-            Color newColour = Poison switch
-            {
+            Color newColour = Poison switch {
                 _ when (Poison & PoisonType.DelayedExplosion) == PoisonType.DelayedExplosion => Color.Orange,
                 _ when (Poison & (PoisonType.Paralysis | PoisonType.LRParalysis)) != 0 => Color.Gray,
                 _ when (Poison & PoisonType.Frozen) == PoisonType.Frozen => Color.Blue,
@@ -876,66 +741,39 @@ namespace Client.MirObjects
                 _ => Color.White
             };
 
-            if (newColour != DrawColour)
-            {
+            if (newColour != DrawColour) {
                 DrawColour = newColour;
                 GameScene.Scene.MapControl.TextureValid = false;
             }
         }
-        public virtual void SetAction()
-        {
-            if (NextAction != null && !GameScene.CanMove)
-            {
-                switch (NextAction.Action)
-                {
-                    case MirAction.Walking:
-                    case MirAction.Running:
-                    case MirAction.MountWalking:
-                    case MirAction.MountRunning:
-                    case MirAction.Pushed:
-                    case MirAction.DashL:
-                    case MirAction.DashR:
-                    case MirAction.Sneek:
-                    case MirAction.Jump:
-                    case MirAction.DashAttack:
-                        return;
-                }
+        
+        
+        public virtual void SetAction() {
+            if (NextAction != null && !GameScene.CanMove) {
+                if (NextAction.Action is MirAction.Walking or MirAction.Running or MirAction.MountWalking or MirAction.MountRunning or MirAction.Pushed or MirAction.DashL or MirAction.DashR
+                    or MirAction.Sneek or MirAction.Jump or MirAction.DashAttack)
+                    return;
             }
 
             if (User == this && CMain.Time < MapControl.NextAction)
                 return;
 
-
-            if (ActionFeed.Count == 0)
-            {
+            if (ActionFeed.Count == 0) {
                 CurrentAction = MirAction.Standing;
-
                 CurrentAction = CMain.Time > BlizzardStopTime ? CurrentAction : MirAction.Stance2;
 
-                if (RidingMount)
-                {
-                    switch (CurrentAction)
-                    {
-                        case MirAction.Standing:
-                            CurrentAction = MirAction.MountStanding;
-                            break;
-                        case MirAction.Walking:
-                            CurrentAction = MirAction.MountWalking;
-                            break;
-                        case MirAction.Running:
-                            CurrentAction = MirAction.MountRunning;
-                            break;
-                        case MirAction.Struck:
-                            CurrentAction = MirAction.MountStruck;
-                            break;
-                        case MirAction.Attack1:
-                            CurrentAction = MirAction.MountAttack;
-                            break;
-                    }
+                if (RidingMount) {
+                    CurrentAction = CurrentAction switch {
+                        MirAction.Standing => MirAction.MountStanding,
+                        MirAction.Walking => MirAction.MountWalking,
+                        MirAction.Running => MirAction.MountRunning,
+                        MirAction.Struck => MirAction.MountStruck,
+                        MirAction.Attack1 => MirAction.MountAttack,
+                        _ => CurrentAction
+                    };
                 }
 
-                if (CurrentAction == MirAction.Standing)
-                {
+                if (CurrentAction == MirAction.Standing) {
                     if (Class == MirClass.Archer && HasClassWeapon)
                         CurrentAction = MirAction.Standing;
                     else
@@ -948,8 +786,7 @@ namespace Client.MirObjects
                 FrameIndex = 0;
                 EffectFrameIndex = 0;
 
-                if (MapLocation != CurrentLocation)
-                {
+                if (MapLocation != CurrentLocation) {
                     GameScene.Scene.MapControl.RemoveObject(this);
                     MapLocation = CurrentLocation;
                     GameScene.Scene.MapControl.AddObject(this);
@@ -962,42 +799,29 @@ namespace Client.MirObjects
 
                 SetLibraries();
             }
-            else
-            {
+            else {
                 QueuedAction action = ActionFeed[0];
                 ActionFeed.RemoveAt(0);
 
                 CurrentAction = action.Action;
 
-                if (RidingMount)
-                {
-                    switch (CurrentAction)
-                    {
-                        case MirAction.Standing:
-                            CurrentAction = MirAction.MountStanding;
-                            break;
-                        case MirAction.Walking:
-                            CurrentAction = MirAction.MountWalking;
-                            break;
-                        case MirAction.Running:
-                            CurrentAction = MirAction.MountRunning;
-                            break;
-                        case MirAction.Struck:
-                            CurrentAction = MirAction.MountStruck;
-                            break;
-                        case MirAction.Attack1:
-                            CurrentAction = MirAction.MountAttack;
-                            break;
-                    }
+                if (RidingMount) {
+                    CurrentAction = CurrentAction switch {
+                        MirAction.Standing => MirAction.MountStanding,
+                        MirAction.Walking => MirAction.MountWalking,
+                        MirAction.Running => MirAction.MountRunning,
+                        MirAction.Struck => MirAction.MountStruck,
+                        MirAction.Attack1 => MirAction.MountAttack,
+                        _ => CurrentAction
+                    };
                 }
 
                 CurrentLocation = action.Location;
-                MirDirection olddirection = Direction;
+                MirDirection old_direction = Direction;
                 Direction = action.Direction;
 
                 Point temp;
-                switch (CurrentAction)
-                {
+                switch (CurrentAction) {
                     case MirAction.Walking:
                     case MirAction.Running:
                     case MirAction.MountWalking:
@@ -1006,10 +830,11 @@ namespace Client.MirObjects
                     case MirAction.DashL:
                     case MirAction.DashR:
                     case MirAction.Sneek:
-                        var steps = 0;
-                        if (CurrentAction == MirAction.MountRunning) steps = 3;
-                        else if (CurrentAction == MirAction.Running) steps = (Sprint && !Sneaking ? 3 : 2);
-                        else steps = 1;
+                        var steps = CurrentAction switch {
+                            MirAction.MountRunning => 3,
+                            MirAction.Running => (Sprint && !Sneaking ? 3 : 2),
+                            _ => 1
+                        };
 
                         temp = Functions.PointMove(CurrentLocation, Direction, CurrentAction == MirAction.Pushed ? 0 : -steps);
 
@@ -1023,13 +848,11 @@ namespace Client.MirObjects
                         break;
                 }
 
-                if (MapLocation != temp)
-                {
+                if (MapLocation != temp) {
                     GameScene.Scene.MapControl.RemoveObject(this);
                     MapLocation = temp;
                     GameScene.Scene.MapControl.AddObject(this);
                 }
-
 
                 bool ArcherLayTrap = false;
 
@@ -1086,7 +909,7 @@ namespace Client.MirObjects
                             case Spell.ShoulderDash:
                                 Frames.TryGetValue(MirAction.Running, out Frame);
                                 CurrentAction = MirAction.DashL;
-                                Direction = olddirection;
+                                Direction = old_direction;
                                 CurrentLocation = Functions.PointMove(CurrentLocation, Direction, 1);
                                 if (this == User)
                                 {
@@ -1106,7 +929,7 @@ namespace Client.MirObjects
                                 }
                                 break;
                             case Spell.SlashingBurst:
-                                 Frames.TryGetValue(MirAction.Attack1, out Frame);
+                                Frames.TryGetValue(MirAction.Attack1, out Frame);
                                 if (this == User)
                                 {
                                     MapControl.NextAction = CMain.Time + 2000; // 80%
@@ -1147,29 +970,29 @@ namespace Client.MirObjects
                                 }
                                 break;
                             case Spell.FlashDash:
+                            {
+                                int sLevel = (byte)action.Params[3];
+
+                                GetFlashDashDistance(sLevel);
+
+                                if (JumpDistance != 0)
                                 {
-                                    int sLevel = (byte)action.Params[3];
-
-                                    GetFlashDashDistance(sLevel);
-
-                                    if (JumpDistance != 0)
-                                    {
-                                        Frames.TryGetValue(MirAction.DashAttack, out Frame);
-                                        CurrentAction = MirAction.DashAttack;
-                                        CurrentLocation = Functions.PointMove(CurrentLocation, Direction, JumpDistance);
-                                    }
-                                    else
-                                    {
-                                        Frames.TryGetValue(CMain.Random.Next(100) >= 40 ? MirAction.Attack1 : MirAction.Attack4, out Frame);
-                                    }
-
-                                    if (this == User)
-                                    {
-                                        MapControl.NextAction = CMain.Time;
-                                        GameScene.SpellTime = CMain.Time + 250; //Spell Delay
-                                        if (JumpDistance != 0) Network.Enqueue(new C.Magic { Spell = Spell, Direction = Direction });
-                                    }
+                                    Frames.TryGetValue(MirAction.DashAttack, out Frame);
+                                    CurrentAction = MirAction.DashAttack;
+                                    CurrentLocation = Functions.PointMove(CurrentLocation, Direction, JumpDistance);
                                 }
+                                else
+                                {
+                                    Frames.TryGetValue(CMain.Random.Next(100) >= 40 ? MirAction.Attack1 : MirAction.Attack4, out Frame);
+                                }
+
+                                if (this == User)
+                                {
+                                    MapControl.NextAction = CMain.Time;
+                                    GameScene.SpellTime = CMain.Time + 250; //Spell Delay
+                                    if (JumpDistance != 0) Network.Enqueue(new C.Magic { Spell = Spell, Direction = Direction });
+                                }
+                            }
                                 break;
                             case Spell.StraightShot:
                                 Frames.TryGetValue(MirAction.AttackRange2, out Frame);
@@ -1212,20 +1035,20 @@ namespace Client.MirObjects
                                 }
                                 break;
                             case Spell.BackStep:
+                            {
+                                int sLevel = (byte)action.Params[3];
+                                GetBackStepDistance(sLevel);
+                                Frames.TryGetValue(MirAction.Jump, out Frame);
+                                CurrentAction = MirAction.Jump;
+                                CurrentLocation = Functions.PointMove(CurrentLocation, Functions.ReverseDirection(Direction), JumpDistance);
+                                if (this == User)
                                 {
-                                    int sLevel = (byte)action.Params[3];
-                                    GetBackStepDistance(sLevel);
-                                    Frames.TryGetValue(MirAction.Jump, out Frame);
-                                    CurrentAction = MirAction.Jump;
-                                    CurrentLocation = Functions.PointMove(CurrentLocation, Functions.ReverseDirection(Direction), JumpDistance);
-                                    if (this == User)
-                                    {
-                                        MapControl.NextAction = CMain.Time + 800;
-                                        GameScene.SpellTime = CMain.Time + 2500; //Spell Delay
-                                        Network.Enqueue(new C.Magic { ObjectID = GameScene.User.ObjectID, Spell = Spell, Direction = Direction });
-                                    }
-                                    break;
+                                    MapControl.NextAction = CMain.Time + 800;
+                                    GameScene.SpellTime = CMain.Time + 2500; //Spell Delay
+                                    Network.Enqueue(new C.Magic { ObjectID = GameScene.User.ObjectID, Spell = Spell, Direction = Direction });
                                 }
+                                break;
+                            }
                             case Spell.ElementalShot:
                                 if (HasElements && !ElementCasted)
                                 {
@@ -1270,22 +1093,16 @@ namespace Client.MirObjects
                 }
 
                 //ArcherTest - Need to check for bow weapon only
-                if (Class == MirClass.Archer && HasClassWeapon)
-                {
-                    switch (CurrentAction)
-                    {
-                        case MirAction.Walking:
-                            Frames.TryGetValue(MirAction.WalkingBow, out Frame);
-                            break;
-                        case MirAction.Running:
-                            Frames.TryGetValue(MirAction.RunningBow, out Frame);
-                            break;
-                    }
+                if (Class == MirClass.Archer && HasClassWeapon) {
+                    Frame = CurrentAction switch {
+                        MirAction.Walking => Frames.GetValueOrDefault(MirAction.WalkingBow),
+                        MirAction.Running => Frames.GetValueOrDefault(MirAction.RunningBow),
+                        _ => Frame
+                    };
                 }
 
                 //Assassin sneekyness
-                if (Class == MirClass.Assassin && Sneaking && (CurrentAction == MirAction.Walking || CurrentAction == MirAction.Running))
-                {
+                if (Class == MirClass.Assassin && Sneaking && CurrentAction is MirAction.Walking or MirAction.Running) {
                     Frames.TryGetValue(MirAction.Sneek, out Frame);
                 }
 
@@ -1297,17 +1114,13 @@ namespace Client.MirObjects
                 SpellLevel = 0;
                 //NextMagic = null;
 
-                ClientMagic magic;
-
                 if (Frame == null) return;
 
                 FrameInterval = Frame.Interval;
                 EffectFrameInterval = Frame.EffectInterval;
 
-                if (this == User)
-                {
-                    switch (CurrentAction)
-                    {
+                if (this == User) {
+                    switch (CurrentAction) {
                         case MirAction.DashFail:
                             //CanSetAction = false;
                             break;
@@ -1357,36 +1170,31 @@ namespace Client.MirObjects
                         case MirAction.Attack1:
                         case MirAction.MountAttack:
 
-                            if (!RidingMount)
-                            {
+                            ClientMagic? magic;
+                            if (!RidingMount) {
                                 if (GameScene.User.Slaying && TargetObject != null)
                                     Spell = Spell.Slaying;
 
                                 if (GameScene.User.Thrusting && GameScene.Scene.MapControl.HasTarget(Functions.PointMove(CurrentLocation, Direction, 2)))
                                     Spell = Spell.Thrusting;
 
-                                if (GameScene.User.HalfMoon)
-                                {
-                                    if (TargetObject != null || GameScene.Scene.MapControl.CanHalfMoon(CurrentLocation, Direction))
-                                    {
+                                if (GameScene.User.HalfMoon) {
+                                    if (TargetObject != null || GameScene.Scene.MapControl.CanHalfMoon(CurrentLocation, Direction)) {
                                         magic = User.GetMagic(Spell.HalfMoon);
                                         if (magic != null && magic.BaseCost + magic.LevelCost * magic.Level <= User.MP)
                                             Spell = Spell.HalfMoon;
                                     }
                                 }
 
-                                if (GameScene.User.CrossHalfMoon)
-                                {
-                                    if (TargetObject != null || GameScene.Scene.MapControl.CanCrossHalfMoon(CurrentLocation))
-                                    {
+                                if (GameScene.User.CrossHalfMoon) {
+                                    if (TargetObject != null || GameScene.Scene.MapControl.CanCrossHalfMoon(CurrentLocation)) {
                                         magic = User.GetMagic(Spell.CrossHalfMoon);
                                         if (magic != null && magic.BaseCost + magic.LevelCost * magic.Level <= User.MP)
                                             Spell = Spell.CrossHalfMoon;
                                     }
                                 }
 
-                                if (GameScene.User.DoubleSlash)
-                                {
+                                if (GameScene.User.DoubleSlash) {
                                     magic = User.GetMagic(Spell.DoubleSlash);
                                     if (magic != null && magic.BaseCost + magic.LevelCost * magic.Level <= User.MP)
                                         Spell = Spell.DoubleSlash;
@@ -1416,12 +1224,17 @@ namespace Client.MirObjects
 
                             Network.Enqueue(new C.Attack { Direction = Direction, Spell = Spell });
 
-                            if (Spell == Spell.Slaying)
-                                GameScene.User.Slaying = false;
-                            if (Spell == Spell.TwinDrakeBlade)
-                                GameScene.User.TwinDrakeBlade = false;
-                            if (Spell == Spell.FlamingSword)
-                                GameScene.User.FlamingSword = false;
+                            switch (Spell) {
+                                case Spell.Slaying:
+                                    GameScene.User.Slaying = false;
+                                    break;
+                                case Spell.TwinDrakeBlade:
+                                    GameScene.User.TwinDrakeBlade = false;
+                                    break;
+                                case Spell.FlamingSword:
+                                    GameScene.User.FlamingSword = false;
+                                    break;
+                            }
 
                             magic = User.GetMagic(Spell);
 
@@ -1442,35 +1255,35 @@ namespace Client.MirObjects
                         //    break;
 
                         case MirAction.AttackRange1:
-                            {
-                                GameScene.AttackTime = CMain.Time + User.AttackSpeed + 200;
+                        {
+                            GameScene.AttackTime = CMain.Time + User.AttackSpeed + 200;
 
-                                uint targetID = (uint)action.Params[0];
-                                Point location = (Point)action.Params[1];
+                            uint targetID = (uint)action.Params[0];
+                            Point location = (Point)action.Params[1];
 
-                                Network.Enqueue(new C.RangeAttack { Direction = Direction, Location = CurrentLocation, TargetID = targetID, TargetLocation = location });
-                            }
+                            Network.Enqueue(new C.RangeAttack { Direction = Direction, Location = CurrentLocation, TargetID = targetID, TargetLocation = location });
+                        }
                             break;
                         case MirAction.AttackRange2:
                         case MirAction.Spell:
+                        {
+                            Spell = (Spell)action.Params[0];
+                            uint targetID = (uint)action.Params[1];
+                            Point location = (Point)action.Params[2];
+
+                            Network.Enqueue(new C.Magic { ObjectID = GameScene.User.ObjectID, Spell = Spell, Direction = Direction, TargetID = targetID, Location = location });
+
+                            if (Spell == Spell.FlashDash)
                             {
-                                Spell = (Spell)action.Params[0];
-                                uint targetID = (uint)action.Params[1];
-                                Point location = (Point)action.Params[2];
-
-                                Network.Enqueue(new C.Magic { ObjectID = GameScene.User.ObjectID, Spell = Spell, Direction = Direction, TargetID = targetID, Location = location });
-
-                                if (Spell == Spell.FlashDash)
-                                {
-                                    GameScene.SpellTime = CMain.Time + 250;
-                                    MapControl.NextAction = CMain.Time;
-                                }
-                                else
-                                {
-                                    GameScene.SpellTime = Spell == Spell.FlameField ? CMain.Time + 2500 : CMain.Time + 1800;
-                                    MapControl.NextAction = CMain.Time + 2500;
-                                }
+                                GameScene.SpellTime = CMain.Time + 250;
+                                MapControl.NextAction = CMain.Time;
                             }
+                            else
+                            {
+                                GameScene.SpellTime = Spell == Spell.FlameField ? CMain.Time + 2500 : CMain.Time + 1800;
+                                MapControl.NextAction = CMain.Time + 2500;
+                            }
+                        }
                             break;                         
                         case MirAction.Harvest:
                             if (ArcherLayTrap)
@@ -1603,7 +1416,7 @@ namespace Client.MirObjects
                         uint attackerID = (uint)action.Params[0];
                         StruckWeapon = -2;
 
-                        if (MapControl.Objects.TryGetValue(attackerID, out MapObject ob))
+                        if (MapControl.Objects.TryGetValue(attackerID, out MapObject? ob))
                             if (ob.Race == ObjectType.Player)
                             {
                                 PlayerObject player = (PlayerObject)ob;
@@ -2329,7 +2142,7 @@ namespace Client.MirObjects
 
                     UpdateWingEffect();
                     break;
-                 case MirAction.Jump:
+                case MirAction.Jump:
                     if (!GameScene.CanMove) return;
                     GameScene.Scene.MapControl.TextureValid = false;
                     if (this == User) GameScene.Scene.MapControl.FloorValid = false;
@@ -2707,11 +2520,13 @@ namespace Client.MirObjects
                                 case Spell.VampireShot:
                                 case Spell.PoisonShot:
                                 case Spell.CrippleShot:
-                                    MapObject ob = MapControl.GetObject(TargetID);
+                                    MapObject? ob = MapControl.GetObject(TargetID);
                                     Effect eff;
-                                    int exFrameStart = 0;
-                                    if (Spell == Spell.PoisonShot) exFrameStart = 200;
-                                    if (Spell == Spell.CrippleShot) exFrameStart = 400;
+                                    int exFrameStart = Spell switch {
+                                        Spell.PoisonShot => 200,
+                                        Spell.CrippleShot => 400,
+                                        _ => 0
+                                    };
                                     switch (FrameIndex)
                                     {
                                         case 7:
@@ -3253,9 +3068,9 @@ namespace Client.MirObjects
                                         missile.Explode = true;
 
                                         missile.Complete += (o, e) =>
-                                            {
-                                                SoundManager.PlaySound(20000 + (ushort)Spell * 10);
-                                            };
+                                        {
+                                            SoundManager.PlaySound(20000 + (ushort)Spell * 10);
+                                        };
 
                                         break;
 
@@ -3326,7 +3141,7 @@ namespace Client.MirObjects
 
                                     case Spell.TrapHexagon:
                                         if (ob != null)
-                                        SoundManager.PlaySound(20000 + (ushort)Spell.TrapHexagon * 10 + 1);
+                                            SoundManager.PlaySound(20000 + (ushort)Spell.TrapHexagon * 10 + 1);
                                         break;
 
                                     #endregion
@@ -3608,14 +3423,14 @@ namespace Client.MirObjects
                     (index >= 1550 && index <= 1574))
                     moveSound = SoundList.WalkLawnL;
                 else if ((index >= 250 && index <= 254) || (index >= 1005 && index <= 1009) || (index >= 1050 && index <= 1054) ||
-                    (index >= 1060 && index <= 1064) || (index >= 1450 && index <= 1454) || (index >= 1650 && index <= 1654))
+                         (index >= 1060 && index <= 1064) || (index >= 1450 && index <= 1454) || (index >= 1650 && index <= 1654))
                     moveSound = SoundList.WalkRoughL;
                 else if ((index >= 605 && index <= 609) || (index >= 650 && index <= 654) || (index >= 660 && index <= 664) ||
-                    (index >= 2000 && index <= 2049) || (index >= 3025 && index <= 3049) || (index >= 2400 && index <= 2424) ||
-                    (index >= 4625 && index <= 4649) || (index >= 4675 && index <= 4678))
+                         (index >= 2000 && index <= 2049) || (index >= 3025 && index <= 3049) || (index >= 2400 && index <= 2424) ||
+                         (index >= 4625 && index <= 4649) || (index >= 4675 && index <= 4678))
                     moveSound = SoundList.WalkStoneL;
                 else if ((index >= 1825 && index <= 1924) || (index >= 2150 && index <= 2174) || (index >= 3075 && index <= 3099) ||
-                    (index >= 3325 && index <= 3349) || (index >= 3375 && index <= 3399))
+                         (index >= 3325 && index <= 3349) || (index >= 3375 && index <= 3399))
                     moveSound = SoundList.WalkCaveL;
                 else if (index == 3230 || index == 3231 || index == 3246 || index == 3277 || (index >= 3780 && index <= 3799))
                     moveSound = SoundList.WalkWoodL;
@@ -3671,339 +3486,339 @@ namespace Client.MirObjects
             switch (GameScene.Scene.MapControl.M2CellInfo[x, y].BackIndex)
             {
                 case 100:
-                    {
-                        //Tiles1
-                        if ((index >= 0 && index <= 39) || (index >= 50 && index <= 74) || (index >= 80 && index <= 84) || (index >= 100 && index <= 204) ||
-                            (index >= 210 && index <= 249) || (index >= 255 && index <= 259) || (index >= 265 && index <= 329) || (index >= 350 && index <= 404) ||
-                            (index >= 410 && index <= 449) || (index >= 455 && index <= 459) || (index >= 465 && index <= 504) ||  (index >= 510 && index <= 549) ||
-                            (index >= 555 && index <= 559) || (index >= 565 && index <= 574) || (index >= 581 && index <= 581) || (index >= 586 && index <= 587) ||
-                            (index >= 600 && index <= 604) || (index >= 610 && index <= 614) || (index >= 615 && index <= 649) || (index >= 655 && index <= 659) || 
-                            (index >= 665 && index <= 704) || (index >= 710 && index <= 749) || (index >= 755 && index <= 759) || (index >= 765 && index <= 824) || 
-                            (index >= 850 && index <= 874) || (index >= 900 && index <= 924) || (index >= 950 && index <= 974) || (index >= 1100 && index <= 1124) || 
-                            (index >= 1150 && index <= 1174) || (index >= 1200 && index <= 1204) || (index >= 1210 && index <= 1214) || (index >= 1255 && index <= 1259) || 
-                            (index >= 1300 && index <= 1324) || (index >= 1340 && index <= 1374) || (index >= 1560 && index <= 1604) || (index >= 1610 && index <= 1614) || 
-                            (index >= 1655 && index <= 1659) || (index >= 1665 && index <= 1674) || (index >= 1700 && index <= 1724) || (index >= 1750 && index <= 1774) ||
-                            (index >= 1850 && index <= 1874) || (index >= 2050 && index <= 2074) || (index >= 2100 && index <= 2124) || (index >= 2150 && index <= 2174) ||
-                            (index >= 2200 && index <= 2224) ||(index >= 2250 && index <= 2274) ||(index >= 2300 && index <= 2324) ||(index >= 2350 && index <= 2374) ||
-                            (index >= 2500 && index <= 2524) ||(index >= 2750 && index <= 2774) ||(index >= 3250 && index <= 3274) ||(index >= 3300 && index <= 3349) ||
-                            (index >= 3375 && index <= 3404) ||(index >= 3425 && index <= 3449) ||(index >= 3475 && index <= 3499) ||(index >= 3525 && index <= 3549) ||
-                            (index >= 3575 && index <= 3599) ||(index >= 3625 && index <= 3649) ||(index >= 3675 && index <= 3749) ||(index >= 3775 && index <= 3780) ||
-                            (index >= 4475 && index <= 4624) ||(index >= 4680 && index <= 4824) ||(index >= 6225 && index <= 7924) ||(index >= 11079 && index <= 11079) ||
-                            (index >= 11083 && index <= 11084) ||(index >= 11120 && index <= 11127) ||(index >= 11129 && index <= 11130) ||(index >= 11132 && index <= 11133) ||
-                            (index >= 11135 && index <= 11136) ||(index >= 13770 && index <= 14019) ||(index >= 14170 && index <= 14219) ||(index >= 14820 && index <= 14869) ||
-                            (index >= 20470 && index <= 21619) ||(index >= 25000 && index <= 31724))
-                            moveSound = SoundList.WalkGroundL;
-                        else if ((index >= 205 && index <= 209) ||(index >= 260 && index <= 264) ||(index >= 330 && index <= 349) ||(index >= 405 && index <= 409) ||
-                            (index >= 460 && index <= 464) ||(index >= 505 && index <= 509) ||(index >= 560 && index <= 564) ||(index >= 575 && index <= 580) ||
-                            (index >= 582 && index <= 585) ||(index >= 588 && index <= 599) ||(index >= 705 && index <= 709) ||(index >= 750 && index <= 754) ||
-                            (index >= 760 && index <= 764) ||(index >= 1205 && index <= 1209) ||(index >= 1215 && index <= 1224) ||(index >= 1250 && index <= 1254) ||
-                            (index >= 1260 && index <= 1274) ||(index >= 1400 && index <= 1424) ||(index >= 1455 && index <= 1459) ||(index >= 1500 && index <= 1524) ||
-                            (index >= 1550 && index <= 1574) ||(index >= 2555 && index <= 2559) ||(index >= 2605 && index <= 2609) ||(index >= 2655 && index <= 2659) ||
-                            (index >= 2705 && index <= 2709) ||(index >= 10320 && index <= 10324) ||(index >= 10329 && index <= 10329) ||(index >= 10334 && index <= 10334) ||
-                            (index >= 10372 && index <= 10372) ||(index >= 10381 && index <= 10381) ||(index >= 10420 && index <= 10422) ||(index >= 10425 && index <= 10424) ||
-                            (index >= 10429 && index <= 10429) ||(index >= 10470 && index <= 10470) ||(index >= 10472 && index <= 10472) ||(index >= 10475 && index <= 10475) ||
-                            (index >= 10479 && index <= 10519) ||(index >= 10530 && index <= 10530) ||(index >= 10535 && index <= 10535) ||(index >= 10539 && index <= 10539) ||
-                            (index >= 10623 && index <= 10624) ||(index >= 10628 && index <= 10629) ||(index >= 10634 && index <= 10634) ||(index >= 10639 && index <= 10639) ||
-                            (index >= 10644 && index <= 10669) ||(index >= 10673 && index <= 10677) ||(index >= 10680 && index <= 10681) ||(index >= 10684 && index <= 10685) ||
-                            (index >= 10688 && index <= 10690) ||(index >= 10721 && index <= 10723) ||(index >= 10725 && index <= 10727) ||(index >= 10729 && index <= 10731) ||
-                            (index >= 10733 && index <= 10770) ||(index >= 10772 && index <= 10772) ||(index >= 10775 && index <= 10775) ||(index >= 10779 && index <= 10779) ||
-                            (index >= 10784 && index <= 10784) ||(index >= 10835 && index <= 10836) ||(index >= 10840 && index <= 10869) ||(index >= 10874 && index <= 10874) ||
-                            (index >= 10890 && index <= 10890) ||(index >= 10920 && index <= 10929) ||(index >= 10931 && index <= 10934) ||(index >= 10936 && index <= 10939) ||
-                            (index >= 10941 && index <= 10970) ||(index >= 10974 && index <= 10974) ||(index >= 10977 && index <= 11019) ||(index >= 11021 && index <= 11021) ||
-                            (index >= 11023 && index <= 11027) ||(index >= 11029 && index <= 11033) ||(index >= 11037 && index <= 11038) ||(index >= 11070 && index <= 11071) ||
-                            (index >= 11075 && index <= 11078) ||(index >= 11080 && index <= 11082) ||(index >= 11086 && index <= 11089) ||(index >= 11091 && index <= 11119) ||
-                            (index >= 11128 && index <= 11128) ||(index >= 11131 && index <= 11131) ||(index >= 11134 && index <= 11134) ||(index >= 11137 && index <= 11171) ||
-                            (index >= 11175 && index <= 11177) ||(index >= 11180 && index <= 11182) ||(index >= 11185 && index <= 11219) ||(index >= 11223 && index <= 11224) ||
-                            (index >= 11227 && index <= 11229) ||(index >= 11232 && index <= 11291) ||(index >= 11296 && index <= 11299) ||(index >= 11305 && index <= 11308) ||
-                            (index >= 11314 && index <= 11317) ||(index >= 11322 && index <= 11327) ||(index >= 11332 && index <= 11369))
-                            moveSound = SoundList.WalkLawnL;
-                        else if ((index >= 250 && index <= 254) ||(index >= 450 && index <= 454) ||(index >= 550 && index <= 554) ||(index >= 1000 && index <= 1024) ||
-                            (index >= 1050 && index <= 1074) ||(index >= 1450 && index <= 1454) ||(index >= 1460 && index <= 1464) ||(index >= 1465 && index <= 1474) ||
-                            (index >= 1605 && index <= 1609) ||(index >= 1615 && index <= 1624) ||(index >= 1650 && index <= 1654) ||(index >= 1660 && index <= 1664))
-                            moveSound = SoundList.WalkRoughL;
-                        else if ((index >= 2800 && index <= 2824) ||(index >= 3130 && index <= 3130) ||(index >= 3137 && index <= 3138) ||(index >= 3177 && index <= 3178) ||
-                            (index >= 3189 && index <= 3190) ||(index >= 3230 && index <= 3231) ||(index >= 3240 && index <= 3242) ||(index >= 3246 && index <= 3246) ||
-                            (index >= 3276 && index <= 3278) ||(index >= 3280 && index <= 3299) ||(index >= 5178 && index <= 5179) ||(index >= 5182 && index <= 5185) ||
-                            (index >= 5188 && index <= 5191) ||(index >= 5194 && index <= 5195) ||(index >= 5780 && index <= 6060) ||(index >= 6080 && index <= 6084) ||
-                            (index >= 6145 && index <= 6224) ||(index >= 14020 && index <= 14169) ||(index >= 14220 && index <= 14819))
-                            moveSound = SoundList.WalkWoodL;
-                        else if ((index >= 825 && index <= 849) ||(index >= 875 && index <= 899) ||(index >= 925 && index <= 949) ||(index >= 975 && index <= 999) ||
-                            (index >= 1025 && index <= 1049) ||(index >= 1075 && index <= 1099) ||(index >= 1125 && index <= 1149) ||(index >= 1175 && index <= 1199) ||
-                            (index >= 1225 && index <= 1249) ||(index >= 1275 && index <= 1299) ||(index >= 1325 && index <= 1339) ||(index >= 2025 && index <= 2049) ||
-                            (index >= 2075 && index <= 2099) ||(index >= 2125 && index <= 2149) ||(index >= 2900 && index <= 2924) ||(index >= 3781 && index <= 4474) ||
-                            (index >= 6085 && index <= 6144))
-                            moveSound = SoundList.WalkWoodL;
-                        else if ((index >= 40 && index <= 49) ||(index >= 75 && index <= 79) ||(index >= 85 && index <= 99) ||(index >= 1375 && index <= 1399) ||
-                            (index >= 1425 && index <= 1449) ||(index >= 1475 && index <= 1499) ||(index >= 1525 && index <= 1549) ||(index >= 1575 && index <= 1559) ||
-                            (index >= 1625 && index <= 1649) ||(index >= 1675 && index <= 1699) ||(index >= 1725 && index <= 1749) ||(index >= 1775 && index <= 1799) ||
-                            (index >= 1825 && index <= 1849) ||(index >= 1875 && index <= 2024) ||(index >= 2175 && index <= 2199) ||(index >= 2225 && index <= 2249) ||
-                            (index >= 2275 && index <= 2299) ||(index >= 2325 && index <= 2349) ||(index >= 2375 && index <= 2499) ||(index >= 2525 && index <= 2549) ||
-                            (index >= 2575 && index <= 2599) ||(index >= 2625 && index <= 2649) ||(index >= 2675 && index <= 2699) ||(index >= 2725 && index <= 2749) ||
-                            (index >= 2775 && index <= 2799) ||(index >= 2825 && index <= 2849) ||(index >= 2875 && index <= 2899) ||(index >= 2925 && index <= 2994) ||
-                            (index >= 2995 && index <= 2999) ||(index >= 3025 && index <= 3129) ||(index >= 3131 && index <= 3136) ||(index >= 3139 && index <= 3176) ||
-                            (index >= 3179 && index <= 3188) ||(index >= 3191 && index <= 3229) ||(index >= 3232 && index <= 3239) ||(index >= 3243 && index <= 3245) ||
-                            (index >= 3247 && index <= 3249) ||(index >= 3275 && index <= 3275) ||(index >= 3279 && index <= 3279) ||(index >= 3350 && index <= 3374) ||
-                            (index >= 3450 && index <= 3474) ||(index >= 3500 && index <= 3524) ||(index >= 3550 && index <= 3574) ||(index >= 3600 && index <= 3624) ||
-                            (index >= 3650 && index <= 3674) ||(index >= 3750 && index <= 3774) ||(index >= 4825 && index <= 5177) ||(index >= 5180 && index <= 5181) ||
-                            (index >= 5186 && index <= 5187) ||(index >= 5192 && index <= 5193) ||(index >= 5196 && index <= 5779) ||(index >= 7925 && index <= 10305) ||
-                            (index >= 11370 && index <= 13769) ||(index >= 14870 && index <= 20469) ||(index >= 21620 && index <= 24999))
-                            moveSound = SoundList.WalkCaveL;
-                        else if ((index >= 605 && index <= 609) ||(index >= 650 && index <= 654) ||(index >= 660 && index <= 664) ||(index >= 2550 && index <= 2554) ||
-                            (index >= 2560 && index <= 2564) ||(index >= 2565 && index <= 2574) ||(index >= 2600 && index <= 2604) ||(index >= 2610 && index <= 2624) ||
-                            (index >= 2650 && index <= 2654) ||(index >= 2660 && index <= 2674) ||(index >= 2700 && index <= 2704) ||(index >= 2710 && index <= 2724) ||
-                            (index >= 2850 && index <= 2874) ||(index >= 3405 && index <= 3424) ||(index >= 4625 && index <= 4679) ||(index >= 6075 && index <= 6079) ||
-                            (index >= 10325 && index <= 10328) ||(index >= 10330 && index <= 10333) ||(index >= 10335 && index <= 10371) ||(index >= 10373 && index <= 10380) ||
-                            (index >= 10382 && index <= 10419) ||(index >= 10423 && index <= 10424) ||(index >= 10426 && index <= 10428) ||(index >= 10430 && index <= 10469) ||
-                            (index >= 10471 && index <= 10471) ||(index >= 10473 && index <= 10474) ||(index >= 10476 && index <= 10478) ||(index >= 10520 && index <= 10529) ||
-                            (index >= 10531 && index <= 10534) ||(index >= 10536 && index <= 10538) ||(index >= 10540 && index <= 10622) ||(index >= 10625 && index <= 10627) ||
-                            (index >= 10630 && index <= 10633) ||(index >= 10635 && index <= 10638) ||(index >= 10640 && index <= 10643) ||(index >= 10670 && index <= 10672) ||
-                            (index >= 10771 && index <= 10771) ||(index >= 10773 && index <= 10774) ||(index >= 10776 && index <= 10778) ||(index >= 10780 && index <= 10783) ||
-                            (index >= 10785 && index <= 10834) ||(index >= 10837 && index <= 10839) ||(index >= 10870 && index <= 10873) ||(index >= 10875 && index <= 10889) ||
-                            (index >= 10891 && index <= 10919) ||(index >= 10930 && index <= 10930) ||(index >= 10935 && index <= 10935) ||(index >= 10940 && index <= 10940) ||
-                            (index >= 10971 && index <= 10973) ||(index >= 10975 && index <= 10976) ||(index >= 11020 && index <= 11020) ||(index >= 11022 && index <= 11022) ||
-                            (index >= 11028 && index <= 11028) ||(index >= 11072 && index <= 11074))
-                            moveSound = SoundList.WalkStoneL;
-                        else if ((index >= 1800 && index <= 1824) || (index >= 3000 && index <= 3024) ||(index >= 10678 && index <= 10679) ||
-                            (index >= 10682 && index <= 10683) ||(index >= 10686 && index <= 10687) ||(index >= 10691 && index <= 10720) ||
-                            (index >= 10724 && index <= 10724) ||(index >= 10728 && index <= 10728) ||(index >= 10732 && index <= 10732) ||
-                            (index >= 11034 && index <= 11036) ||(index >= 11039 && index <= 11069) ||(index >= 11085 && index <= 11085) ||
-                            (index >= 11090 && index <= 11090) ||(index >= 11172 && index <= 11174) ||(index >= 11178 && index <= 11179) ||
-                            (index >= 11183 && index <= 11184) ||(index >= 11220 && index <= 11222) ||(index >= 11225 && index <= 11226) ||
-                            (index >= 11230 && index <= 11231) ||(index >= 11292 && index <= 11295) ||(index >= 11300 && index <= 11304) ||
-                            (index >= 11309 && index <= 11313) ||(index >= 11318 && index <= 11321) ||(index >= 11328 && index <= 11331))
-                            moveSound = SoundList.WalkWaterL;
-                        else
-                            moveSound = SoundList.WalkWaterL;
-                    }
+                {
+                    //Tiles1
+                    if ((index >= 0 && index <= 39) || (index >= 50 && index <= 74) || (index >= 80 && index <= 84) || (index >= 100 && index <= 204) ||
+                        (index >= 210 && index <= 249) || (index >= 255 && index <= 259) || (index >= 265 && index <= 329) || (index >= 350 && index <= 404) ||
+                        (index >= 410 && index <= 449) || (index >= 455 && index <= 459) || (index >= 465 && index <= 504) ||  (index >= 510 && index <= 549) ||
+                        (index >= 555 && index <= 559) || (index >= 565 && index <= 574) || (index >= 581 && index <= 581) || (index >= 586 && index <= 587) ||
+                        (index >= 600 && index <= 604) || (index >= 610 && index <= 614) || (index >= 615 && index <= 649) || (index >= 655 && index <= 659) || 
+                        (index >= 665 && index <= 704) || (index >= 710 && index <= 749) || (index >= 755 && index <= 759) || (index >= 765 && index <= 824) || 
+                        (index >= 850 && index <= 874) || (index >= 900 && index <= 924) || (index >= 950 && index <= 974) || (index >= 1100 && index <= 1124) || 
+                        (index >= 1150 && index <= 1174) || (index >= 1200 && index <= 1204) || (index >= 1210 && index <= 1214) || (index >= 1255 && index <= 1259) || 
+                        (index >= 1300 && index <= 1324) || (index >= 1340 && index <= 1374) || (index >= 1560 && index <= 1604) || (index >= 1610 && index <= 1614) || 
+                        (index >= 1655 && index <= 1659) || (index >= 1665 && index <= 1674) || (index >= 1700 && index <= 1724) || (index >= 1750 && index <= 1774) ||
+                        (index >= 1850 && index <= 1874) || (index >= 2050 && index <= 2074) || (index >= 2100 && index <= 2124) || (index >= 2150 && index <= 2174) ||
+                        (index >= 2200 && index <= 2224) ||(index >= 2250 && index <= 2274) ||(index >= 2300 && index <= 2324) ||(index >= 2350 && index <= 2374) ||
+                        (index >= 2500 && index <= 2524) ||(index >= 2750 && index <= 2774) ||(index >= 3250 && index <= 3274) ||(index >= 3300 && index <= 3349) ||
+                        (index >= 3375 && index <= 3404) ||(index >= 3425 && index <= 3449) ||(index >= 3475 && index <= 3499) ||(index >= 3525 && index <= 3549) ||
+                        (index >= 3575 && index <= 3599) ||(index >= 3625 && index <= 3649) ||(index >= 3675 && index <= 3749) ||(index >= 3775 && index <= 3780) ||
+                        (index >= 4475 && index <= 4624) ||(index >= 4680 && index <= 4824) ||(index >= 6225 && index <= 7924) ||(index >= 11079 && index <= 11079) ||
+                        (index >= 11083 && index <= 11084) ||(index >= 11120 && index <= 11127) ||(index >= 11129 && index <= 11130) ||(index >= 11132 && index <= 11133) ||
+                        (index >= 11135 && index <= 11136) ||(index >= 13770 && index <= 14019) ||(index >= 14170 && index <= 14219) ||(index >= 14820 && index <= 14869) ||
+                        (index >= 20470 && index <= 21619) ||(index >= 25000 && index <= 31724))
+                        moveSound = SoundList.WalkGroundL;
+                    else if ((index >= 205 && index <= 209) ||(index >= 260 && index <= 264) ||(index >= 330 && index <= 349) ||(index >= 405 && index <= 409) ||
+                             (index >= 460 && index <= 464) ||(index >= 505 && index <= 509) ||(index >= 560 && index <= 564) ||(index >= 575 && index <= 580) ||
+                             (index >= 582 && index <= 585) ||(index >= 588 && index <= 599) ||(index >= 705 && index <= 709) ||(index >= 750 && index <= 754) ||
+                             (index >= 760 && index <= 764) ||(index >= 1205 && index <= 1209) ||(index >= 1215 && index <= 1224) ||(index >= 1250 && index <= 1254) ||
+                             (index >= 1260 && index <= 1274) ||(index >= 1400 && index <= 1424) ||(index >= 1455 && index <= 1459) ||(index >= 1500 && index <= 1524) ||
+                             (index >= 1550 && index <= 1574) ||(index >= 2555 && index <= 2559) ||(index >= 2605 && index <= 2609) ||(index >= 2655 && index <= 2659) ||
+                             (index >= 2705 && index <= 2709) ||(index >= 10320 && index <= 10324) ||(index >= 10329 && index <= 10329) ||(index >= 10334 && index <= 10334) ||
+                             (index >= 10372 && index <= 10372) ||(index >= 10381 && index <= 10381) ||(index >= 10420 && index <= 10422) ||(index >= 10425 && index <= 10424) ||
+                             (index >= 10429 && index <= 10429) ||(index >= 10470 && index <= 10470) ||(index >= 10472 && index <= 10472) ||(index >= 10475 && index <= 10475) ||
+                             (index >= 10479 && index <= 10519) ||(index >= 10530 && index <= 10530) ||(index >= 10535 && index <= 10535) ||(index >= 10539 && index <= 10539) ||
+                             (index >= 10623 && index <= 10624) ||(index >= 10628 && index <= 10629) ||(index >= 10634 && index <= 10634) ||(index >= 10639 && index <= 10639) ||
+                             (index >= 10644 && index <= 10669) ||(index >= 10673 && index <= 10677) ||(index >= 10680 && index <= 10681) ||(index >= 10684 && index <= 10685) ||
+                             (index >= 10688 && index <= 10690) ||(index >= 10721 && index <= 10723) ||(index >= 10725 && index <= 10727) ||(index >= 10729 && index <= 10731) ||
+                             (index >= 10733 && index <= 10770) ||(index >= 10772 && index <= 10772) ||(index >= 10775 && index <= 10775) ||(index >= 10779 && index <= 10779) ||
+                             (index >= 10784 && index <= 10784) ||(index >= 10835 && index <= 10836) ||(index >= 10840 && index <= 10869) ||(index >= 10874 && index <= 10874) ||
+                             (index >= 10890 && index <= 10890) ||(index >= 10920 && index <= 10929) ||(index >= 10931 && index <= 10934) ||(index >= 10936 && index <= 10939) ||
+                             (index >= 10941 && index <= 10970) ||(index >= 10974 && index <= 10974) ||(index >= 10977 && index <= 11019) ||(index >= 11021 && index <= 11021) ||
+                             (index >= 11023 && index <= 11027) ||(index >= 11029 && index <= 11033) ||(index >= 11037 && index <= 11038) ||(index >= 11070 && index <= 11071) ||
+                             (index >= 11075 && index <= 11078) ||(index >= 11080 && index <= 11082) ||(index >= 11086 && index <= 11089) ||(index >= 11091 && index <= 11119) ||
+                             (index >= 11128 && index <= 11128) ||(index >= 11131 && index <= 11131) ||(index >= 11134 && index <= 11134) ||(index >= 11137 && index <= 11171) ||
+                             (index >= 11175 && index <= 11177) ||(index >= 11180 && index <= 11182) ||(index >= 11185 && index <= 11219) ||(index >= 11223 && index <= 11224) ||
+                             (index >= 11227 && index <= 11229) ||(index >= 11232 && index <= 11291) ||(index >= 11296 && index <= 11299) ||(index >= 11305 && index <= 11308) ||
+                             (index >= 11314 && index <= 11317) ||(index >= 11322 && index <= 11327) ||(index >= 11332 && index <= 11369))
+                        moveSound = SoundList.WalkLawnL;
+                    else if ((index >= 250 && index <= 254) ||(index >= 450 && index <= 454) ||(index >= 550 && index <= 554) ||(index >= 1000 && index <= 1024) ||
+                             (index >= 1050 && index <= 1074) ||(index >= 1450 && index <= 1454) ||(index >= 1460 && index <= 1464) ||(index >= 1465 && index <= 1474) ||
+                             (index >= 1605 && index <= 1609) ||(index >= 1615 && index <= 1624) ||(index >= 1650 && index <= 1654) ||(index >= 1660 && index <= 1664))
+                        moveSound = SoundList.WalkRoughL;
+                    else if ((index >= 2800 && index <= 2824) ||(index >= 3130 && index <= 3130) ||(index >= 3137 && index <= 3138) ||(index >= 3177 && index <= 3178) ||
+                             (index >= 3189 && index <= 3190) ||(index >= 3230 && index <= 3231) ||(index >= 3240 && index <= 3242) ||(index >= 3246 && index <= 3246) ||
+                             (index >= 3276 && index <= 3278) ||(index >= 3280 && index <= 3299) ||(index >= 5178 && index <= 5179) ||(index >= 5182 && index <= 5185) ||
+                             (index >= 5188 && index <= 5191) ||(index >= 5194 && index <= 5195) ||(index >= 5780 && index <= 6060) ||(index >= 6080 && index <= 6084) ||
+                             (index >= 6145 && index <= 6224) ||(index >= 14020 && index <= 14169) ||(index >= 14220 && index <= 14819))
+                        moveSound = SoundList.WalkWoodL;
+                    else if ((index >= 825 && index <= 849) ||(index >= 875 && index <= 899) ||(index >= 925 && index <= 949) ||(index >= 975 && index <= 999) ||
+                             (index >= 1025 && index <= 1049) ||(index >= 1075 && index <= 1099) ||(index >= 1125 && index <= 1149) ||(index >= 1175 && index <= 1199) ||
+                             (index >= 1225 && index <= 1249) ||(index >= 1275 && index <= 1299) ||(index >= 1325 && index <= 1339) ||(index >= 2025 && index <= 2049) ||
+                             (index >= 2075 && index <= 2099) ||(index >= 2125 && index <= 2149) ||(index >= 2900 && index <= 2924) ||(index >= 3781 && index <= 4474) ||
+                             (index >= 6085 && index <= 6144))
+                        moveSound = SoundList.WalkWoodL;
+                    else if ((index >= 40 && index <= 49) ||(index >= 75 && index <= 79) ||(index >= 85 && index <= 99) ||(index >= 1375 && index <= 1399) ||
+                             (index >= 1425 && index <= 1449) ||(index >= 1475 && index <= 1499) ||(index >= 1525 && index <= 1549) ||(index >= 1575 && index <= 1559) ||
+                             (index >= 1625 && index <= 1649) ||(index >= 1675 && index <= 1699) ||(index >= 1725 && index <= 1749) ||(index >= 1775 && index <= 1799) ||
+                             (index >= 1825 && index <= 1849) ||(index >= 1875 && index <= 2024) ||(index >= 2175 && index <= 2199) ||(index >= 2225 && index <= 2249) ||
+                             (index >= 2275 && index <= 2299) ||(index >= 2325 && index <= 2349) ||(index >= 2375 && index <= 2499) ||(index >= 2525 && index <= 2549) ||
+                             (index >= 2575 && index <= 2599) ||(index >= 2625 && index <= 2649) ||(index >= 2675 && index <= 2699) ||(index >= 2725 && index <= 2749) ||
+                             (index >= 2775 && index <= 2799) ||(index >= 2825 && index <= 2849) ||(index >= 2875 && index <= 2899) ||(index >= 2925 && index <= 2994) ||
+                             (index >= 2995 && index <= 2999) ||(index >= 3025 && index <= 3129) ||(index >= 3131 && index <= 3136) ||(index >= 3139 && index <= 3176) ||
+                             (index >= 3179 && index <= 3188) ||(index >= 3191 && index <= 3229) ||(index >= 3232 && index <= 3239) ||(index >= 3243 && index <= 3245) ||
+                             (index >= 3247 && index <= 3249) ||(index >= 3275 && index <= 3275) ||(index >= 3279 && index <= 3279) ||(index >= 3350 && index <= 3374) ||
+                             (index >= 3450 && index <= 3474) ||(index >= 3500 && index <= 3524) ||(index >= 3550 && index <= 3574) ||(index >= 3600 && index <= 3624) ||
+                             (index >= 3650 && index <= 3674) ||(index >= 3750 && index <= 3774) ||(index >= 4825 && index <= 5177) ||(index >= 5180 && index <= 5181) ||
+                             (index >= 5186 && index <= 5187) ||(index >= 5192 && index <= 5193) ||(index >= 5196 && index <= 5779) ||(index >= 7925 && index <= 10305) ||
+                             (index >= 11370 && index <= 13769) ||(index >= 14870 && index <= 20469) ||(index >= 21620 && index <= 24999))
+                        moveSound = SoundList.WalkCaveL;
+                    else if ((index >= 605 && index <= 609) ||(index >= 650 && index <= 654) ||(index >= 660 && index <= 664) ||(index >= 2550 && index <= 2554) ||
+                             (index >= 2560 && index <= 2564) ||(index >= 2565 && index <= 2574) ||(index >= 2600 && index <= 2604) ||(index >= 2610 && index <= 2624) ||
+                             (index >= 2650 && index <= 2654) ||(index >= 2660 && index <= 2674) ||(index >= 2700 && index <= 2704) ||(index >= 2710 && index <= 2724) ||
+                             (index >= 2850 && index <= 2874) ||(index >= 3405 && index <= 3424) ||(index >= 4625 && index <= 4679) ||(index >= 6075 && index <= 6079) ||
+                             (index >= 10325 && index <= 10328) ||(index >= 10330 && index <= 10333) ||(index >= 10335 && index <= 10371) ||(index >= 10373 && index <= 10380) ||
+                             (index >= 10382 && index <= 10419) ||(index >= 10423 && index <= 10424) ||(index >= 10426 && index <= 10428) ||(index >= 10430 && index <= 10469) ||
+                             (index >= 10471 && index <= 10471) ||(index >= 10473 && index <= 10474) ||(index >= 10476 && index <= 10478) ||(index >= 10520 && index <= 10529) ||
+                             (index >= 10531 && index <= 10534) ||(index >= 10536 && index <= 10538) ||(index >= 10540 && index <= 10622) ||(index >= 10625 && index <= 10627) ||
+                             (index >= 10630 && index <= 10633) ||(index >= 10635 && index <= 10638) ||(index >= 10640 && index <= 10643) ||(index >= 10670 && index <= 10672) ||
+                             (index >= 10771 && index <= 10771) ||(index >= 10773 && index <= 10774) ||(index >= 10776 && index <= 10778) ||(index >= 10780 && index <= 10783) ||
+                             (index >= 10785 && index <= 10834) ||(index >= 10837 && index <= 10839) ||(index >= 10870 && index <= 10873) ||(index >= 10875 && index <= 10889) ||
+                             (index >= 10891 && index <= 10919) ||(index >= 10930 && index <= 10930) ||(index >= 10935 && index <= 10935) ||(index >= 10940 && index <= 10940) ||
+                             (index >= 10971 && index <= 10973) ||(index >= 10975 && index <= 10976) ||(index >= 11020 && index <= 11020) ||(index >= 11022 && index <= 11022) ||
+                             (index >= 11028 && index <= 11028) ||(index >= 11072 && index <= 11074))
+                        moveSound = SoundList.WalkStoneL;
+                    else if ((index >= 1800 && index <= 1824) || (index >= 3000 && index <= 3024) ||(index >= 10678 && index <= 10679) ||
+                             (index >= 10682 && index <= 10683) ||(index >= 10686 && index <= 10687) ||(index >= 10691 && index <= 10720) ||
+                             (index >= 10724 && index <= 10724) ||(index >= 10728 && index <= 10728) ||(index >= 10732 && index <= 10732) ||
+                             (index >= 11034 && index <= 11036) ||(index >= 11039 && index <= 11069) ||(index >= 11085 && index <= 11085) ||
+                             (index >= 11090 && index <= 11090) ||(index >= 11172 && index <= 11174) ||(index >= 11178 && index <= 11179) ||
+                             (index >= 11183 && index <= 11184) ||(index >= 11220 && index <= 11222) ||(index >= 11225 && index <= 11226) ||
+                             (index >= 11230 && index <= 11231) ||(index >= 11292 && index <= 11295) ||(index >= 11300 && index <= 11304) ||
+                             (index >= 11309 && index <= 11313) ||(index >= 11318 && index <= 11321) ||(index >= 11328 && index <= 11331))
+                        moveSound = SoundList.WalkWaterL;
+                    else
+                        moveSound = SoundList.WalkWaterL;
+                }
                     break;
                 case 101:
-                    {
-                        //Tiles2
-                        if ((index >= 0 && index <= 74) || (index >= 79 && index <= 83) || (index >= 94 && index <= 204) || (index >= 209 && index <= 213) ||
-                            (index >= 209 && index <= 213) || (index >= 224 && index <= 249) || (index >= 255 && index <= 258) || (index >= 274 && index <= 329) ||
-                            (index >= 350 && index <= 404) || (index >= 424 && index <= 449) || (index >= 455 && index <= 459) || (index >= 474 && index <= 504) ||
-                            (index >= 509 && index <= 513) || (index >= 524 && index <= 549) || (index >= 555 && index <= 559) || (index >= 565 && index <= 573) ||
-                            (index >= 594 && index <= 704) || (index >= 709 && index <= 713) || (index >= 724 && index <= 748) || (index >= 755 && index <= 759) ||
-                            (index >= 774 && index <= 904) || (index >= 909 && index <= 923) || (index >= 974 && index <= 1004) || (index >= 1055 && index <= 1058) ||
-                            (index >= 1064 && index <= 1204) || (index >= 1209 && index <= 1213) || (index >= 1300 && index <= 1373) || (index >= 1574 && index <= 1604) ||
-                            (index >= 1609 && index <= 1649) || (index >= 1655 && index <= 1659) || (index >= 1674 && index <= 1704) || (index >= 1709 && index <= 1723) ||
-                            (index >= 1755 && index <= 1758) || (index >= 1765 && index <= 1799) || (index >= 2050 && index <= 2523) || (index >= 2724 && index <= 2849) ||
-                            (index >= 2950 && index <= 2999) || (index >= 3150 && index <= 3804) || (index >= 3809 && index <= 3849) || (index >= 3855 && index <= 3858) ||
-                            (index >= 4475 && index <= 4794) || (index >= 5024 && index <= 5054) || (index >= 5059 && index <= 5299))
-                            moveSound = SoundList.WalkGroundL;
-                        else if ((index >= 205 && index <= 208) || (index >= 214 && index <= 223) || (index >= 264 && index <= 273) || (index >= 330 && index <= 349) ||
-                            (index >= 405 && index <= 423) || (index >= 460 && index <= 474) || (index >= 505 && index <= 508) || (index >= 514 && index <= 523) ||
-                            (index >= 560 && index <= 564) || (index >= 714 && index <= 723) || (index >= 764 && index <= 773) || (index >= 905 && index <= 908) ||
-                            (index >= 955 && index <= 973) || (index >= 1009 && index <= 1023) || (index >= 1205 && index <= 1208) || (index >= 5055 && index <= 5058))
-                            moveSound = SoundList.WalkLawnL;
-                        else if ((index >= 250 && index <= 254) || (index >= 259 && index <= 263) || (index >= 450 && index <= 454) || (index >= 550 && index <= 554) ||
-                            (index >= 574 && index <= 593) || (index >= 705 && index <= 708) || (index >= 749 && index <= 754) || (index >= 924 && index <= 954) ||
-                            (index >= 1005 && index <= 1008) || (index >= 1024 && index <= 1054) || (index >= 1059 && index <= 1063) || (index >= 760 && index <= 763) ||
-                            (index >= 1214 && index <= 1299) || (index >= 1374 && index <= 1573) || (index >= 1605 && index <= 1608) || (index >= 1650 && index <= 1654) ||
-                            (index >= 1660 && index <= 1673) || (index >= 1705 && index <= 1708) || (index >= 1724 && index <= 1754) || (index >= 1759 && index <= 1764) ||
-                            (index >= 2555 && index <= 2558) || (index >= 2605 && index <= 2608) || (index >= 2655 && index <= 2658) || (index >= 2705 && index <= 2708))
-                            moveSound = SoundList.WalkRoughL;
-                        else if ((index >= 75 && index <= 78) || (index >= 84 && index <= 93) || (index >= 2524 && index <= 2554) || (index >= 2560 && index <= 2604) ||
-                            (index >= 2609 && index <= 2654) || (index >= 2659 && index <= 2704) || (index >= 2709 && index <= 2723) || (index >= 2850 && index <= 2949) ||
-                            (index >= 3805 && index <= 3808) || (index >= 3850 && index <= 3854) || (index >= 3859 && index <= 3873) || (index >= 5300 && index <= 5323) ||
-                            (index >= 6052 && index <= 6118))
-                            moveSound = SoundList.WalkStoneL;
-                        else if ((index >= 4795 && index <= 5023))
-                            moveSound = SoundList.WalkCaveL;
-                        else if ((index >= 1800 && index <= 2049) || (index >= 3000 && index <= 3149))
-                            moveSound = SoundList.WalkWaterL;
-                        else if ((index >= 5324 && index <= 6051) || (index >= 6119 && index <= 6296))
-                            moveSound = SoundList.WalkRoomL;
-                        else moveSound = SoundList.WalkWaterL;
-                    }
+                {
+                    //Tiles2
+                    if ((index >= 0 && index <= 74) || (index >= 79 && index <= 83) || (index >= 94 && index <= 204) || (index >= 209 && index <= 213) ||
+                        (index >= 209 && index <= 213) || (index >= 224 && index <= 249) || (index >= 255 && index <= 258) || (index >= 274 && index <= 329) ||
+                        (index >= 350 && index <= 404) || (index >= 424 && index <= 449) || (index >= 455 && index <= 459) || (index >= 474 && index <= 504) ||
+                        (index >= 509 && index <= 513) || (index >= 524 && index <= 549) || (index >= 555 && index <= 559) || (index >= 565 && index <= 573) ||
+                        (index >= 594 && index <= 704) || (index >= 709 && index <= 713) || (index >= 724 && index <= 748) || (index >= 755 && index <= 759) ||
+                        (index >= 774 && index <= 904) || (index >= 909 && index <= 923) || (index >= 974 && index <= 1004) || (index >= 1055 && index <= 1058) ||
+                        (index >= 1064 && index <= 1204) || (index >= 1209 && index <= 1213) || (index >= 1300 && index <= 1373) || (index >= 1574 && index <= 1604) ||
+                        (index >= 1609 && index <= 1649) || (index >= 1655 && index <= 1659) || (index >= 1674 && index <= 1704) || (index >= 1709 && index <= 1723) ||
+                        (index >= 1755 && index <= 1758) || (index >= 1765 && index <= 1799) || (index >= 2050 && index <= 2523) || (index >= 2724 && index <= 2849) ||
+                        (index >= 2950 && index <= 2999) || (index >= 3150 && index <= 3804) || (index >= 3809 && index <= 3849) || (index >= 3855 && index <= 3858) ||
+                        (index >= 4475 && index <= 4794) || (index >= 5024 && index <= 5054) || (index >= 5059 && index <= 5299))
+                        moveSound = SoundList.WalkGroundL;
+                    else if ((index >= 205 && index <= 208) || (index >= 214 && index <= 223) || (index >= 264 && index <= 273) || (index >= 330 && index <= 349) ||
+                             (index >= 405 && index <= 423) || (index >= 460 && index <= 474) || (index >= 505 && index <= 508) || (index >= 514 && index <= 523) ||
+                             (index >= 560 && index <= 564) || (index >= 714 && index <= 723) || (index >= 764 && index <= 773) || (index >= 905 && index <= 908) ||
+                             (index >= 955 && index <= 973) || (index >= 1009 && index <= 1023) || (index >= 1205 && index <= 1208) || (index >= 5055 && index <= 5058))
+                        moveSound = SoundList.WalkLawnL;
+                    else if ((index >= 250 && index <= 254) || (index >= 259 && index <= 263) || (index >= 450 && index <= 454) || (index >= 550 && index <= 554) ||
+                             (index >= 574 && index <= 593) || (index >= 705 && index <= 708) || (index >= 749 && index <= 754) || (index >= 924 && index <= 954) ||
+                             (index >= 1005 && index <= 1008) || (index >= 1024 && index <= 1054) || (index >= 1059 && index <= 1063) || (index >= 760 && index <= 763) ||
+                             (index >= 1214 && index <= 1299) || (index >= 1374 && index <= 1573) || (index >= 1605 && index <= 1608) || (index >= 1650 && index <= 1654) ||
+                             (index >= 1660 && index <= 1673) || (index >= 1705 && index <= 1708) || (index >= 1724 && index <= 1754) || (index >= 1759 && index <= 1764) ||
+                             (index >= 2555 && index <= 2558) || (index >= 2605 && index <= 2608) || (index >= 2655 && index <= 2658) || (index >= 2705 && index <= 2708))
+                        moveSound = SoundList.WalkRoughL;
+                    else if ((index >= 75 && index <= 78) || (index >= 84 && index <= 93) || (index >= 2524 && index <= 2554) || (index >= 2560 && index <= 2604) ||
+                             (index >= 2609 && index <= 2654) || (index >= 2659 && index <= 2704) || (index >= 2709 && index <= 2723) || (index >= 2850 && index <= 2949) ||
+                             (index >= 3805 && index <= 3808) || (index >= 3850 && index <= 3854) || (index >= 3859 && index <= 3873) || (index >= 5300 && index <= 5323) ||
+                             (index >= 6052 && index <= 6118))
+                        moveSound = SoundList.WalkStoneL;
+                    else if ((index >= 4795 && index <= 5023))
+                        moveSound = SoundList.WalkCaveL;
+                    else if ((index >= 1800 && index <= 2049) || (index >= 3000 && index <= 3149))
+                        moveSound = SoundList.WalkWaterL;
+                    else if ((index >= 5324 && index <= 6051) || (index >= 6119 && index <= 6296))
+                        moveSound = SoundList.WalkRoomL;
+                    else moveSound = SoundList.WalkWaterL;
+                }
                     break;
                 case 102:
-                    {
-                        //Tiles3
-                        if ((index >= 0 && index <= 299) || (index >= 400 && index <= 449) || (index >= 455 && index <= 522) || (index >= 528 && index <= 531) ||
+                {
+                    //Tiles3
+                    if ((index >= 0 && index <= 299) || (index >= 400 && index <= 449) || (index >= 455 && index <= 522) || (index >= 528 && index <= 531) ||
                         (index >= 1553 && index <= 1554) || (index >= 1560 && index <= 1561) || (index >= 1565 && index <= 1566) || (index >= 1569 && index <= 1699) ||
                         (index >= 1805 && index <= 1809) || (index >= 1850 && index <= 1854) || (index >= 1860 && index <= 1864) || (index >= 1950 && index <= 1954) ||
                         (index >= 2000 && index <= 2204) || (index >= 2300 && index <= 2653))
-                            moveSound = SoundList.WalkGroundL;
-                        else if ((index >= 300 && index <= 399) || (index >= 450 && index <= 454) || (index >= 524 && index <= 527) || (index >= 1705 && index <= 1709) ||
-                            (index >= 1715 && index <= 1799) || (index >= 2205 && index <= 2299))
-                            moveSound = SoundList.WalkLawnL;
-                        else if ((index >= 1700 && index <= 1704) || (index >= 1710 && index <= 1714))
-                            moveSound = SoundList.WalkRoughL;
-                        else if ((index >= 1800 && index <= 1804) || (index >= 1810 && index <= 1849) || (index >= 1855 && index <= 1859) || (index >= 1865 && index <= 1949) ||
-                            (index >= 1955 && index <= 1999))
-                            moveSound = SoundList.WalkStoneL;
-                        else if ((index >= 1411 && index <= 1550) || (index >= 1555 && index <= 1557))
-                            moveSound = SoundList.WalkWoodL;
-                        else if ((index >= 532 && index <= 1410) || (index >= 1551 && index <= 1552) || (index >= 1558 && index <= 1559) || (index >= 1562 && index <= 1564) ||
-                            (index >= 1567 && index <= 1568))
-                            moveSound = SoundList.WalkWaterL;
-                        else moveSound = SoundList.WalkWaterL;
-                    }
+                        moveSound = SoundList.WalkGroundL;
+                    else if ((index >= 300 && index <= 399) || (index >= 450 && index <= 454) || (index >= 524 && index <= 527) || (index >= 1705 && index <= 1709) ||
+                             (index >= 1715 && index <= 1799) || (index >= 2205 && index <= 2299))
+                        moveSound = SoundList.WalkLawnL;
+                    else if ((index >= 1700 && index <= 1704) || (index >= 1710 && index <= 1714))
+                        moveSound = SoundList.WalkRoughL;
+                    else if ((index >= 1800 && index <= 1804) || (index >= 1810 && index <= 1849) || (index >= 1855 && index <= 1859) || (index >= 1865 && index <= 1949) ||
+                             (index >= 1955 && index <= 1999))
+                        moveSound = SoundList.WalkStoneL;
+                    else if ((index >= 1411 && index <= 1550) || (index >= 1555 && index <= 1557))
+                        moveSound = SoundList.WalkWoodL;
+                    else if ((index >= 532 && index <= 1410) || (index >= 1551 && index <= 1552) || (index >= 1558 && index <= 1559) || (index >= 1562 && index <= 1564) ||
+                             (index >= 1567 && index <= 1568))
+                        moveSound = SoundList.WalkWaterL;
+                    else moveSound = SoundList.WalkWaterL;
+                }
                     break;
                 case 103:
-                    {
-                        //Tiles4
-                        if ((index >= 0000 && index <= 199) || (index >= 0205 && index <= 209) || (index >= 0250 && index <= 254) || (index >= 260 && index <= 1481) ||
-                            (index >= 1495 && index <= 1549) || (index >= 1555 && index <= 1559) || (index >= 2500 && index <= 3349) || (index >= 3355 && index <= 3359) ||
-                            (index >= 3365 && index <= 3399) || (index >= 3500 && index <= 3899) || (index >= 4193 && index <= 4254) || (index >= 4650 && index <= 4849) ||
-                            (index >= 5000 && index <= 5149) || (index >= 5155 && index <= 5399) || (index >= 5405 && index <= 5409) || (index >= 5415 && index <= 5449) ||
-                            (index >= 5550 && index <= 5554) || (index >= 5560 && index <= 5564) || (index >= 5605 && index <= 5609) || (index >= 5615 && index <= 5625) ||
-                            (index >= 5680 && index <= 5749) || (index >= 7400 && index <= 7649) || (index >= 7655 && index <= 7749) || (index >= 7900 && index <= 8099) ||
-                            (index >= 8166 && index <= 8299) || (index >= 8305 && index <= 8309) || (index >= 8350 && index <= 8354) || (index >= 8360 && index <= 8364) ||
-                            (index >= 8400 && index <= 8499) || (index >= 8605 && index <= 8609) || (index >= 8615 && index <= 8619) || (index >= 8623 && index <= 8654) ||
-                            (index >= 8660 && index <= 8754) || (index >= 8805 && index <= 8809) || (index >= 9050 && index <= 9299) || (index >= 9450 && index <= 9549))
-                            moveSound = SoundList.WalkGroundL;
-                        else if ((index >= 200 && index <= 204) || (index >= 210 && index <= 249) || (index >= 255 && index <= 259) || (index >= 1482 && index <= 1494) ||
-                            (index >= 1560 && index <= 2499) || (index >= 4255 && index <= 4299) || (index >= 4305 && index <= 4349) || (index >= 5555 && index <= 5559) ||
-                            (index >= 5565 && index <= 5604) || (index >= 5610 && index <= 5614) || (index >= 7650 && index <= 7654) || (index >= 7750 && index <= 7899) ||
-                            (index >= 8100 && index <= 8165) || (index >= 8300 && index <= 8304) || (index >= 8310 && index <= 8349) || (index >= 8355 && index <= 8359) ||
-                            (index >= 8365 && index <= 8399) || (index >= 8505 && index <= 8599) || (index >= 8610 && index <= 8614) || (index >= 8620 && index <= 8622) ||
-                            (index >= 8655 && index <= 8659) || (index >= 8755 && index <= 8799) || (index >= 8810 && index <= 8849) || (index >= 8950 && index <= 8999) ||
-                            (index >= 9005 && index <= 9049) || (index >= 9550 && index <= 9554))
-                            moveSound = SoundList.WalkLawnL;
-                        else if ((index >= 4300 && index <= 4304) || (index >= 8600 && index <= 8604) || (index >= 1550 && index <= 1554) || (index >= 4131 && index <= 4193) ||
-                            (index >= 4350 && index <= 4549) || (index >= 5150 && index <= 5154) || (index >= 8500 && index <= 8504) || (index >= 8800 && index <= 8804) ||
-                            (index >= 8850 && index <= 8949) || (index >= 9000 && index <= 9004))
-                            moveSound = SoundList.WalkRoughL;
-                        else if ((index >= 3350 && index <= 3354) || (index >= 3360 && index <= 3364) || (index >= 3400 && index <= 3499) || (index >= 5400 && index <= 5404) ||
-                            (index >= 5410 && index <= 5414) || (index >= 5450 && index <= 5549) || (index >= 5626 && index <= 5679) || (index >= 9300 && index <= 9449) ||
-                            (index >= 9555 && index <= 9749))
-                            moveSound = SoundList.WalkStoneL;
-                        else if ((index >= 3900 && index <= 4130) || (index >= 4550 && index <= 4649) || (index >= 4850 && index <= 4999) || (index >= 5750 && index <= 7399) ||
-                            (index >= 9750 && index <= 11349))
-                            moveSound = SoundList.WalkCaveL;
-                        else if ((index >= 11350 && index <= 13534))
-                            moveSound = SoundList.WalkWoodL;
-                        else moveSound = SoundList.WalkWaterL;
-                    }
+                {
+                    //Tiles4
+                    if ((index >= 0000 && index <= 199) || (index >= 0205 && index <= 209) || (index >= 0250 && index <= 254) || (index >= 260 && index <= 1481) ||
+                        (index >= 1495 && index <= 1549) || (index >= 1555 && index <= 1559) || (index >= 2500 && index <= 3349) || (index >= 3355 && index <= 3359) ||
+                        (index >= 3365 && index <= 3399) || (index >= 3500 && index <= 3899) || (index >= 4193 && index <= 4254) || (index >= 4650 && index <= 4849) ||
+                        (index >= 5000 && index <= 5149) || (index >= 5155 && index <= 5399) || (index >= 5405 && index <= 5409) || (index >= 5415 && index <= 5449) ||
+                        (index >= 5550 && index <= 5554) || (index >= 5560 && index <= 5564) || (index >= 5605 && index <= 5609) || (index >= 5615 && index <= 5625) ||
+                        (index >= 5680 && index <= 5749) || (index >= 7400 && index <= 7649) || (index >= 7655 && index <= 7749) || (index >= 7900 && index <= 8099) ||
+                        (index >= 8166 && index <= 8299) || (index >= 8305 && index <= 8309) || (index >= 8350 && index <= 8354) || (index >= 8360 && index <= 8364) ||
+                        (index >= 8400 && index <= 8499) || (index >= 8605 && index <= 8609) || (index >= 8615 && index <= 8619) || (index >= 8623 && index <= 8654) ||
+                        (index >= 8660 && index <= 8754) || (index >= 8805 && index <= 8809) || (index >= 9050 && index <= 9299) || (index >= 9450 && index <= 9549))
+                        moveSound = SoundList.WalkGroundL;
+                    else if ((index >= 200 && index <= 204) || (index >= 210 && index <= 249) || (index >= 255 && index <= 259) || (index >= 1482 && index <= 1494) ||
+                             (index >= 1560 && index <= 2499) || (index >= 4255 && index <= 4299) || (index >= 4305 && index <= 4349) || (index >= 5555 && index <= 5559) ||
+                             (index >= 5565 && index <= 5604) || (index >= 5610 && index <= 5614) || (index >= 7650 && index <= 7654) || (index >= 7750 && index <= 7899) ||
+                             (index >= 8100 && index <= 8165) || (index >= 8300 && index <= 8304) || (index >= 8310 && index <= 8349) || (index >= 8355 && index <= 8359) ||
+                             (index >= 8365 && index <= 8399) || (index >= 8505 && index <= 8599) || (index >= 8610 && index <= 8614) || (index >= 8620 && index <= 8622) ||
+                             (index >= 8655 && index <= 8659) || (index >= 8755 && index <= 8799) || (index >= 8810 && index <= 8849) || (index >= 8950 && index <= 8999) ||
+                             (index >= 9005 && index <= 9049) || (index >= 9550 && index <= 9554))
+                        moveSound = SoundList.WalkLawnL;
+                    else if ((index >= 4300 && index <= 4304) || (index >= 8600 && index <= 8604) || (index >= 1550 && index <= 1554) || (index >= 4131 && index <= 4193) ||
+                             (index >= 4350 && index <= 4549) || (index >= 5150 && index <= 5154) || (index >= 8500 && index <= 8504) || (index >= 8800 && index <= 8804) ||
+                             (index >= 8850 && index <= 8949) || (index >= 9000 && index <= 9004))
+                        moveSound = SoundList.WalkRoughL;
+                    else if ((index >= 3350 && index <= 3354) || (index >= 3360 && index <= 3364) || (index >= 3400 && index <= 3499) || (index >= 5400 && index <= 5404) ||
+                             (index >= 5410 && index <= 5414) || (index >= 5450 && index <= 5549) || (index >= 5626 && index <= 5679) || (index >= 9300 && index <= 9449) ||
+                             (index >= 9555 && index <= 9749))
+                        moveSound = SoundList.WalkStoneL;
+                    else if ((index >= 3900 && index <= 4130) || (index >= 4550 && index <= 4649) || (index >= 4850 && index <= 4999) || (index >= 5750 && index <= 7399) ||
+                             (index >= 9750 && index <= 11349))
+                        moveSound = SoundList.WalkCaveL;
+                    else if ((index >= 11350 && index <= 13534))
+                        moveSound = SoundList.WalkWoodL;
+                    else moveSound = SoundList.WalkWaterL;
+                }
                     break;
                 case 104:
-                    {
-                        //Tiles5
-                        if ((index >= 10 && index <= 0014) || (index >= 100 && index <= 0104) || (index >= 110 && index <= 0114) || (index >= 156 && index <= 0159) ||
-                            (index >= 165 && index <= 0204) || (index >= 210 && index <= 0214) || (index >= 255 && index <= 0259) || (index >= 300 && index <= 0304) ||
-                            (index >= 310 && index <= 0314) || (index >= 400 && index <= 0404) || (index >= 410 && index <= 0414) || (index >= 500 && index <= 0504) ||
-                            (index >= 510 && index <= 0514) || (index >= 555 && index <= 0559) || (index >= 800 && index <= 0849) || (index >= 855 && index <= 0859) ||
-                            (index >= 900 && index <= 0904) || (index >= 910 && index <= 0914) || (index >= 955 && index <= 0959) || (index >= 1000 && index <= 1004) ||
-                            (index >= 1010 && index <= 1014) || (index >= 1055 && index <= 1059) || (index >= 1400 && index <= 1404) || (index >= 1410 && index <= 1449) ||
-                            (index >= 1455 && index <= 1459) || (index >= 1465 && index <= 1499) || (index >= 1700 && index <= 1749) || (index >= 1755 && index <= 1759) ||
-                            (index >= 1765 && index <= 1804) || (index >= 1810 && index <= 1849) || (index >= 1855 && index <= 1859) || (index >= 1900 && index <= 1904) ||
-                            (index >= 1910 && index <= 1949) || (index >= 1955 && index <= 1959) || (index >= 2000 && index <= 2099) || (index >= 2150 && index <= 2154) ||
-                            (index >= 2160 && index <= 2164) || (index >= 2250 && index <= 2254) || (index >= 2260 && index <= 2263) || (index >= 2300 && index <= 2399) ||
-                            (index >= 2500 && index <= 2549) || (index >= 2555 && index <= 2559) || (index >= 2565 && index <= 2699) || (index >= 2750 && index <= 2754) ||
-                            (index >= 2760 && index <= 2764) || (index >= 2800 && index <= 2804) || (index >= 2810 && index <= 2814) || (index >= 2855 && index <= 2859) ||
-                            (index >= 2865 && index <= 2904) || (index >= 2910 && index <= 2914) || (index >= 2955 && index <= 2959) || (index >= 2965 && index <= 3004) ||
-                            (index >= 3010 && index <= 3014) || (index >= 3100 && index <= 3104) || (index >= 3111 && index <= 3114) || (index >= 3200 && index <= 3204) ||
-                            (index >= 3300 && index <= 3304) || (index >= 3800 && index <= 3804) || (index >= 3900 && index <= 3904) || (index >= 3910 && index <= 3914) ||
-                            (index >= 4000 && index <= 4004) || (index >= 4010 && index <= 4014) || (index >= 4100 && index <= 4104) || (index >= 4110 && index <= 4114) ||
-                            (index >= 4200 && index <= 4204) || (index >= 4210 && index <= 4214) || (index >= 4300 && index <= 4304) || (index >= 4310 && index <= 4311) ||
-                            (index >= 4500 && index <= 4504) || (index >= 4510 && index <= 4514) || (index >= 4600 && index <= 4604) || (index >= 4610 && index <= 4614) ||
-                            (index >= 4620 && index <= 4621) || (index >= 4655 && index <= 4659) || (index >= 4700 && index <= 4904) || (index >= 4910 && index <= 4949) ||
-                            (index >= 4955 && index <= 4959) || (index >= 5000 && index <= 5004) || (index >= 5010 && index <= 5014) || (index >= 5100 && index <= 5104) ||
-                            (index >= 5110 && index <= 5114) || (index >= 5155 && index <= 5159) || (index >= 5165 && index <= 5204) || (index >= 5210 && index <= 5254) ||
-                            (index >= 5260 && index <= 5264) || (index >= 5305 && index <= 5309) || (index >= 5355 && index <= 5359) || (index >= 5400 && index <= 5599) ||
-                            (index >= 5650 && index <= 5654) || (index >= 5700 && index <= 5799) || (index >= 5900 && index <= 6049) || (index >= 6100 && index <= 6399) ||
-                            (index >= 6850 && index <= 6949) || (index >= 7050 && index <= 7349) || (index >= 7750 && index <= 7754) || (index >= 7760 && index <= 7764) ||
-                            (index >= 7805 && index <= 7809) || (index >= 7815 && index <= 7849) || (index >= 7950 && index <= 7999) || (index >= 8150 && index <= 8399))
-                            moveSound = SoundList.WalkGroundL;
-                        else if ((index >= 710 && index <= 0714) || (index >= 860 && index <= 0899) || (index >= 905 && index <= 0909) || (index >= 915 && index <= 0949) ||
-                            (index >= 960 && index <= 0999) || (index >= 1005 && index <= 1009) || (index >= 1015 && index <= 1049) || (index >= 1060 && index <= 1099) ||
-                            (index >= 1105 && index <= 1109) || (index >= 1160 && index <= 1199) || (index >= 1260 && index <= 1264) || (index >= 1305 && index <= 1309) ||
-                            (index >= 1360 && index <= 1364) || (index >= 1405 && index <= 1409) || (index >= 1460 && index <= 1464) || (index >= 1500 && index <= 1549) ||
-                            (index >= 1555 && index <= 1599) || (index >= 1608 && index <= 1609) || (index >= 1660 && index <= 1664) || (index >= 1760 && index <= 1764) ||
-                            (index >= 1805 && index <= 1809) || (index >= 1860 && index <= 1899) || (index >= 1905 && index <= 1909) || (index >= 1960 && index <= 1999) ||
-                            (index >= 2400 && index <= 2499) || (index >= 2550 && index <= 2554) || (index >= 2560 && index <= 2564) || (index >= 3400 && index <= 3404) ||
-                            (index >= 3410 && index <= 3414) || (index >= 3455 && index <= 3459) || (index >= 3465 && index <= 3504) || (index >= 3510 && index <= 3514) ||
-                            (index >= 3555 && index <= 3559) || (index >= 3565 && index <= 3604) || (index >= 3610 && index <= 3614) || (index >= 3700 && index <= 3704) ||
-                            (index >= 3710 && index <= 3714) || (index >= 4400 && index <= 4404) || (index >= 4410 && index <= 4414) || (index >= 4904 && index <= 4909) ||
-                            (index >= 4950 && index <= 4954) || (index >= 4960 && index <= 4999) || (index >= 5005 && index <= 5009) || (index >= 5015 && index <= 5099) ||
-                            (index >= 5105 && index <= 5109) || (index >= 5115 && index <= 5154) || (index >= 5160 && index <= 5164) || (index >= 5205 && index <= 5209) ||
-                            (index >= 5225 && index <= 5259) || (index >= 5265 && index <= 5304) || (index >= 5310 && index <= 5354) || (index >= 5360 && index <= 5399) ||
-                            (index >= 5600 && index <= 5649) || (index >= 5655 && index <= 5699) || (index >= 6050 && index <= 6099) || (index >= 6950 && index <= 7049) ||
-                            (index >= 7350 && index <= 7449) || (index >= 7855 && index <= 7859) || (index >= 7865 && index <= 7899))
-                            moveSound = SoundList.WalkLawnL;
-                        else if ((index >= 600 && index <= 0604) || (index >= 610 && index <= 0614) || (index >= 655 && index <= 0659) || (index >= 700 && index <= 0704) ||
-                            (index >= 850 && index <= 0854) || (index >= 950 && index <= 0954) || (index >= 1050 && index <= 1054) || (index >= 1150 && index <= 1154) ||
-                            (index >= 1250 && index <= 1254) || (index >= 1350 && index <= 1354) || (index >= 1450 && index <= 1454) || (index >= 1550 && index <= 1554) ||
-                            (index >= 1650 && index <= 1654) || (index >= 1750 && index <= 1754) || (index >= 1850 && index <= 1854) || (index >= 1950 && index <= 1954) ||
-                            (index >= 5800 && index <= 5899) || (index >= 7450 && index <= 7454) || (index >= 7460 && index <= 7464) || (index >= 7505 && index <= 7509) ||
-                            (index >= 7515 && index <= 7554) || (index >= 7560 && index <= 7564) || (index >= 7605 && index <= 7609) || (index >= 7615 && index <= 7649) ||
-                            (index >= 7655 && index <= 7659) || (index >= 7665 && index <= 7704) || (index >= 7755 && index <= 7759) || (index >= 7765 && index <= 7804) ||
-                            (index >= 7810 && index <= 7814) || (index >= 7850 && index <= 7854) || (index >= 7860 && index <= 7864))
-                            moveSound = SoundList.WalkRoughL;
-                        else if ((index >= 5 && index <= 0009) || (index >= 15 && index <= 0099) || (index >= 105 && index <= 0109) || (index >= 115 && index <= 0155) ||
-                            (index >= 160 && index <= 0164) || (index >= 205 && index <= 0209) || (index >= 215 && index <= 0254) || (index >= 260 && index <= 0299) ||
-                            (index >= 305 && index <= 0309) || (index >= 315 && index <= 0399) || (index >= 405 && index <= 0409) || (index >= 415 && index <= 0499) ||
-                            (index >= 505 && index <= 0509) || (index >= 515 && index <= 0554) || (index >= 560 && index <= 0599) || (index >= 605 && index <= 0609) ||
-                            (index >= 615 && index <= 0654) || (index >= 660 && index <= 0699) || (index >= 705 && index <= 0709) || (index >= 715 && index <= 0799) ||
-                            (index >= 1100 && index <= 1104) || (index >= 1110 && index <= 1149) || (index >= 1155 && index <= 1159) || (index >= 1200 && index <= 1249) ||
-                            (index >= 1255 && index <= 1259) || (index >= 1265 && index <= 1304) || (index >= 1310 && index <= 1349) || (index >= 1355 && index <= 1359) ||
-                            (index >= 1365 && index <= 1399) || (index >= 1600 && index <= 1604) || (index >= 1606 && index <= 1607) || (index >= 1610 && index <= 1649) ||
-                            (index >= 1655 && index <= 1659) || (index >= 1665 && index <= 1699) || (index >= 2100 && index <= 2149) || (index >= 2155 && index <= 2159) ||
-                            (index >= 2165 && index <= 2249) || (index >= 2255 && index <= 2259) || (index >= 2264 && index <= 2299) || (index >= 2700 && index <= 2749) ||
-                            (index >= 2755 && index <= 2759) || (index >= 2765 && index <= 2799) || (index >= 2805 && index <= 2809) || (index >= 2815 && index <= 2854) ||
-                            (index >= 2860 && index <= 2864) || (index >= 2905 && index <= 2909) || (index >= 2915 && index <= 2954) || (index >= 2960 && index <= 2964) ||
-                            (index >= 3005 && index <= 3009) || (index >= 3015 && index <= 3099) || (index >= 3105 && index <= 3110) || (index >= 3115 && index <= 3199) ||
-                            (index >= 3205 && index <= 3299) || (index >= 3305 && index <= 3399) || (index >= 3405 && index <= 3409) || (index >= 3415 && index <= 3454) ||
-                            (index >= 3460 && index <= 3464) || (index >= 3505 && index <= 3509) || (index >= 3515 && index <= 3554) || (index >= 3560 && index <= 3564) ||
-                            (index >= 3605 && index <= 3609) || (index >= 3615 && index <= 3699) || (index >= 3705 && index <= 3709) || (index >= 3715 && index <= 3799) ||
-                            (index >= 3805 && index <= 3899) || (index >= 3905 && index <= 3909) || (index >= 3915 && index <= 3999) || (index >= 4005 && index <= 4009) ||
-                            (index >= 4015 && index <= 4099) || (index >= 4105 && index <= 4109) || (index >= 4115 && index <= 4199) || (index >= 4205 && index <= 4209) ||
-                            (index >= 4305 && index <= 4309) || (index >= 4312 && index <= 4399) || (index >= 4405 && index <= 4409) || (index >= 4415 && index <= 4499) ||
-                            (index >= 4505 && index <= 4509) || (index >= 4515 && index <= 4599) || (index >= 4605 && index <= 4609) || (index >= 4615 && index <= 4619) ||
-                            (index >= 4622 && index <= 4654) || (index >= 4660 && index <= 4699) || (index >= 6400 && index <= 6849) || (index >= 7455 && index <= 7459) ||
-                            (index >= 7465 && index <= 7504) || (index >= 7510 && index <= 7514) || (index >= 7555 && index <= 7559) || (index >= 7565 && index <= 7604) ||
-                            (index >= 7610 && index <= 7614) || (index >= 7650 && index <= 7654) || (index >= 7660 && index <= 7664) ||
-                            (index >= 7705 && index <= 7709) || (index >= 7715 && index <= 7749))
-                            moveSound = SoundList.WalkStoneL;
-                        else if ((index >= 8000 && index <= 8149) || (index >= 8400 && index <= 8481))
-                            moveSound = SoundList.WalkCaveL;
-                        else if ((index >= 7900 && index <= 7949))
-                            moveSound = SoundList.WalkWaterL;
-                        else moveSound = SoundList.WalkWaterL;
-                    }
+                {
+                    //Tiles5
+                    if ((index >= 10 && index <= 0014) || (index >= 100 && index <= 0104) || (index >= 110 && index <= 0114) || (index >= 156 && index <= 0159) ||
+                        (index >= 165 && index <= 0204) || (index >= 210 && index <= 0214) || (index >= 255 && index <= 0259) || (index >= 300 && index <= 0304) ||
+                        (index >= 310 && index <= 0314) || (index >= 400 && index <= 0404) || (index >= 410 && index <= 0414) || (index >= 500 && index <= 0504) ||
+                        (index >= 510 && index <= 0514) || (index >= 555 && index <= 0559) || (index >= 800 && index <= 0849) || (index >= 855 && index <= 0859) ||
+                        (index >= 900 && index <= 0904) || (index >= 910 && index <= 0914) || (index >= 955 && index <= 0959) || (index >= 1000 && index <= 1004) ||
+                        (index >= 1010 && index <= 1014) || (index >= 1055 && index <= 1059) || (index >= 1400 && index <= 1404) || (index >= 1410 && index <= 1449) ||
+                        (index >= 1455 && index <= 1459) || (index >= 1465 && index <= 1499) || (index >= 1700 && index <= 1749) || (index >= 1755 && index <= 1759) ||
+                        (index >= 1765 && index <= 1804) || (index >= 1810 && index <= 1849) || (index >= 1855 && index <= 1859) || (index >= 1900 && index <= 1904) ||
+                        (index >= 1910 && index <= 1949) || (index >= 1955 && index <= 1959) || (index >= 2000 && index <= 2099) || (index >= 2150 && index <= 2154) ||
+                        (index >= 2160 && index <= 2164) || (index >= 2250 && index <= 2254) || (index >= 2260 && index <= 2263) || (index >= 2300 && index <= 2399) ||
+                        (index >= 2500 && index <= 2549) || (index >= 2555 && index <= 2559) || (index >= 2565 && index <= 2699) || (index >= 2750 && index <= 2754) ||
+                        (index >= 2760 && index <= 2764) || (index >= 2800 && index <= 2804) || (index >= 2810 && index <= 2814) || (index >= 2855 && index <= 2859) ||
+                        (index >= 2865 && index <= 2904) || (index >= 2910 && index <= 2914) || (index >= 2955 && index <= 2959) || (index >= 2965 && index <= 3004) ||
+                        (index >= 3010 && index <= 3014) || (index >= 3100 && index <= 3104) || (index >= 3111 && index <= 3114) || (index >= 3200 && index <= 3204) ||
+                        (index >= 3300 && index <= 3304) || (index >= 3800 && index <= 3804) || (index >= 3900 && index <= 3904) || (index >= 3910 && index <= 3914) ||
+                        (index >= 4000 && index <= 4004) || (index >= 4010 && index <= 4014) || (index >= 4100 && index <= 4104) || (index >= 4110 && index <= 4114) ||
+                        (index >= 4200 && index <= 4204) || (index >= 4210 && index <= 4214) || (index >= 4300 && index <= 4304) || (index >= 4310 && index <= 4311) ||
+                        (index >= 4500 && index <= 4504) || (index >= 4510 && index <= 4514) || (index >= 4600 && index <= 4604) || (index >= 4610 && index <= 4614) ||
+                        (index >= 4620 && index <= 4621) || (index >= 4655 && index <= 4659) || (index >= 4700 && index <= 4904) || (index >= 4910 && index <= 4949) ||
+                        (index >= 4955 && index <= 4959) || (index >= 5000 && index <= 5004) || (index >= 5010 && index <= 5014) || (index >= 5100 && index <= 5104) ||
+                        (index >= 5110 && index <= 5114) || (index >= 5155 && index <= 5159) || (index >= 5165 && index <= 5204) || (index >= 5210 && index <= 5254) ||
+                        (index >= 5260 && index <= 5264) || (index >= 5305 && index <= 5309) || (index >= 5355 && index <= 5359) || (index >= 5400 && index <= 5599) ||
+                        (index >= 5650 && index <= 5654) || (index >= 5700 && index <= 5799) || (index >= 5900 && index <= 6049) || (index >= 6100 && index <= 6399) ||
+                        (index >= 6850 && index <= 6949) || (index >= 7050 && index <= 7349) || (index >= 7750 && index <= 7754) || (index >= 7760 && index <= 7764) ||
+                        (index >= 7805 && index <= 7809) || (index >= 7815 && index <= 7849) || (index >= 7950 && index <= 7999) || (index >= 8150 && index <= 8399))
+                        moveSound = SoundList.WalkGroundL;
+                    else if ((index >= 710 && index <= 0714) || (index >= 860 && index <= 0899) || (index >= 905 && index <= 0909) || (index >= 915 && index <= 0949) ||
+                             (index >= 960 && index <= 0999) || (index >= 1005 && index <= 1009) || (index >= 1015 && index <= 1049) || (index >= 1060 && index <= 1099) ||
+                             (index >= 1105 && index <= 1109) || (index >= 1160 && index <= 1199) || (index >= 1260 && index <= 1264) || (index >= 1305 && index <= 1309) ||
+                             (index >= 1360 && index <= 1364) || (index >= 1405 && index <= 1409) || (index >= 1460 && index <= 1464) || (index >= 1500 && index <= 1549) ||
+                             (index >= 1555 && index <= 1599) || (index >= 1608 && index <= 1609) || (index >= 1660 && index <= 1664) || (index >= 1760 && index <= 1764) ||
+                             (index >= 1805 && index <= 1809) || (index >= 1860 && index <= 1899) || (index >= 1905 && index <= 1909) || (index >= 1960 && index <= 1999) ||
+                             (index >= 2400 && index <= 2499) || (index >= 2550 && index <= 2554) || (index >= 2560 && index <= 2564) || (index >= 3400 && index <= 3404) ||
+                             (index >= 3410 && index <= 3414) || (index >= 3455 && index <= 3459) || (index >= 3465 && index <= 3504) || (index >= 3510 && index <= 3514) ||
+                             (index >= 3555 && index <= 3559) || (index >= 3565 && index <= 3604) || (index >= 3610 && index <= 3614) || (index >= 3700 && index <= 3704) ||
+                             (index >= 3710 && index <= 3714) || (index >= 4400 && index <= 4404) || (index >= 4410 && index <= 4414) || (index >= 4904 && index <= 4909) ||
+                             (index >= 4950 && index <= 4954) || (index >= 4960 && index <= 4999) || (index >= 5005 && index <= 5009) || (index >= 5015 && index <= 5099) ||
+                             (index >= 5105 && index <= 5109) || (index >= 5115 && index <= 5154) || (index >= 5160 && index <= 5164) || (index >= 5205 && index <= 5209) ||
+                             (index >= 5225 && index <= 5259) || (index >= 5265 && index <= 5304) || (index >= 5310 && index <= 5354) || (index >= 5360 && index <= 5399) ||
+                             (index >= 5600 && index <= 5649) || (index >= 5655 && index <= 5699) || (index >= 6050 && index <= 6099) || (index >= 6950 && index <= 7049) ||
+                             (index >= 7350 && index <= 7449) || (index >= 7855 && index <= 7859) || (index >= 7865 && index <= 7899))
+                        moveSound = SoundList.WalkLawnL;
+                    else if ((index >= 600 && index <= 0604) || (index >= 610 && index <= 0614) || (index >= 655 && index <= 0659) || (index >= 700 && index <= 0704) ||
+                             (index >= 850 && index <= 0854) || (index >= 950 && index <= 0954) || (index >= 1050 && index <= 1054) || (index >= 1150 && index <= 1154) ||
+                             (index >= 1250 && index <= 1254) || (index >= 1350 && index <= 1354) || (index >= 1450 && index <= 1454) || (index >= 1550 && index <= 1554) ||
+                             (index >= 1650 && index <= 1654) || (index >= 1750 && index <= 1754) || (index >= 1850 && index <= 1854) || (index >= 1950 && index <= 1954) ||
+                             (index >= 5800 && index <= 5899) || (index >= 7450 && index <= 7454) || (index >= 7460 && index <= 7464) || (index >= 7505 && index <= 7509) ||
+                             (index >= 7515 && index <= 7554) || (index >= 7560 && index <= 7564) || (index >= 7605 && index <= 7609) || (index >= 7615 && index <= 7649) ||
+                             (index >= 7655 && index <= 7659) || (index >= 7665 && index <= 7704) || (index >= 7755 && index <= 7759) || (index >= 7765 && index <= 7804) ||
+                             (index >= 7810 && index <= 7814) || (index >= 7850 && index <= 7854) || (index >= 7860 && index <= 7864))
+                        moveSound = SoundList.WalkRoughL;
+                    else if ((index >= 5 && index <= 0009) || (index >= 15 && index <= 0099) || (index >= 105 && index <= 0109) || (index >= 115 && index <= 0155) ||
+                             (index >= 160 && index <= 0164) || (index >= 205 && index <= 0209) || (index >= 215 && index <= 0254) || (index >= 260 && index <= 0299) ||
+                             (index >= 305 && index <= 0309) || (index >= 315 && index <= 0399) || (index >= 405 && index <= 0409) || (index >= 415 && index <= 0499) ||
+                             (index >= 505 && index <= 0509) || (index >= 515 && index <= 0554) || (index >= 560 && index <= 0599) || (index >= 605 && index <= 0609) ||
+                             (index >= 615 && index <= 0654) || (index >= 660 && index <= 0699) || (index >= 705 && index <= 0709) || (index >= 715 && index <= 0799) ||
+                             (index >= 1100 && index <= 1104) || (index >= 1110 && index <= 1149) || (index >= 1155 && index <= 1159) || (index >= 1200 && index <= 1249) ||
+                             (index >= 1255 && index <= 1259) || (index >= 1265 && index <= 1304) || (index >= 1310 && index <= 1349) || (index >= 1355 && index <= 1359) ||
+                             (index >= 1365 && index <= 1399) || (index >= 1600 && index <= 1604) || (index >= 1606 && index <= 1607) || (index >= 1610 && index <= 1649) ||
+                             (index >= 1655 && index <= 1659) || (index >= 1665 && index <= 1699) || (index >= 2100 && index <= 2149) || (index >= 2155 && index <= 2159) ||
+                             (index >= 2165 && index <= 2249) || (index >= 2255 && index <= 2259) || (index >= 2264 && index <= 2299) || (index >= 2700 && index <= 2749) ||
+                             (index >= 2755 && index <= 2759) || (index >= 2765 && index <= 2799) || (index >= 2805 && index <= 2809) || (index >= 2815 && index <= 2854) ||
+                             (index >= 2860 && index <= 2864) || (index >= 2905 && index <= 2909) || (index >= 2915 && index <= 2954) || (index >= 2960 && index <= 2964) ||
+                             (index >= 3005 && index <= 3009) || (index >= 3015 && index <= 3099) || (index >= 3105 && index <= 3110) || (index >= 3115 && index <= 3199) ||
+                             (index >= 3205 && index <= 3299) || (index >= 3305 && index <= 3399) || (index >= 3405 && index <= 3409) || (index >= 3415 && index <= 3454) ||
+                             (index >= 3460 && index <= 3464) || (index >= 3505 && index <= 3509) || (index >= 3515 && index <= 3554) || (index >= 3560 && index <= 3564) ||
+                             (index >= 3605 && index <= 3609) || (index >= 3615 && index <= 3699) || (index >= 3705 && index <= 3709) || (index >= 3715 && index <= 3799) ||
+                             (index >= 3805 && index <= 3899) || (index >= 3905 && index <= 3909) || (index >= 3915 && index <= 3999) || (index >= 4005 && index <= 4009) ||
+                             (index >= 4015 && index <= 4099) || (index >= 4105 && index <= 4109) || (index >= 4115 && index <= 4199) || (index >= 4205 && index <= 4209) ||
+                             (index >= 4305 && index <= 4309) || (index >= 4312 && index <= 4399) || (index >= 4405 && index <= 4409) || (index >= 4415 && index <= 4499) ||
+                             (index >= 4505 && index <= 4509) || (index >= 4515 && index <= 4599) || (index >= 4605 && index <= 4609) || (index >= 4615 && index <= 4619) ||
+                             (index >= 4622 && index <= 4654) || (index >= 4660 && index <= 4699) || (index >= 6400 && index <= 6849) || (index >= 7455 && index <= 7459) ||
+                             (index >= 7465 && index <= 7504) || (index >= 7510 && index <= 7514) || (index >= 7555 && index <= 7559) || (index >= 7565 && index <= 7604) ||
+                             (index >= 7610 && index <= 7614) || (index >= 7650 && index <= 7654) || (index >= 7660 && index <= 7664) ||
+                             (index >= 7705 && index <= 7709) || (index >= 7715 && index <= 7749))
+                        moveSound = SoundList.WalkStoneL;
+                    else if ((index >= 8000 && index <= 8149) || (index >= 8400 && index <= 8481))
+                        moveSound = SoundList.WalkCaveL;
+                    else if ((index >= 7900 && index <= 7949))
+                        moveSound = SoundList.WalkWaterL;
+                    else moveSound = SoundList.WalkWaterL;
+                }
                     break;
                 case 105:
-                    {
-                        //Tiles6
-                        if (index >= 0 && index <= 1539)
-                            moveSound = SoundList.WalkLawnL;
-                        else if (index >= 1540 && index <= 2368)
-                            moveSound = SoundList.WalkRoomL;
-                        else
-                            moveSound = SoundList.WalkWaterL;
-                    }
+                {
+                    //Tiles6
+                    if (index >= 0 && index <= 1539)
+                        moveSound = SoundList.WalkLawnL;
+                    else if (index >= 1540 && index <= 2368)
+                        moveSound = SoundList.WalkRoomL;
+                    else
+                        moveSound = SoundList.WalkWaterL;
+                }
                     break;
                 case 106:
-                    {
-                        //Tiles7
-                        if ((index >= 0 && index <= 19) || (index >= 24 && index <= 053) || (index >= 56 && index <= 69) || (index >= 72 && index <= 74) ||
-                            (index >= 77 && index <= 93) || (index >= 99 && index <= 115) || (index >= 121 && index <= 124) || (index >= 127 && index <= 132) ||
-                            (index >= 135 && index <= 141) || (index >= 185 && index <= 190) || (index >= 191 && index <= 200) || (index >= 927 && index <= 940) ||
-                            (index >= 961 && index <= 1160))
-                            moveSound = SoundList.WalkGroundL;
-                        else if ((index >= 201 && index <= 926) || (index >= 941 && index <= 960) || (index >= 1161 && index <= 3310))
-                            moveSound = SoundList.WalkLawnL;
-                        else if ((index >= 96 && index <= 98))
-                            moveSound = SoundList.WalkWoodL;
-                        else if ((index >= 94 && index <= 95) || (index >= 151 && index <= 184))
-                            moveSound = SoundList.WalkStoneL;
-                        else if ((index >= 20 && index <= 23) || (index >= 54 && index <= 55) || (index >= 70 && index <= 71) || (index >= 75 && index <= 76) ||
-                            (index >= 116 && index <= 120))
-                            moveSound = SoundList.WalkCaveL;
-                        else if ((index >= 125 && index <= 126) || (index >= 133 && index <= 134) || (index >= 142 && index <= 151))
-                            moveSound = SoundList.WalkWaterL;
-                        else moveSound = SoundList.WalkWaterL;
-                    }
+                {
+                    //Tiles7
+                    if ((index >= 0 && index <= 19) || (index >= 24 && index <= 053) || (index >= 56 && index <= 69) || (index >= 72 && index <= 74) ||
+                        (index >= 77 && index <= 93) || (index >= 99 && index <= 115) || (index >= 121 && index <= 124) || (index >= 127 && index <= 132) ||
+                        (index >= 135 && index <= 141) || (index >= 185 && index <= 190) || (index >= 191 && index <= 200) || (index >= 927 && index <= 940) ||
+                        (index >= 961 && index <= 1160))
+                        moveSound = SoundList.WalkGroundL;
+                    else if ((index >= 201 && index <= 926) || (index >= 941 && index <= 960) || (index >= 1161 && index <= 3310))
+                        moveSound = SoundList.WalkLawnL;
+                    else if ((index >= 96 && index <= 98))
+                        moveSound = SoundList.WalkWoodL;
+                    else if ((index >= 94 && index <= 95) || (index >= 151 && index <= 184))
+                        moveSound = SoundList.WalkStoneL;
+                    else if ((index >= 20 && index <= 23) || (index >= 54 && index <= 55) || (index >= 70 && index <= 71) || (index >= 75 && index <= 76) ||
+                             (index >= 116 && index <= 120))
+                        moveSound = SoundList.WalkCaveL;
+                    else if ((index >= 125 && index <= 126) || (index >= 133 && index <= 134) || (index >= 142 && index <= 151))
+                        moveSound = SoundList.WalkWaterL;
+                    else moveSound = SoundList.WalkWaterL;
+                }
                     break;
                 case 107:
-                    {
-                        //Tiles8
-                        if (index >= 0 && index <= 1215)
-                            moveSound = SoundList.WalkCaveL;
-                        else moveSound = SoundList.WalkWaterL;
-                    }
+                {
+                    //Tiles8
+                    if (index >= 0 && index <= 1215)
+                        moveSound = SoundList.WalkCaveL;
+                    else moveSound = SoundList.WalkWaterL;
+                }
                     break;
                 default:
                     moveSound = SoundList.WalkWaterL;
@@ -4017,67 +3832,67 @@ namespace Client.MirObjects
             switch (GameScene.Scene.MapControl.M2CellInfo[x, y].MiddleIndex)
             {
                 case 114:
-                    {
-                        //SMTiles5  iJam Ver
-                        if ((index >= 3165 && index <= 21311) || (index >= 23775 && index <= 24650))
-                            moveSound = SoundList.WalkGroundL;
-                        else if ((index >= 2773 && index <= 3164) || (index >= 21416 && index <= 21462) || (index >= 21510 && index <= 21511) || (index >= 21528 && index <= 21531) ||
-                                (index >= 21548 && index <= 21533) || (index >= 21569 && index <= 21575) || (index >= 21591 && index <= 21594) || (index >= 21609 && index <= 21613) ||
-                                (index >= 21627 && index <= 21632) || (index >= 21646 && index <= 21650) || (index >= 21634 && index <= 21667) || (index >= 22977 && index <= 23316) ||
-                                (index >= 30473 && index <= 31255))
-                            moveSound = SoundList.WalkLawnL;
-                        else if ((index >= 24651 && index <= 30472))
-                            moveSound = SoundList.WalkRoomL;
-                        else if ((index >= 0 && index <= 2772) || (index >= 21312 && index <= 21415) || (index >= 21463 && index <= 21509) || (index >= 21512 && index <= 21527) ||
-                            (index >= 21532 && index <= 21547) || (index >= 21534 && index <= 21568) || (index >= 21576 && index <= 21590) || (index >= 21595 && index <= 21608) ||
-                            (index >= 21614 && index <= 21626) || (index >= 21633 && index <= 21645) || (index >= 21651 && index <= 21633) || (index >= 21668 && index <= 22976) ||
-                            (index >= 23317 && index <= 23774) || (index >= 31256 && index <= 31302))
-                            moveSound = SoundList.WalkStoneL;
-                    }
+                {
+                    //SMTiles5  iJam Ver
+                    if ((index >= 3165 && index <= 21311) || (index >= 23775 && index <= 24650))
+                        moveSound = SoundList.WalkGroundL;
+                    else if ((index >= 2773 && index <= 3164) || (index >= 21416 && index <= 21462) || (index >= 21510 && index <= 21511) || (index >= 21528 && index <= 21531) ||
+                             (index >= 21548 && index <= 21533) || (index >= 21569 && index <= 21575) || (index >= 21591 && index <= 21594) || (index >= 21609 && index <= 21613) ||
+                             (index >= 21627 && index <= 21632) || (index >= 21646 && index <= 21650) || (index >= 21634 && index <= 21667) || (index >= 22977 && index <= 23316) ||
+                             (index >= 30473 && index <= 31255))
+                        moveSound = SoundList.WalkLawnL;
+                    else if ((index >= 24651 && index <= 30472))
+                        moveSound = SoundList.WalkRoomL;
+                    else if ((index >= 0 && index <= 2772) || (index >= 21312 && index <= 21415) || (index >= 21463 && index <= 21509) || (index >= 21512 && index <= 21527) ||
+                             (index >= 21532 && index <= 21547) || (index >= 21534 && index <= 21568) || (index >= 21576 && index <= 21590) || (index >= 21595 && index <= 21608) ||
+                             (index >= 21614 && index <= 21626) || (index >= 21633 && index <= 21645) || (index >= 21651 && index <= 21633) || (index >= 21668 && index <= 22976) ||
+                             (index >= 23317 && index <= 23774) || (index >= 31256 && index <= 31302))
+                        moveSound = SoundList.WalkStoneL;
+                }
                     break;
                 case 116:
-                    {
-                        //SMTiles7  iJam Ver
-                        if ((index >= 10 && index <= 13) || (index >= 23 && index <= 25) || (index >= 35 && index <= 37) || (index >= 47 && index <= 49) ||
-                            (index >= 59 && index <= 61) || (index >= 71 && index <= 73) || (index >= 83 && index <= 85) || (index >= 95 && index <= 97) ||
-                            (index >= 107 && index <= 109) || (index >= 119 && index <= 121) || (index >= 131 && index <= 133) || (index >= 143 && index <= 145) ||
-                            (index >= 155 && index <= 157) || (index >= 167 && index <= 169) || (index >= 179 && index <= 181) || (index >= 191 && index <= 193) ||
-                            (index >= 203 && index <= 205) || (index >= 215 && index <= 217) || (index >= 227 && index <= 229) || (index >= 239 && index <= 241) ||
-                            (index >= 251 && index <= 253) || (index >= 263 && index <= 264) || (index >= 269 && index <= 271) || (index >= 281 && index <= 283) ||
-                            (index >= 297 && index <= 299) || (index >= 311 && index <= 313) || (index >= 323 && index <= 325) || (index >= 333 && index <= 335) ||
-                            (index >= 341 && index <= 343) || (index >= 347 && index <= 349) || (index >= 351 && index <= 353) || (index >= 488 && index <= 489) ||
-                            (index >= 494 && index <= 495) || (index >= 502 && index <= 503) || (index >= 512 && index <= 514) || (index >= 524 && index <= 526) ||
-                            (index >= 538 && index <= 540) || (index >= 554 && index <= 556) || (index >= 572 && index <= 573) || (index >= 648 && index <= 649) ||
-                            (index >= 665 && index <= 667) || (index >= 677 && index <= 679) || (index >= 689 && index <= 690) || (index >= 701 && index <= 702) ||
-                            (index >= 713 && index <= 714) || (index >= 1260 && index <= 1567) || (index >= 2772 && index <= 5869) || (index >= 8887 && index <= 10230))
-                            moveSound = SoundList.WalkGroundL;
-                        else if ((index >= 2013 && index <= 2438) || (index >= 2639 && index <= 2771))
-                            moveSound = SoundList.WalkRoughL;
-                        else if ((index >= 7810 && index <= 7814) || (index >= 7827 && index <= 7832) || (index >= 7847 && index <= 7853) || (index >= 7866 && index <= 7867) ||
-                            (index >= 7872 && index <= 7874) || (index >= 7884 && index <= 7887) || (index >= 7892 && index <= 7910) || (index >= 7916 && index <= 7923) ||
-                            (index >= 7929 && index <= 7990))
-                            moveSound = SoundList.WalkWoodL;
-                        else if ((index >= 5870 && index <= 7753) || (index >= 7868 && index <= 7871) || (index >= 7888 && index <= 7891) || (index >= 7991 && index <= 8886) ||
-                            (index >= 10231 && index <= 10430))
-                            moveSound = SoundList.WalkRoomL;
-                        else if ((index >= 0 && index <= 9) || (index >= 14 && index <= 22) || (index >= 26 && index <= 34) || (index >= 38 && index <= 46) ||
-                            (index >= 50 && index <= 58) || (index >= 62 && index <= 70) || (index >= 74 && index <= 82) || (index >= 86 && index <= 94) ||
-                            (index >= 98 && index <= 106) || (index >= 110 && index <= 118) || (index >= 122 && index <= 130) || (index >= 134 && index <= 142) ||
-                            (index >= 146 && index <= 154) || (index >= 158 && index <= 166) || (index >= 170 && index <= 178) || (index >= 182 && index <= 190) ||
-                            (index >= 194 && index <= 202) || (index >= 206 && index <= 214) || (index >= 218 && index <= 226) || (index >= 230 && index <= 238) ||
-                            (index >= 242 && index <= 250) || (index >= 254 && index <= 262) || (index >= 265 && index <= 268) || (index >= 272 && index <= 280) ||
-                            (index >= 284 && index <= 296) || (index >= 300 && index <= 310) || (index >= 314 && index <= 322) || (index >= 326 && index <= 332) ||
-                            (index >= 336 && index <= 340) || (index >= 344 && index <= 346) || (index >= 350 && index <= 350) || (index >= 354 && index <= 487) ||
-                            (index >= 490 && index <= 493) || (index >= 496 && index <= 501) || (index >= 504 && index <= 511) || (index >= 515 && index <= 523) ||
-                            (index >= 527 && index <= 537) || (index >= 541 && index <= 553) || (index >= 557 && index <= 571) || (index >= 574 && index <= 647) ||
-                            (index >= 650 && index <= 664) || (index >= 668 && index <= 676) || (index >= 680 && index <= 688) || (index >= 691 && index <= 700) ||
-                            (index >= 703 && index <= 712) || (index >= 715 && index <= 1259) || (index >= 1568 && index <= 2012) || (index >= 7754 && index <= 7809) ||
-                            (index >= 7815 && index <= 7826) || (index >= 7833 && index <= 7846) || (index >= 7854 && index <= 7865) || (index >= 7875 && index <= 7883) ||
-                            (index >= 7911 && index <= 7915) || (index >= 7924 && index <= 7928))
-                            moveSound = SoundList.WalkStoneL;
-                        else if ((index >= 2439 && index <= 2638))
-                            moveSound = SoundList.WalkCaveL;
-                    }
+                {
+                    //SMTiles7  iJam Ver
+                    if ((index >= 10 && index <= 13) || (index >= 23 && index <= 25) || (index >= 35 && index <= 37) || (index >= 47 && index <= 49) ||
+                        (index >= 59 && index <= 61) || (index >= 71 && index <= 73) || (index >= 83 && index <= 85) || (index >= 95 && index <= 97) ||
+                        (index >= 107 && index <= 109) || (index >= 119 && index <= 121) || (index >= 131 && index <= 133) || (index >= 143 && index <= 145) ||
+                        (index >= 155 && index <= 157) || (index >= 167 && index <= 169) || (index >= 179 && index <= 181) || (index >= 191 && index <= 193) ||
+                        (index >= 203 && index <= 205) || (index >= 215 && index <= 217) || (index >= 227 && index <= 229) || (index >= 239 && index <= 241) ||
+                        (index >= 251 && index <= 253) || (index >= 263 && index <= 264) || (index >= 269 && index <= 271) || (index >= 281 && index <= 283) ||
+                        (index >= 297 && index <= 299) || (index >= 311 && index <= 313) || (index >= 323 && index <= 325) || (index >= 333 && index <= 335) ||
+                        (index >= 341 && index <= 343) || (index >= 347 && index <= 349) || (index >= 351 && index <= 353) || (index >= 488 && index <= 489) ||
+                        (index >= 494 && index <= 495) || (index >= 502 && index <= 503) || (index >= 512 && index <= 514) || (index >= 524 && index <= 526) ||
+                        (index >= 538 && index <= 540) || (index >= 554 && index <= 556) || (index >= 572 && index <= 573) || (index >= 648 && index <= 649) ||
+                        (index >= 665 && index <= 667) || (index >= 677 && index <= 679) || (index >= 689 && index <= 690) || (index >= 701 && index <= 702) ||
+                        (index >= 713 && index <= 714) || (index >= 1260 && index <= 1567) || (index >= 2772 && index <= 5869) || (index >= 8887 && index <= 10230))
+                        moveSound = SoundList.WalkGroundL;
+                    else if ((index >= 2013 && index <= 2438) || (index >= 2639 && index <= 2771))
+                        moveSound = SoundList.WalkRoughL;
+                    else if ((index >= 7810 && index <= 7814) || (index >= 7827 && index <= 7832) || (index >= 7847 && index <= 7853) || (index >= 7866 && index <= 7867) ||
+                             (index >= 7872 && index <= 7874) || (index >= 7884 && index <= 7887) || (index >= 7892 && index <= 7910) || (index >= 7916 && index <= 7923) ||
+                             (index >= 7929 && index <= 7990))
+                        moveSound = SoundList.WalkWoodL;
+                    else if ((index >= 5870 && index <= 7753) || (index >= 7868 && index <= 7871) || (index >= 7888 && index <= 7891) || (index >= 7991 && index <= 8886) ||
+                             (index >= 10231 && index <= 10430))
+                        moveSound = SoundList.WalkRoomL;
+                    else if ((index >= 0 && index <= 9) || (index >= 14 && index <= 22) || (index >= 26 && index <= 34) || (index >= 38 && index <= 46) ||
+                             (index >= 50 && index <= 58) || (index >= 62 && index <= 70) || (index >= 74 && index <= 82) || (index >= 86 && index <= 94) ||
+                             (index >= 98 && index <= 106) || (index >= 110 && index <= 118) || (index >= 122 && index <= 130) || (index >= 134 && index <= 142) ||
+                             (index >= 146 && index <= 154) || (index >= 158 && index <= 166) || (index >= 170 && index <= 178) || (index >= 182 && index <= 190) ||
+                             (index >= 194 && index <= 202) || (index >= 206 && index <= 214) || (index >= 218 && index <= 226) || (index >= 230 && index <= 238) ||
+                             (index >= 242 && index <= 250) || (index >= 254 && index <= 262) || (index >= 265 && index <= 268) || (index >= 272 && index <= 280) ||
+                             (index >= 284 && index <= 296) || (index >= 300 && index <= 310) || (index >= 314 && index <= 322) || (index >= 326 && index <= 332) ||
+                             (index >= 336 && index <= 340) || (index >= 344 && index <= 346) || (index >= 350 && index <= 350) || (index >= 354 && index <= 487) ||
+                             (index >= 490 && index <= 493) || (index >= 496 && index <= 501) || (index >= 504 && index <= 511) || (index >= 515 && index <= 523) ||
+                             (index >= 527 && index <= 537) || (index >= 541 && index <= 553) || (index >= 557 && index <= 571) || (index >= 574 && index <= 647) ||
+                             (index >= 650 && index <= 664) || (index >= 668 && index <= 676) || (index >= 680 && index <= 688) || (index >= 691 && index <= 700) ||
+                             (index >= 703 && index <= 712) || (index >= 715 && index <= 1259) || (index >= 1568 && index <= 2012) || (index >= 7754 && index <= 7809) ||
+                             (index >= 7815 && index <= 7826) || (index >= 7833 && index <= 7846) || (index >= 7854 && index <= 7865) || (index >= 7875 && index <= 7883) ||
+                             (index >= 7911 && index <= 7915) || (index >= 7924 && index <= 7928))
+                        moveSound = SoundList.WalkStoneL;
+                    else if ((index >= 2439 && index <= 2638))
+                        moveSound = SoundList.WalkCaveL;
+                }
                     break;
             }
             #endregion
@@ -4112,13 +3927,13 @@ namespace Client.MirObjects
                     (index >= 229475 && index <= 230959) || (index >= 231378 && index <= 231436))
                     moveSound = SoundList.WalkGroundL;
                 else if ((index >= 209236 && index <= 209295) || (index >= 209356 && index <= 209415) || (index >= 209476 && index <= 209535) || (index >= 209836 && index <= 210435) ||
-                    (index >= 210689 && index <= 210915) || (index >= 223242 && index <= 225299) || (index >= 226252 && index <= 227305) || (index >= 228128 && index <= 228132) ||
-                    (index >= 228187 && index <= 228192) || (index >= 228245 && index <= 228249) || (index >= 228275 && index <= 228280) || (index >= 228358 && index <= 228454) ||
-                    (index >= 228974 && index <= 229474) || (index >= 230960 && index <= 231377))
+                         (index >= 210689 && index <= 210915) || (index >= 223242 && index <= 225299) || (index >= 226252 && index <= 227305) || (index >= 228128 && index <= 228132) ||
+                         (index >= 228187 && index <= 228192) || (index >= 228245 && index <= 228249) || (index >= 228275 && index <= 228280) || (index >= 228358 && index <= 228454) ||
+                         (index >= 228974 && index <= 229474) || (index >= 230960 && index <= 231377))
                     moveSound = SoundList.WalkLawnL;
                 else if ((index >= 300000 && index <= 209118) || (index >= 220541 && index <= 220787) || (index >= 221195 && index <= 223241) || (index >= 225300 && index <= 226251) ||
-                    (index >= 227306 && index <= 228127) || (index >= 228133 && index <= 228186) || (index >= 228193 && index <= 228244) || (index >= 228250 && index <= 228274) ||
-                    (index >= 228281 && index <= 228357) || (index >= 228455 && index <= 228973) || (index >= 231437 && index <= 231703))
+                         (index >= 227306 && index <= 228127) || (index >= 228133 && index <= 228186) || (index >= 228193 && index <= 228244) || (index >= 228250 && index <= 228274) ||
+                         (index >= 228281 && index <= 228357) || (index >= 228455 && index <= 228973) || (index >= 231437 && index <= 231703))
                     moveSound = SoundList.WalkStoneL;
                 else if ((index >= 211036 && index <= 219199))
                     moveSound = SoundList.WalkRoomL;
@@ -4144,39 +3959,39 @@ namespace Client.MirObjects
                 else if ((index >= 301468 && index <= 301515) || (index >= 302130 && index <= 302131) || (index >= 302292 && index <= 302491) || (index >= 302828 && index <= 303063))
                     moveSound = SoundList.WalkRoughL;
                 else if ((index >= 301516 && index <= 301555) || (index >= 304647 && index <= 304934) || (index >= 305615 && index <= 305618) || (index >= 305628 && index <= 303632) ||
-                    (index >= 305641 && index <= 305646) || (index >= 305652 && index <= 305660) || (index >= 305664 && index <= 305674) || (index >= 305677 && index <= 305988) ||
-                    (index >= 306438 && index <= 306456) || (index >= 306475 && index <= 306483) || (index >= 306506 && index <= 306511) || (index >= 306534 && index <= 306539) ||
-                    (index >= 306626 && index <= 306635) || (index >= 306762 && index <= 306787) || (index >= 306930 && index <= 306935) || (index >= 306943 && index <= 306950) ||
-                    (index >= 306956 && index <= 307026) || (index >= 307105 && index <= 307109) || (index >= 307119 && index <= 307123) || (index >= 307134 && index <= 307137) ||
-                    (index >= 307150 && index <= 307161) || (index >= 307168 && index <= 307242) || (index >= 308983 && index <= 310891))
+                         (index >= 305641 && index <= 305646) || (index >= 305652 && index <= 305660) || (index >= 305664 && index <= 305674) || (index >= 305677 && index <= 305988) ||
+                         (index >= 306438 && index <= 306456) || (index >= 306475 && index <= 306483) || (index >= 306506 && index <= 306511) || (index >= 306534 && index <= 306539) ||
+                         (index >= 306626 && index <= 306635) || (index >= 306762 && index <= 306787) || (index >= 306930 && index <= 306935) || (index >= 306943 && index <= 306950) ||
+                         (index >= 306956 && index <= 307026) || (index >= 307105 && index <= 307109) || (index >= 307119 && index <= 307123) || (index >= 307134 && index <= 307137) ||
+                         (index >= 307150 && index <= 307161) || (index >= 307168 && index <= 307242) || (index >= 308983 && index <= 310891))
                     moveSound = SoundList.WalkLawnL;
                 else if ((index >= 300691 && index <= 300694) || (index >= 301155 && index <= 301164) || (index >= 301167 && index <= 301173) || (index >= 301181 && index <= 301185) ||
-                    (index >= 301194 && index <= 301197) || (index >= 301208 && index <= 301211) || (index >= 301223 && index <= 301225) || (index >= 301233 && index <= 301235) ||
-                    (index >= 301238 && index <= 301239) || (index >= 301247 && index <= 301250) || (index >= 301254 && index <= 301256) || (index >= 301262 && index <= 301265) ||
-                    (index >= 301271 && index <= 301273) || (index >= 301277 && index <= 301280) || (index >= 301288 && index <= 301295) || (index >= 301305 && index <= 301310) ||
-                    (index >= 301322 && index <= 301325) || (index >= 301339 && index <= 301341) || (index >= 301350 && index <= 301352) || (index >= 301356 && index <= 301358) ||
-                    (index >= 301368 && index <= 301375) || (index >= 301386 && index <= 301392) || (index >= 301404 && index <= 301409) || (index >= 301424 && index <= 301427) ||
-                    (index >= 301587 && index <= 301590) || (index >= 301605 && index <= 301608) || (index >= 301622 && index <= 301625) || (index >= 301638 && index <= 301642) ||
-                    (index >= 301655 && index <= 301660) || (index >= 301666 && index <= 301678) || (index >= 301683 && index <= 301685) || (index >= 301688 && index <= 301692) ||
-                    (index >= 301700 && index <= 301709) || (index >= 301718 && index <= 301728) || (index >= 301736 && index <= 301744) || (index >= 301754 && index <= 301763))
+                         (index >= 301194 && index <= 301197) || (index >= 301208 && index <= 301211) || (index >= 301223 && index <= 301225) || (index >= 301233 && index <= 301235) ||
+                         (index >= 301238 && index <= 301239) || (index >= 301247 && index <= 301250) || (index >= 301254 && index <= 301256) || (index >= 301262 && index <= 301265) ||
+                         (index >= 301271 && index <= 301273) || (index >= 301277 && index <= 301280) || (index >= 301288 && index <= 301295) || (index >= 301305 && index <= 301310) ||
+                         (index >= 301322 && index <= 301325) || (index >= 301339 && index <= 301341) || (index >= 301350 && index <= 301352) || (index >= 301356 && index <= 301358) ||
+                         (index >= 301368 && index <= 301375) || (index >= 301386 && index <= 301392) || (index >= 301404 && index <= 301409) || (index >= 301424 && index <= 301427) ||
+                         (index >= 301587 && index <= 301590) || (index >= 301605 && index <= 301608) || (index >= 301622 && index <= 301625) || (index >= 301638 && index <= 301642) ||
+                         (index >= 301655 && index <= 301660) || (index >= 301666 && index <= 301678) || (index >= 301683 && index <= 301685) || (index >= 301688 && index <= 301692) ||
+                         (index >= 301700 && index <= 301709) || (index >= 301718 && index <= 301728) || (index >= 301736 && index <= 301744) || (index >= 301754 && index <= 301763))
                     moveSound = SoundList.WalkWoodL;
                 else if ((index >= 303064 && index <= 304418))
                     moveSound = SoundList.WalkRoomL;
                 else if ((index >= 328055 && index <= 332912))
                     moveSound = SoundList.WalkCaveL;
                 else if ((index >= 300683 && index <= 300690) || (index >= 300700 && index <= 300713) || (index >= 300719 && index <= 300732) || (index >= 300746 && index <= 300751) ||
-                    (index >= 300830 && index <= 300832) || (index >= 300850 && index <= 300851) || (index >= 300905 && index <= 300906) || (index >= 300921 && index <= 300922) ||
-                    (index >= 300936 && index <= 300938) || (index >= 301089 && index <= 301104) || (index >= 301107 && index <= 301111) || (index >= 301114 && index <= 301136) ||
-                    (index >= 301139 && index <= 301154) || (index >= 301165 && index <= 301166) || (index >= 301174 && index <= 301180) || (index >= 301186 && index <= 301193) ||
-                    (index >= 301198 && index <= 301207) || (index >= 301212 && index <= 301222) || (index >= 301226 && index <= 301232) || (index >= 301236 && index <= 301237) ||
-                    (index >= 301240 && index <= 301246) || (index >= 301251 && index <= 301253) || (index >= 301258 && index <= 301261) || (index >= 301266 && index <= 301270) ||
-                    (index >= 301274 && index <= 301276) || (index >= 301281 && index <= 301287) || (index >= 301296 && index <= 301304) || (index >= 301311 && index <= 301321) ||
-                    (index >= 301326 && index <= 301338) || (index >= 301342 && index <= 301349) || (index >= 301354 && index <= 301355) || (index >= 301359 && index <= 301367) ||
-                    (index >= 301376 && index <= 301385) || (index >= 301393 && index <= 301403) || (index >= 301410 && index <= 301421) || (index >= 301428 && index <= 301440) ||
-                    (index >= 301447 && index <= 301459) || (index >= 301556 && index <= 301586) || (index >= 301591 && index <= 301604) || (index >= 301609 && index <= 301621) ||
-                    (index >= 301626 && index <= 301637) || (index >= 301643 && index <= 301654) || (index >= 301661 && index <= 301665) || (index >= 301679 && index <= 301682) ||
-                    (index >= 301686 && index <= 301687) || (index >= 301693 && index <= 301699) || (index >= 301710 && index <= 301717) || (index >= 301729 && index <= 301735) ||
-                    (index >= 301768 && index <= 301771) || (index >= 301787 && index <= 301789) || (index >= 301745 && index <= 301753))
+                         (index >= 300830 && index <= 300832) || (index >= 300850 && index <= 300851) || (index >= 300905 && index <= 300906) || (index >= 300921 && index <= 300922) ||
+                         (index >= 300936 && index <= 300938) || (index >= 301089 && index <= 301104) || (index >= 301107 && index <= 301111) || (index >= 301114 && index <= 301136) ||
+                         (index >= 301139 && index <= 301154) || (index >= 301165 && index <= 301166) || (index >= 301174 && index <= 301180) || (index >= 301186 && index <= 301193) ||
+                         (index >= 301198 && index <= 301207) || (index >= 301212 && index <= 301222) || (index >= 301226 && index <= 301232) || (index >= 301236 && index <= 301237) ||
+                         (index >= 301240 && index <= 301246) || (index >= 301251 && index <= 301253) || (index >= 301258 && index <= 301261) || (index >= 301266 && index <= 301270) ||
+                         (index >= 301274 && index <= 301276) || (index >= 301281 && index <= 301287) || (index >= 301296 && index <= 301304) || (index >= 301311 && index <= 301321) ||
+                         (index >= 301326 && index <= 301338) || (index >= 301342 && index <= 301349) || (index >= 301354 && index <= 301355) || (index >= 301359 && index <= 301367) ||
+                         (index >= 301376 && index <= 301385) || (index >= 301393 && index <= 301403) || (index >= 301410 && index <= 301421) || (index >= 301428 && index <= 301440) ||
+                         (index >= 301447 && index <= 301459) || (index >= 301556 && index <= 301586) || (index >= 301591 && index <= 301604) || (index >= 301609 && index <= 301621) ||
+                         (index >= 301626 && index <= 301637) || (index >= 301643 && index <= 301654) || (index >= 301661 && index <= 301665) || (index >= 301679 && index <= 301682) ||
+                         (index >= 301686 && index <= 301687) || (index >= 301693 && index <= 301699) || (index >= 301710 && index <= 301717) || (index >= 301729 && index <= 301735) ||
+                         (index >= 301768 && index <= 301771) || (index >= 301787 && index <= 301789) || (index >= 301745 && index <= 301753))
                     moveSound = SoundList.WalkWaterL;
             }
 
@@ -4189,7 +4004,7 @@ namespace Client.MirObjects
                 else if ((index >= 501845 && index <= 503293) || (index >= 513557 && index <= 513745))
                     moveSound = SoundList.WalkLawnL;
                 else if ((index >= 509087 && index <= 509519) || (index >= 512813 && index <= 512909) || (index >= 516308 && index <= 521325) || (index >= 522111 && index <= 526819) ||
-                    (index >= 528872 && index <= 530723))
+                         (index >= 528872 && index <= 530723))
                     moveSound = SoundList.WalkRoomL;
                 else if ((index >= 512910 && index <= 513556) || (index >= 513746 && index <= 514853) || (index >= 515037 && index <= 516307))
                     moveSound = SoundList.WalkStoneL;
@@ -4228,68 +4043,68 @@ namespace Client.MirObjects
                     moveSound = SoundList.WalkRoughL;
                 // Stone
                 else if ((index >= 500 && index <= 518) || (index >= 523 && index <= 524) || (index >= 527 && index <= 528)
-                    || (index >= 907 && index <= 733) || (index >= 1543 && index <= 1564) || (index >= 1561 && index <= 1564)
-                    || (index == 1589) || (index >= 1591 && index <= 1592) || (index == 1595) || (index >= 1598 && index <= 1600)
-                    || (index >= 1751 && index <= 1752) || (index >= 1760 && index <= 1762) || (index >= 1770 && index <= 1771)
-                    || (index >= 1882 && index <= 1883) || (index >= 1891 && index <= 1893) || (index >= 1900 && index <= 1903)
-                    || (index >= 1910 && index <= 1911) || (index >= 1920 && index <= 1922) || (index >= 1926 && index <= 1929)
-                    || (index >= 1940 && index <= 1941) || (index == 7138) || (index == 7492) || (index == 7552) || (index == 7557)
-                    || (index == 7560) || (index == 7932) || (index == 7935) || (index == 7940) || (index == 7943) || (index == 8085)
-                    || (index == 8110) || (index == 8111) || (index == 8130) || (index == 8352) || (index == 8356) || (index == 8543)
-                    || (index == 8571) || (index == 8579) || (index == 8680) || (index == 9217) || (index == 9248) || (index == 9249)
-                    || (index >= 9283 && index <= 9285) || (index >= 9287 && index <= 9288) || (index >= 9300 && index <= 9301)
-                    || (index >= 9317 && index <= 9318) || (index >= 9321 && index <= 9322) || (index >= 9333 && index <= 9334)
-                    || (index == 9350) || (index == 9353) || (index >= 9377 && index <= 9378) || (index == 9381)
-                    || (index >= 9405 && index <= 9406) || (index == 9409) || (index >= 9442 && index <= 9443)
-                    || (index >= 9471 && index <= 9472) || (index == 9484) || (index == 9517) || (index >= 9553 && index <= 9554)
-                    || (index >= 9630 && index <= 9631) || (index == 9662))
+                         || (index >= 907 && index <= 733) || (index >= 1543 && index <= 1564) || (index >= 1561 && index <= 1564)
+                         || (index == 1589) || (index >= 1591 && index <= 1592) || (index == 1595) || (index >= 1598 && index <= 1600)
+                         || (index >= 1751 && index <= 1752) || (index >= 1760 && index <= 1762) || (index >= 1770 && index <= 1771)
+                         || (index >= 1882 && index <= 1883) || (index >= 1891 && index <= 1893) || (index >= 1900 && index <= 1903)
+                         || (index >= 1910 && index <= 1911) || (index >= 1920 && index <= 1922) || (index >= 1926 && index <= 1929)
+                         || (index >= 1940 && index <= 1941) || (index == 7138) || (index == 7492) || (index == 7552) || (index == 7557)
+                         || (index == 7560) || (index == 7932) || (index == 7935) || (index == 7940) || (index == 7943) || (index == 8085)
+                         || (index == 8110) || (index == 8111) || (index == 8130) || (index == 8352) || (index == 8356) || (index == 8543)
+                         || (index == 8571) || (index == 8579) || (index == 8680) || (index == 9217) || (index == 9248) || (index == 9249)
+                         || (index >= 9283 && index <= 9285) || (index >= 9287 && index <= 9288) || (index >= 9300 && index <= 9301)
+                         || (index >= 9317 && index <= 9318) || (index >= 9321 && index <= 9322) || (index >= 9333 && index <= 9334)
+                         || (index == 9350) || (index == 9353) || (index >= 9377 && index <= 9378) || (index == 9381)
+                         || (index >= 9405 && index <= 9406) || (index == 9409) || (index >= 9442 && index <= 9443)
+                         || (index >= 9471 && index <= 9472) || (index == 9484) || (index == 9517) || (index >= 9553 && index <= 9554)
+                         || (index >= 9630 && index <= 9631) || (index == 9662))
                     moveSound = SoundList.WalkStoneL;
                 // Cave
                 else if (index >= 980 && index <= 1498)
                     moveSound = SoundList.WalkCaveL;
                 // Wood
                 else if ((index >= 1502 && index <= 1533) || (index == 1535) || (index == 1539) || (index == 1541) || (index == 1566)
-                    || (index == 1569) || (index == 1573) || (index >= 1577 && index <= 1578) || (index >= 1580 && index <= 1587))
+                         || (index == 1569) || (index == 1573) || (index >= 1577 && index <= 1578) || (index >= 1580 && index <= 1587))
                     moveSound = SoundList.WalkWoodL;
                 // Room
                 else if ((index == 1534) || (index >= 1536 && index <= 1538) || (index == 1540) || (index == 1567)
-                    || (index >= 1570 && index <= 1572) || (index >= 1574 && index <= 1576) || (index == 1579) || (index == 1590)
-                    || (index >= 1593 && index <= 1594) || (index >= 1596 && index <= 1597))
+                         || (index >= 1570 && index <= 1572) || (index >= 1574 && index <= 1576) || (index == 1579) || (index == 1590)
+                         || (index >= 1593 && index <= 1594) || (index >= 1596 && index <= 1597))
                     moveSound = SoundList.WalkRoomL;
                 // Water
                 else if ((index >= 0 && index <= 3) || (index >= 7 && index <= 11) || (index >= 14 && index <= 17)
-                    || (index >= 23 && index <= 25) || (index >= 30 && index <= 35) || (index >= 38 && index <= 43)
-                    || (index >= 48 && index <= 51) || (index >= 55 && index <= 59) || (index >= 62 && index <= 65)
-                    || (index >= 88 && index <= 91) || (index >= 100 && index <= 104) || (index >= 109 && index <= 117)
-                    || (index >= 124 && index <= 130) || (index >= 139 && index <= 142) || (index >= 145 && index <= 150)
-                    || (index >= 153 && index <= 159) || (index >= 164 && index <= 167) || (index >= 172 && index <= 175)
-                    || (index >= 179 && index <= 182) || (index >= 186 && index <= 192) || (index >= 195 && index <= 200)
-                    || (index >= 205 && index <= 207) || (index >= 212 && index <= 216) || (index >= 221 && index <= 224)
-                    || (index >= 228 && index <= 231) || (index >= 236 && index <= 243) || (index >= 250 && index <= 258)
-                    || (index >= 264 && index <= 268) || (index >= 277 && index <= 279) || (index >= 291 && index <= 296)
-                    || (index >= 300 && index <= 305) || (index >= 308 && index <= 311) || (index >= 320 && index <= 326)
-                    || (index >= 333 && index <= 341) || (index >= 350 && index <= 354) || (index >= 363 && index <= 366)
-                    || (index >= 385 && index <= 388) || (index >= 392 && index <= 396) || (index >= 400 && index <= 403)
-                    || (index >= 415 && index <= 417) || (index >= 423 && index <= 427) || (index >= 435 && index <= 443)
-                    || (index >= 449 && index <= 457) || (index >= 5825 && index <= 5829) || (index >= 5835 && index <= 5844)
-                    || (index >= 5849 && index <= 5859) || (index >= 5865 && index <= 5877) || (index >= 5882 && index <= 5894)
-                    || (index >= 5900 && index <= 5912) || (index >= 5918 && index <= 5932) || (index >= 5937 && index <= 5951)
-                    || (index >= 5958 && index <= 5973) || (index >= 5979 && index <= 5993) || (index >= 5999 && index <= 6011)
-                    || (index >= 6017 && index <= 6029) || (index >= 6034 && index <= 6046) || (index >= 6051 && index <= 6061)
-                    || (index >= 6067 && index <= 6076) || (index >= 6083 && index <= 6087) || (index >= 6105 && index <= 6110)
-                    || (index >= 6116 && index <= 6128) || (index >= 6138 && index <= 6152) || (index >= 6159 && index <= 6283)
-                    || (index >= 6290 && index <= 6303) || (index >= 6313 && index <= 6325) || (index >= 6331 && index <= 6336)
-                    || (index >= 6340 && index <= 6345) || (index >= 6348 && index <= 6354) || (index >= 6357 && index <= 6363)
-                    || (index >= 6366 && index <= 6371) || (index >= 6378 && index <= 6383) || (index >= 6386 && index <= 6392)
-                    || (index >= 6395 && index <= 6400) || (index >= 6404 && index <= 6409) || (index >= 6416 && index <= 6421)
-                    || (index >= 6424 && index <= 6430) || (index >= 6433 && index <= 6439) || (index >= 6442 && index <= 6448)
-                    || (index >= 6454 && index <= 6458) || (index >= 6462 && index <= 6467) || (index >= 6471 && index <= 6477)
-                    || (index >= 6480 && index <= 6486) || (index >= 6493 && index <= 6499) || (index >= 6502 && index <= 6508)
-                    || (index >= 6511 && index <= 6517) || (index >= 6520 && index <= 6525) || (index >= 6532 && index <= 6537)
-                    || (index >= 6541 && index <= 6546) || (index >= 6549 && index <= 6555) || (index >= 6558 && index <= 6563)
-                    || (index >= 6569 && index <= 6575) || (index >= 6578 && index <= 6584) || (index >= 6587 && index <= 6593)
-                    || (index >= 6597 && index <= 6601) || (index >= 6607 && index <= 6613) || (index >= 6616 && index <= 6622)
-                    || (index >= 6627 && index <= 6631) || (index >= 6635 && index <= 6639))
+                         || (index >= 23 && index <= 25) || (index >= 30 && index <= 35) || (index >= 38 && index <= 43)
+                         || (index >= 48 && index <= 51) || (index >= 55 && index <= 59) || (index >= 62 && index <= 65)
+                         || (index >= 88 && index <= 91) || (index >= 100 && index <= 104) || (index >= 109 && index <= 117)
+                         || (index >= 124 && index <= 130) || (index >= 139 && index <= 142) || (index >= 145 && index <= 150)
+                         || (index >= 153 && index <= 159) || (index >= 164 && index <= 167) || (index >= 172 && index <= 175)
+                         || (index >= 179 && index <= 182) || (index >= 186 && index <= 192) || (index >= 195 && index <= 200)
+                         || (index >= 205 && index <= 207) || (index >= 212 && index <= 216) || (index >= 221 && index <= 224)
+                         || (index >= 228 && index <= 231) || (index >= 236 && index <= 243) || (index >= 250 && index <= 258)
+                         || (index >= 264 && index <= 268) || (index >= 277 && index <= 279) || (index >= 291 && index <= 296)
+                         || (index >= 300 && index <= 305) || (index >= 308 && index <= 311) || (index >= 320 && index <= 326)
+                         || (index >= 333 && index <= 341) || (index >= 350 && index <= 354) || (index >= 363 && index <= 366)
+                         || (index >= 385 && index <= 388) || (index >= 392 && index <= 396) || (index >= 400 && index <= 403)
+                         || (index >= 415 && index <= 417) || (index >= 423 && index <= 427) || (index >= 435 && index <= 443)
+                         || (index >= 449 && index <= 457) || (index >= 5825 && index <= 5829) || (index >= 5835 && index <= 5844)
+                         || (index >= 5849 && index <= 5859) || (index >= 5865 && index <= 5877) || (index >= 5882 && index <= 5894)
+                         || (index >= 5900 && index <= 5912) || (index >= 5918 && index <= 5932) || (index >= 5937 && index <= 5951)
+                         || (index >= 5958 && index <= 5973) || (index >= 5979 && index <= 5993) || (index >= 5999 && index <= 6011)
+                         || (index >= 6017 && index <= 6029) || (index >= 6034 && index <= 6046) || (index >= 6051 && index <= 6061)
+                         || (index >= 6067 && index <= 6076) || (index >= 6083 && index <= 6087) || (index >= 6105 && index <= 6110)
+                         || (index >= 6116 && index <= 6128) || (index >= 6138 && index <= 6152) || (index >= 6159 && index <= 6283)
+                         || (index >= 6290 && index <= 6303) || (index >= 6313 && index <= 6325) || (index >= 6331 && index <= 6336)
+                         || (index >= 6340 && index <= 6345) || (index >= 6348 && index <= 6354) || (index >= 6357 && index <= 6363)
+                         || (index >= 6366 && index <= 6371) || (index >= 6378 && index <= 6383) || (index >= 6386 && index <= 6392)
+                         || (index >= 6395 && index <= 6400) || (index >= 6404 && index <= 6409) || (index >= 6416 && index <= 6421)
+                         || (index >= 6424 && index <= 6430) || (index >= 6433 && index <= 6439) || (index >= 6442 && index <= 6448)
+                         || (index >= 6454 && index <= 6458) || (index >= 6462 && index <= 6467) || (index >= 6471 && index <= 6477)
+                         || (index >= 6480 && index <= 6486) || (index >= 6493 && index <= 6499) || (index >= 6502 && index <= 6508)
+                         || (index >= 6511 && index <= 6517) || (index >= 6520 && index <= 6525) || (index >= 6532 && index <= 6537)
+                         || (index >= 6541 && index <= 6546) || (index >= 6549 && index <= 6555) || (index >= 6558 && index <= 6563)
+                         || (index >= 6569 && index <= 6575) || (index >= 6578 && index <= 6584) || (index >= 6587 && index <= 6593)
+                         || (index >= 6597 && index <= 6601) || (index >= 6607 && index <= 6613) || (index >= 6616 && index <= 6622)
+                         || (index >= 6627 && index <= 6631) || (index >= 6635 && index <= 6639))
                     moveSound = SoundList.WalkWaterL;
                 // Ground
                 else moveSound = SoundList.WalkGroundL;
@@ -4323,23 +4138,23 @@ namespace Client.MirObjects
                     moveSound = SoundList.WalkStoneL;
                 // Wood
                 else if ((index >= 3157 && index <= 3159) || (index >= 3168 && index <= 3171) || (index >= 3179 && index <= 3182)
-                    || (index >= 3199 && index <= 3202) || (index >= 3220 && index <= 3222) || (index >= 3243 && index <= 3245)
-                    || (index >= 3266 && index <= 3268) || (index >= 3286 && index <= 3289) || (index >= 3307 && index <= 3309)
-                    || (index >= 3329 && index <= 3331) || (index >= 3352 && index <= 3354) || (index >= 3374 && index <= 3376)
-                    || (index >= 3387 && index <= 3389) || (index >= 3502 && index <= 3503) || (index >= 3522 && index <= 3523)
-                    || (index >= 3532 && index <= 3538) || (index >= 3545 && index <= 3551) || (index >= 3559 && index <= 3566)
-                    || (index >= 3581 && index <= 3582) || (index >= 3591 && index <= 3592) || (index >= 3598 && index <= 3600)
-                    || (index >= 3615 && index <= 3617) || (index >= 3634 && index <= 3636) || (index == 3659) || (index == 3715)
-                    || (index >= 3727 && index <= 3728) || (index >= 3738 && index <= 3739) || (index == 3745) || (index == 3749)
-                    || (index == 3750) || (index >= 3754 && index <= 3757) || (index >= 3774 && index <= 3776)
-                    || (index >= 3797 && index <= 3798) || (index >= 3816 && index <= 3818) || (index >= 3831 && index <= 3832)
-                    || (index >= 3836 && index <= 3837) || (index >= 3850 && index <= 3853) || (index >= 3866 && index <= 3868))
+                         || (index >= 3199 && index <= 3202) || (index >= 3220 && index <= 3222) || (index >= 3243 && index <= 3245)
+                         || (index >= 3266 && index <= 3268) || (index >= 3286 && index <= 3289) || (index >= 3307 && index <= 3309)
+                         || (index >= 3329 && index <= 3331) || (index >= 3352 && index <= 3354) || (index >= 3374 && index <= 3376)
+                         || (index >= 3387 && index <= 3389) || (index >= 3502 && index <= 3503) || (index >= 3522 && index <= 3523)
+                         || (index >= 3532 && index <= 3538) || (index >= 3545 && index <= 3551) || (index >= 3559 && index <= 3566)
+                         || (index >= 3581 && index <= 3582) || (index >= 3591 && index <= 3592) || (index >= 3598 && index <= 3600)
+                         || (index >= 3615 && index <= 3617) || (index >= 3634 && index <= 3636) || (index == 3659) || (index == 3715)
+                         || (index >= 3727 && index <= 3728) || (index >= 3738 && index <= 3739) || (index == 3745) || (index == 3749)
+                         || (index == 3750) || (index >= 3754 && index <= 3757) || (index >= 3774 && index <= 3776)
+                         || (index >= 3797 && index <= 3798) || (index >= 3816 && index <= 3818) || (index >= 3831 && index <= 3832)
+                         || (index >= 3836 && index <= 3837) || (index >= 3850 && index <= 3853) || (index >= 3866 && index <= 3868))
                     moveSound = SoundList.WalkWoodL;
                 // Water
                 else if ((index == 3744) || (index >= 3761 && index <= 3769) || (index >= 3782 && index <= 3790)
-                    || (index >= 3804 && index <= 3809) || (index >= 3824 && index <= 3830) || (index >= 3842 && index <= 3848)
-                    || (index >= 3860 && index <= 3865) || (index == 3870) || (index >= 3875 && index <= 3881) || (index == 3884)
-                    || (index >= 3890 && index <= 3894))
+                         || (index >= 3804 && index <= 3809) || (index >= 3824 && index <= 3830) || (index >= 3842 && index <= 3848)
+                         || (index >= 3860 && index <= 3865) || (index == 3870) || (index >= 3875 && index <= 3881) || (index == 3884)
+                         || (index >= 3890 && index <= 3894))
                     moveSound = SoundList.WalkWaterL;
                 // Ground
                 else moveSound = SoundList.WalkGroundL;
@@ -4397,14 +4212,14 @@ namespace Client.MirObjects
                     moveSound = SoundList.WalkStoneL;
                 // Snow
                 else if ((index >= 2 && index <= 984) || (index >= 2123 && index <= 2453) || (index >= 2456 && index <= 2458)
-                    || (index >= 2462 && index <= 2465) || (index >= 2468 && index <= 2736) || (index >= 3287 && index <= 3295)
-                    || (index >= 3298 && index <= 3299) || (index >= 3302 && index <= 3306))
+                         || (index >= 2462 && index <= 2465) || (index >= 2468 && index <= 2736) || (index >= 3287 && index <= 3295)
+                         || (index >= 3298 && index <= 3299) || (index >= 3302 && index <= 3306))
                     moveSound = SoundList.WalkSnowL;
                 // Wood
                 else if ((index >= 2454 && index <= 2455) || (index >= 2459 && index <= 2461) || (index >= 2466 && index <= 2467)
-                    || (index >= 4590 && index <= 4593) || (index >= 4611 && index <= 4613) || (index == 4646) || (index == 4655)
-                    || (index == 4665) || (index == 4668) || (index == 4675) || (index >= 4687 && index <= 4688) || (index >= 4693 && index <= 4694)
-                    || (index >= 4762 && index <= 4713) || (index >= 4729 && index <= 4732) || (index >= 4750 && index <= 4751))
+                         || (index >= 4590 && index <= 4593) || (index >= 4611 && index <= 4613) || (index == 4646) || (index == 4655)
+                         || (index == 4665) || (index == 4668) || (index == 4675) || (index >= 4687 && index <= 4688) || (index >= 4693 && index <= 4694)
+                         || (index >= 4762 && index <= 4713) || (index >= 4729 && index <= 4732) || (index >= 4750 && index <= 4751))
                     moveSound = SoundList.WalkWoodL;
                 // Cave
                 else if ((index >= 3311 && index <= 3854) || (index >= 4304 && index <= 4519))
@@ -4456,14 +4271,14 @@ namespace Client.MirObjects
                     moveSound = SoundList.WalkLawnL;
                 // Stone
                 else if ((index >= 30 && index <= 34) || (index >= 45 && index <= 48) || (index >= 120 && index <= 124)
-                    || (index >= 135 && index <= 138) || (index >= 185 && index <= 193) || (index >= 200 && index <= 208)
-                    || (index >= 330 && index <= 334) || (index >= 345 && index <= 348) || (index >= 450 && index <= 454)
-                    || (index >= 465 && index <= 468) || (index >= 1025 && index <= 1033))
+                         || (index >= 135 && index <= 138) || (index >= 185 && index <= 193) || (index >= 200 && index <= 208)
+                         || (index >= 330 && index <= 334) || (index >= 345 && index <= 348) || (index >= 450 && index <= 454)
+                         || (index >= 465 && index <= 468) || (index >= 1025 && index <= 1033))
                     moveSound = SoundList.WalkStoneL;
                 // Rough
                 else if ((index >= 600 && index <= 604) || (index >= 615 && index <= 618) || (index >= 780 && index <= 784)
-                    || (index >= 795 && index <= 814) || (index >= 825 && index <= 844) || (index >= 855 && index <= 868)
-                    || (index >= 930 && index <= 934) || (index >= 945 && index <= 958))
+                         || (index >= 795 && index <= 814) || (index >= 825 && index <= 844) || (index >= 855 && index <= 868)
+                         || (index >= 930 && index <= 934) || (index >= 945 && index <= 958))
                     moveSound = SoundList.WalkRoughL;
                 // Ground
                 else moveSound = SoundList.WalkGroundL;
@@ -4513,51 +4328,51 @@ namespace Client.MirObjects
                     moveSound = SoundList.WalkLawnL;
                 // Rough
                 else if ((index >= 10205 && index <= 10208) || (index >= 10215 && index <= 10223) || (index >= 10250 && index <= 10254)
-                    || (index >= 10260 && index <= 10273) || (index >= 11005 && index <= 11008) || (index >= 11015 && index <= 11054)
-                    || (index >= 11060 && index <= 11073) || (index >= 11405 && index <= 11408) || (index >= 11450 && index <= 11454))
+                         || (index >= 10260 && index <= 10273) || (index >= 11005 && index <= 11008) || (index >= 11015 && index <= 11054)
+                         || (index >= 11060 && index <= 11073) || (index >= 11405 && index <= 11408) || (index >= 11450 && index <= 11454))
                     moveSound = SoundList.WalkRoughL;
                 // Stone
                 else if ((index >= 10 && index <= 14) || (index >= 10085 && index <= 10093) || (index >= 10105 && index <= 10108)
-                    || (index >= 10150 && index <= 10154) || (index >= 10160 && index <= 10173) || (index >= 10605 && index <= 10608)
-                    || (index >= 10615 && index <= 10623) || (index >= 10650 && index <= 10654) || (index >= 10660 && index <= 10673)
-                    || (index >= 11305 && index <= 11308) || (index >= 11315 && index <= 11354) || (index >= 11360 && index <= 11373)
-                    || (index >= 11479 && index <= 11481) || (index >= 11486 && index <= 11488) || (index >= 11491 && index <= 11493)
-                    || (index >= 12000 && index <= 12023) || (index >= 12400 && index <= 12423) || (index >= 12550 && index <= 12554)
-                    || (index >= 12560 && index <= 12563) || (index >= 12600 && index <= 12604) || (index >= 12610 && index <= 12613)
-                    || (index >= 12650 && index <= 12654) || (index >= 12660 && index <= 12663) || (index >= 12700 && index <= 12704)
-                    || (index >= 12710 && index <= 12713) || (index >= 12850 && index <= 12874) || (index >= 12995 && index <= 13049)
-                    || (index >= 14625 && index <= 14678) || (index >= 15045 && index <= 15143) || (index >= 15780 && index <= 15849)
-                    || (index >= 16075 && index <= 16077))
+                         || (index >= 10150 && index <= 10154) || (index >= 10160 && index <= 10173) || (index >= 10605 && index <= 10608)
+                         || (index >= 10615 && index <= 10623) || (index >= 10650 && index <= 10654) || (index >= 10660 && index <= 10673)
+                         || (index >= 11305 && index <= 11308) || (index >= 11315 && index <= 11354) || (index >= 11360 && index <= 11373)
+                         || (index >= 11479 && index <= 11481) || (index >= 11486 && index <= 11488) || (index >= 11491 && index <= 11493)
+                         || (index >= 12000 && index <= 12023) || (index >= 12400 && index <= 12423) || (index >= 12550 && index <= 12554)
+                         || (index >= 12560 && index <= 12563) || (index >= 12600 && index <= 12604) || (index >= 12610 && index <= 12613)
+                         || (index >= 12650 && index <= 12654) || (index >= 12660 && index <= 12663) || (index >= 12700 && index <= 12704)
+                         || (index >= 12710 && index <= 12713) || (index >= 12850 && index <= 12874) || (index >= 12995 && index <= 13049)
+                         || (index >= 14625 && index <= 14678) || (index >= 15045 && index <= 15143) || (index >= 15780 && index <= 15849)
+                         || (index >= 16075 && index <= 16077))
                     moveSound = SoundList.WalkStoneL;
                 // Cave
                 else if ((index >= 10040 && index <= 10078) || (index >= 11375 && index <= 11378) || (index >= 11380 && index <= 11383)
-                    || (index >= 11387 && index <= 11390) || (index >= 11394 && index <= 11396) || (index >= 11425 && index <= 11449)
-                    || (index >= 11475 && index <= 11478) || (index >= 11482 && index <= 11485) || (index >= 11489 && index <= 11490)
-                    || (index >= 11494 && index <= 11499) || (index >= 11525 && index <= 11549) || (index >= 11575 && index <= 11973)
-                    || (index >= 12150 && index <= 12173) || (index >= 12450 && index <= 12473) || (index >= 12495 && index <= 12499)
-                    || (index >= 12525 && index <= 12549) || (index >= 12575 && index <= 12599) || (index >= 12625 && index <= 12649)
-                    || (index >= 12675 && index <= 12699) || (index >= 12725 && index <= 12749) || (index >= 12775 && index <= 12799)
-                    || (index >= 12825 && index <= 12849) || (index >= 12875 && index <= 12899) || (index >= 12925 && index <= 12993)
-                    || (index >= 13075 && index <= 13098) || (index >= 13125 && index <= 13129) || (index >= 13131 && index <= 13136)
-                    || (index >= 13139 && index <= 13176) || (index >= 13180 && index <= 13188) || (index >= 13191 && index <= 13229)
-                    || (index >= 13232 && index <= 13239) || (index >= 13242 && index <= 13245) || (index >= 13247 && index <= 13275)
-                    || (index >= 13279 && index <= 13281) || (index >= 14825 && index <= 15035) || (index >= 15225 && index <= 15779))
+                         || (index >= 11387 && index <= 11390) || (index >= 11394 && index <= 11396) || (index >= 11425 && index <= 11449)
+                         || (index >= 11475 && index <= 11478) || (index >= 11482 && index <= 11485) || (index >= 11489 && index <= 11490)
+                         || (index >= 11494 && index <= 11499) || (index >= 11525 && index <= 11549) || (index >= 11575 && index <= 11973)
+                         || (index >= 12150 && index <= 12173) || (index >= 12450 && index <= 12473) || (index >= 12495 && index <= 12499)
+                         || (index >= 12525 && index <= 12549) || (index >= 12575 && index <= 12599) || (index >= 12625 && index <= 12649)
+                         || (index >= 12675 && index <= 12699) || (index >= 12725 && index <= 12749) || (index >= 12775 && index <= 12799)
+                         || (index >= 12825 && index <= 12849) || (index >= 12875 && index <= 12899) || (index >= 12925 && index <= 12993)
+                         || (index >= 13075 && index <= 13098) || (index >= 13125 && index <= 13129) || (index >= 13131 && index <= 13136)
+                         || (index >= 13139 && index <= 13176) || (index >= 13180 && index <= 13188) || (index >= 13191 && index <= 13229)
+                         || (index >= 13232 && index <= 13239) || (index >= 13242 && index <= 13245) || (index >= 13247 && index <= 13275)
+                         || (index >= 13279 && index <= 13281) || (index >= 14825 && index <= 15035) || (index >= 15225 && index <= 15779))
                     moveSound = SoundList.WalkCaveL;
                 // Wood
                 else if ((index >= 25 && index <= 29) || (index == 11379) || (index >= 11384 && index <= 11386)
-                    || (index >= 11391 && index <= 11393) || (index >= 11397 && index <= 11399) || (index == 13130)
-                    || (index >= 13137 && index <= 13138) || (index >= 13177 && index <= 13179) || (index >= 13189 && index <= 13190)
-                    || (index >= 13230 && index <= 13231) || (index >= 13240 && index <= 13241) || (index == 13246)
-                    || (index >= 13276 && index <= 13278) || (index == 13282) || (index >= 13780 && index <= 14434)
-                    || (index >= 15178 && index <= 15179) || (index >= 15182 && index <= 15185) || (index >= 15188 && index <= 15191)
-                    || (index >= 15194 && index <= 15195) || (index >= 15875 && index <= 16041) || (index >= 16080 && index <= 16083)
-                    || (index >= 16145 && index <= 16188))
+                         || (index >= 11391 && index <= 11393) || (index >= 11397 && index <= 11399) || (index == 13130)
+                         || (index >= 13137 && index <= 13138) || (index >= 13177 && index <= 13179) || (index >= 13189 && index <= 13190)
+                         || (index >= 13230 && index <= 13231) || (index >= 13240 && index <= 13241) || (index == 13246)
+                         || (index >= 13276 && index <= 13278) || (index == 13282) || (index >= 13780 && index <= 14434)
+                         || (index >= 15178 && index <= 15179) || (index >= 15182 && index <= 15185) || (index >= 15188 && index <= 15191)
+                         || (index >= 15194 && index <= 15195) || (index >= 15875 && index <= 16041) || (index >= 16080 && index <= 16083)
+                         || (index >= 16145 && index <= 16188))
                     moveSound = SoundList.WalkWoodL;
                 // Room
                 else if ((index >= 12175 && index <= 12199) || (index >= 12232 && index <= 10249) || (index >= 12275 && index <= 12299)
-                    || (index >= 12325 && index <= 12349) || (index >= 12375 && index <= 12399) || (index >= 12425 && index <= 12449)
-                    || (index >= 12475 && index <= 12488) || (index >= 12800 && index <= 12824) || (index >= 12900 && index <= 12924)
-                    || (index >= 15037 && index <= 15040) || (index >= 16085 && index <= 16088))
+                         || (index >= 12325 && index <= 12349) || (index >= 12375 && index <= 12399) || (index >= 12425 && index <= 12449)
+                         || (index >= 12475 && index <= 12488) || (index >= 12800 && index <= 12824) || (index >= 12900 && index <= 12924)
+                         || (index >= 15037 && index <= 15040) || (index >= 16085 && index <= 16088))
                     moveSound = SoundList.WalkRoomL;
                 // Water
                 else if ((index >= 0 && index <= 4) || (index >= 30 && index <= 34))
@@ -4658,7 +4473,7 @@ namespace Client.MirObjects
                     moveSound = SoundList.WalkWoodL;
                 // Stone
                 else if ((index >= 4596 && index <= 4602) || (index >= 4638 && index <= 4644) || (index >= 4670 && index <= 4676)
-                    || (index >= 6383 && index <= 6387))
+                         || (index >= 6383 && index <= 6387))
                     moveSound = SoundList.WalkStoneL;
                 else moveSound = SoundList.WalkSnowL;
             #endregion
@@ -5050,19 +4865,19 @@ namespace Client.MirObjects
             if (HairLibrary != null)
                 HairLibrary.Draw(DrawFrame + HairOffSet, DrawLocation, DrawColour, true);
         }
-		public void DrawWeapon()
-		{
-			if (Weapon < 0) return;
+        public void DrawWeapon()
+        {
+            if (Weapon < 0) return;
 
-			if (WeaponLibrary1 != null)
-			{
-				WeaponLibrary1.Draw(DrawFrame + WeaponOffSet, DrawLocation, DrawColour, true); //original
+            if (WeaponLibrary1 != null)
+            {
+                WeaponLibrary1.Draw(DrawFrame + WeaponOffSet, DrawLocation, DrawColour, true); //original
 
-				if (WeaponEffectLibrary1 != null)
-					WeaponEffectLibrary1.DrawBlend(DrawFrame + WeaponOffSet, DrawLocation, DrawColour, true, 0.4F);
-			}
-		}
-		public void DrawWeapon2()
+                if (WeaponEffectLibrary1 != null)
+                    WeaponEffectLibrary1.DrawBlend(DrawFrame + WeaponOffSet, DrawLocation, DrawColour, true, 0.4F);
+            }
+        }
+        public void DrawWeapon2()
         {
             if (Weapon == -1) return;
 

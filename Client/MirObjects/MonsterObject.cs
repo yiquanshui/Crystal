@@ -2142,7 +2142,7 @@ namespace Client.MirObjects
                                                 int duration = 7 * FrameInterval;
                                                 int totalDuration = loops * duration;
 
-                                                if (FrameLoop == null)
+                                                if (Loop == null)
                                                 {
                                                     for (int i = 0; i < loops; i++)
                                                     {
@@ -2179,7 +2179,7 @@ namespace Client.MirObjects
                                                     int duration = 5 * FrameInterval;
                                                     int totalDuration = loops * duration;
 
-                                                    if (FrameLoop == null)
+                                                    if (Loop == null)
                                                     {
                                                         for (int i = 0; i < loops; i++)
                                                         {
@@ -2287,7 +2287,7 @@ namespace Client.MirObjects
                                                 int duration = 5 * FrameInterval;
                                                 int totalDuration = loops * duration;
 
-                                                if (FrameLoop == null)
+                                                if (Loop == null)
                                                 {
                                                     for (int i = 0; i < loops; i++)
                                                     {
@@ -3752,16 +3752,16 @@ namespace Client.MirObjects
         {
             if (Frame == null) return 0;
 
-            if (FrameLoop != null)
+            if (Loop != null)
             {
-                if (FrameLoop.CurrentCount > FrameLoop.Loops)
+                if (Loop.CurrentCount > Loop.Loops)
                 {
-                    FrameLoop = null;
+                    Loop = null;
                 }
-                else if (FrameIndex >= FrameLoop.End)
+                else if (FrameIndex >= Loop.End)
                 {
-                    FrameIndex = FrameLoop.Start - 1;
-                    FrameLoop.CurrentCount++;
+                    FrameIndex = Loop.Start - 1;
+                    Loop.CurrentCount++;
                 }
             }
 

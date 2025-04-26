@@ -163,7 +163,7 @@ namespace Client.MirScenes
         public static UserItem[] GuildStorage = new UserItem[112];
         public static UserItem[] Refine = new UserItem[16];
         public static UserItem HoverItem, SelectedItem;
-        public static MirItemCell SelectedCell;
+        public static MirItemCell? SelectedCell;
 
         public static bool PickedUpGold;
         public MirControl ItemLabel, MailLabel, MemoLabel, GuildBuffLabel;
@@ -4008,7 +4008,7 @@ namespace Client.MirScenes
                 }
 
                 if (p.ObjectID == User.ObjectID)
-                    User.TargetID = User.LastTargetObjectId;
+                    User.TargetID = MapObject.LastTargetObjectId;
 
                 if (playDefaultSound)
                     SoundManager.PlaySound(SoundList.Teleport);
@@ -10025,7 +10025,7 @@ namespace Client.MirScenes
 
     public sealed class MapControl : MirControl
     {
-        public static UserObject User
+        public static UserObject? User
         {
             get { return MapObject.User; }
             set { MapObject.User = value; }
@@ -10285,10 +10285,8 @@ namespace Client.MirScenes
             }
         }
 
-        public static MapObject GetObject(uint targetID)
-        {
-            Objects.TryGetValue(targetID, out var ob);
-            return ob;
+        public static MapObject? GetObject(uint targetID) {
+            return Objects.GetValueOrDefault(targetID);
         }
 
         public override void Draw()

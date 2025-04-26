@@ -6,22 +6,17 @@
         public static FrameSet DefaultNPC, DefaultMonster;
         public static List<FrameSet> DragonStatue, GreatFoxSpirit, HellBomb, CaveStatue;
 
-        static FrameSet()
-        {
-            FrameSet frame;
-
+        static FrameSet() {
             Player = new FrameSet();
 
             //Default NPC
-            DefaultNPC = new FrameSet
-            {
+            DefaultNPC = new FrameSet {
                 { MirAction.Standing, new Frame(0, 4, 0, 450) },
                 { MirAction.Harvest, new Frame(12, 10, 0, 200) }
             };
 
             //Default Monster
-            DefaultMonster = new FrameSet
-            {
+            DefaultMonster = new FrameSet {
                 { MirAction.Standing, new Frame(0, 4, 0, 500) },
                 { MirAction.Walking, new Frame(32, 6, 0, 100) },
                 { MirAction.Attack1, new Frame(80, 6, 0, 100) },
@@ -33,7 +28,8 @@
 
             #region DragonStatue
             //DragonStatue 1
-            DragonStatue = new List<FrameSet> { (frame = new FrameSet()) };
+            FrameSet frame;
+            DragonStatue = [frame = new FrameSet()];
             frame.Add(MirAction.Standing, new Frame(300, 1, -1, 1000));
             frame.Add(MirAction.AttackRange1, new Frame(300, 1, -1, 120));
             frame.Add(MirAction.Struck, new Frame(300, 1, -1, 200));
@@ -71,7 +67,7 @@
 
             #region GreatFoxSpirit
             //GreatFoxSpirit level 0
-            GreatFoxSpirit = new List<FrameSet> { (frame = new FrameSet()) };
+            GreatFoxSpirit = [frame = new FrameSet()];
             frame.Add(MirAction.Standing, new Frame(0, 20, -20, 100));
             frame.Add(MirAction.Attack1, new Frame(22, 8, -8, 120));
             frame.Add(MirAction.Struck, new Frame(20, 2, -2, 200));
@@ -118,7 +114,7 @@
 
             #region HellBombs
             //HellBomb1
-            HellBomb = new List<FrameSet> { (frame = new FrameSet()) };
+            HellBomb = [frame = new FrameSet()];
             frame.Add(MirAction.Standing, new Frame(52, 9, -9, 100) { Blend = true });
             frame.Add(MirAction.Attack1, new Frame(999, 1, -1, 120) { Blend = true });
             frame.Add(MirAction.Struck, new Frame(52, 9, -9, 100) { Blend = true });
@@ -138,7 +134,7 @@
 
             #region CaveStatues
             //CaveStatue1
-            CaveStatue = new List<FrameSet> { (frame = new FrameSet()) };
+            CaveStatue = [frame = new FrameSet()];
             frame.Add(MirAction.Standing, new Frame(0, 1, -1, 100) { Blend = false });
             frame.Add(MirAction.Struck, new Frame(0, 1, -1, 100) { Blend = false });
             frame.Add(MirAction.Die, new Frame(2, 8, -8, 100) { Blend = false });
@@ -206,18 +202,12 @@
         public int Interval, EffectInterval;
         public bool Reverse, Blend;
 
-        public int OffSet
-        {
-            get { return Count + Skip; }
-        }
+        public int OffSet => Count + Skip;
 
-        public int EffectOffSet
-        {
-            get { return EffectCount + EffectSkip; }
-        }
+        public int EffectOffSet => EffectCount + EffectSkip;
 
-        public Frame(int start, int count, int skip, int interval, int effectstart = 0, int effectcount = 0, int effectskip = 0, int effectinterval = 0)
-        {
+
+        public Frame(int start, int count, int skip, int interval, int effectstart = 0, int effectcount = 0, int effectskip = 0, int effectinterval = 0) {
             Start = start;
             Count = count;
             Skip = skip;
@@ -228,8 +218,7 @@
             EffectInterval = effectinterval;
         }
 
-        public Frame(BinaryReader reader)
-        {
+        public Frame(BinaryReader reader) {
             Start = reader.ReadInt32();
             Count = reader.ReadInt32();
             Skip = reader.ReadInt32();
