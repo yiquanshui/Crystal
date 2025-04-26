@@ -25,7 +25,8 @@ namespace Client.Resolution
                 int i = 0;
                 while (EnumDisplaySettings(null, i, ref vDevMode))
                 {
-                    string displayResolution = $"w{vDevMode.dmPelsWidth}h{vDevMode.dmPelsHeight}";
+                    bool Swap = vDevMode.dmDisplayOrientation == ScreenOrientation.Angle90;
+                    string displayResolution = Swap? $"w{vDevMode.dmPelsHeight}h{vDevMode.dmPelsWidth}" :$"w{vDevMode.dmPelsWidth}h{vDevMode.dmPelsHeight}";
 
                     if(supportedResolutions.Contains(displayResolution))
                     {
