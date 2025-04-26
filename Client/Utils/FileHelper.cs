@@ -16,7 +16,8 @@ namespace Client.Utils
     public class FileInformation
     {
         public string FileName; //Relative.
-        public int Length, Compressed;
+        public int Length;
+        public readonly int Compressed;
         public DateTime Creation;
 
         public FileInformation()
