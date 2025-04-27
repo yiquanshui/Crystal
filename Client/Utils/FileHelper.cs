@@ -15,7 +15,7 @@ namespace Client.Utils
 
     public class FileInformation
     {
-        public string FileName; //Relative.
+        public string RelativePath;
         public int Length;
         public readonly int Compressed;
         public DateTime Creation;
@@ -26,7 +26,7 @@ namespace Client.Utils
         }
         public FileInformation(BinaryReader reader)
         {
-            FileName = reader.ReadString();
+            RelativePath = reader.ReadString();
             Length = reader.ReadInt32();
             Compressed = reader.ReadInt32();
 
@@ -34,7 +34,7 @@ namespace Client.Utils
         }
         public void Save(BinaryWriter writer)
         {
-            writer.Write(FileName);
+            writer.Write(RelativePath);
             writer.Write(Length);
             writer.Write(Compressed);
             writer.Write(Creation.ToBinary());

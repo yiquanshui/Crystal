@@ -1,44 +1,41 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net;
 using Client;
 using Microsoft.Web.WebView2.Core;
-using System.Net.Http.Headers;
-using System.Net.Http.Handlers;
 using Client.Utils;
 
 namespace Launcher
 {
     public partial class AMain : Form
     {
-        private long _totalBytes, _completedBytes;
-        private int _fileCount, _currentCount;
+        private FileDownloader? _file_downloader;
+        private long _total_size;
+        private int _total_file_count, _valid_file_count;
+        private int _download_task_count;
 
         public bool Completed, Checked, CleanFiles;
         private bool LabelSwitch;
         private bool ErrorFound;
 
-        private List<FileInformation> OldList;
-        private readonly Queue<FileInformation> DownloadList = new();
-        private readonly List<Download> ActiveDownloads = [];
+        private List<FileInformation> _server_files = [];
+        private readonly Queue<FileInformation> _need_download_files = new();
 
         private Stopwatch _stopwatch = Stopwatch.StartNew();
 
-        public Thread _workThread;
+        public Thread? _workThread;
 
-        private bool dragging = false;
+        private bool dragging;
         private Point dragCursorPoint;
         private Point dragFormPoint;
 
-        private readonly Config ConfigForm = new Config();
+        private readonly Config ConfigForm = new();
 
-        private bool Restart = false;
+        private bool Restart;
 
         public AMain()
         {
             InitializeComponent();
 
-            BackColor = Color.FromArgb(1, 0, 0);
             TransparencyKey = Color.FromArgb(1, 0, 0);
         }
 
@@ -56,73 +53,81 @@ namespace Launcher
 
         
         public void Start() {
+            BackColor = Color.FromArgb(1, 0, 0);
             try {
-                GetOldFileList();
+                CleanUp();
+                GetServerFileInfos();
 
-                if (OldList.Count == 0) {
+                if (_server_files.Count == 0) {
                     MessageBox.Show(GameLanguage.PatchErr);
                     Completed = true;
                     return;
                 }
 
-                _fileCount = OldList.Count;
-                foreach (FileInformation info in OldList)
-                    CheckFile(info);
+                _total_file_count = _server_files.Count;
+                long valid_size = 0;
+                foreach (FileInformation info in _server_files) {
+                    _total_size += info.Length;
+                    if (CheckFile(info)) {
+                        valid_size += info.Length;
+                        _valid_file_count++;
+                    } else {
+                        _need_download_files.Enqueue(info);
+                    }
+                }
+
+                _file_downloader = new FileDownloader() {
+                    DownloadedSize = valid_size
+                };
 
                 Checked = true;
-                _fileCount = 0;
-                _currentCount = 0;
-
-                _fileCount = DownloadList.Count;
-
                 _stopwatch = Stopwatch.StartNew();
                 BeginDownload().Wait();
             }
             catch (EndOfStreamException ex) {
                 MessageBox.Show("End of stream found. Host is likely using a pre version 1.1.0.0 patch system");
-                Completed = true;
                 SaveError(ex.ToString());
             }
             catch (Exception ex) {
                 MessageBox.Show(ex.ToString(), "Error");
-                Completed = true;
                 SaveError(ex.ToString());
             }
 
+            _file_downloader = null;
+            Completed = true;
             _stopwatch.Stop();
         }
 
         
         private async Task BeginDownload() {
-            if (DownloadList.Count == 0) {
-                Completed = true;
-                CleanUp();
-                return;
-            }
-
             ServicePointManager.DefaultConnectionLimit = Settings.P_Concurrency;
 
-            List<Task> tasks = [];
-            for (var i = 1; i < Settings.P_Concurrency; i++) {
-                if (DownloadList.TryDequeue(out var file_info)) {
-                    var download = new Download {
-                        Info = file_info
-                    };
-                    tasks.Add(DownloadFile(download));
-                };
+            List<Task<bool>> tasks = [];
+            for (var i = 0; i < Settings.P_Concurrency; i++) {
+                if (_need_download_files.TryDequeue(out var file_info)) {
+                    var task = _file_downloader!.AsyncDownload(Settings.P_Host, file_info, Settings.P_Client);
+                    tasks.Add(task);
+                    ++_download_task_count;
+                }
             }
 
             while (tasks.Count > 0) {
-                Task finish_task = Task.WhenAny(tasks);
-                await finish_task;
+                Task<bool> finish_task = await Task.WhenAny(tasks);
                 tasks.Remove(finish_task);
+                --_download_task_count;
+                if (await finish_task) {
+                    _valid_file_count++;
+                }
+                else {
+                    // _error_count++;
+                    ErrorFound = true;
+                }
                 
-                if (DownloadList.TryDequeue(out var file_info)) {
-                    var download = new Download {
-                        Info = file_info
-                    };
-                    tasks.Add(DownloadFile(download));
-                };
+                if (_need_download_files.TryDequeue(out var file_info)) {
+                    var task = _file_downloader!.AsyncDownload(Settings.P_Host, file_info, Settings.P_Client);
+                    tasks.Add(task);
+                    ++_download_task_count;
+                }
             }
         }
 
@@ -149,195 +154,87 @@ namespace Launcher
 
 
         private bool NeedFile(string name) {
-            return OldList.Any(info => name.EndsWith(info.FileName));
+            return _server_files.Any(info => name.EndsWith(info.RelativePath));
         }
 
         
-        private void GetOldFileList()
-        {
-            OldList = [];
+        private void GetServerFileInfos() {
+            _server_files = [];
             string uri_string = Settings.P_Host + Path.ChangeExtension(Settings.P_PatchFileName, ".gz");
-            byte[]? data = DownloadFile(uri_string).Result;
-            if (data == null) return;
+            Stream? stream = FileDownloader.AsyncDownload(uri_string).Result;
+            if (stream == null) return;
+            MemoryStream ms = new MemoryStream();
+            stream.CopyTo(ms);
+            ms.Seek(0, SeekOrigin.Begin);
             
-            using MemoryStream stream = new (data);
-            using BinaryReader reader = new (stream);
-            if (reader.ReadByte() == 60)
-            {
+            using BinaryReader reader = new (ms);
+            if (reader.ReadByte() == 60) {
                 //assume we got a html page back with an error code so it's not a patchlist
                 return;
             }
             
             reader.BaseStream.Seek(0, SeekOrigin.Begin);
             int count = reader.ReadInt32();
-
-            for (int i = 0; i < count; i++)
-            {
-                OldList.Add(new FileInformation(reader));
+            for (int i = 0; i < count; i++) {
+                _server_files.Add(new FileInformation(reader));
             }
         }
 
 
-        public void ParseOld(BinaryReader reader) {
-            int count = reader.ReadInt32();
-            for (int i = 0; i < count; i++)
-                OldList.Add(new FileInformation(reader));
-        }
-
-        
-        private void CheckFile(FileInformation old) {
-            FileInformation? info = GetFileInformation(Settings.P_Client + old.FileName);
-            _currentCount++;
-            if (info != null && old.Length == info.Length && old.Creation == info.Creation) return;
+        private bool CheckFile(FileInformation info) {
+            info.RelativePath = info.RelativePath.Replace(@"\", "/");
+            if (info.RelativePath != "PList.gz" && (info.Compressed != info.Length || info.Compressed == 0)) {
+                info.RelativePath += ".gz";
+            }
             
-            DownloadList.Enqueue(old);
-            _totalBytes += old.Length;
+            FileInformation? local_info = GetFileInformation(Settings.P_Client, info.RelativePath);
+            _valid_file_count++;
+            return (local_info != null && info.Length == local_info.Length && info.Creation == local_info.Creation);
         }
 
-        private int error_count = 0;
 
-        //TODO : implement true multi download
-        private async Task DownloadFile(Download dl) {
-            FileInformation info = dl.Info;
-            string name = info.FileName.Replace(@"\", "/");
-            if (name != "PList.gz" && (info.Compressed != info.Length || info.Compressed == 0)) {
-                name += ".gz";
-            }
-
-            try {
-                using HttpClientHandler http_handler = new();
-                http_handler.AllowAutoRedirect = true;
-                using ProgressMessageHandler progress_handler = new(http_handler);
-                progress_handler.HttpReceiveProgress += (_, args) => {
-                    dl.CurrentBytes = args.BytesTransferred;
-                };
-
-                using HttpClient client = new(progress_handler);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                client.DefaultRequestHeaders.AcceptCharset.Clear();
-                client.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
-
-                if (Settings.P_NeedLogin) {
-                    string auth_info = Settings.P_Login + ":" + Settings.P_Password;
-                    auth_info = Convert.ToBase64String(System.Text.Encoding.Default.GetBytes(auth_info));
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", auth_info);
-                }
-
-                ActiveDownloads.Add(dl);
-                _currentCount++;
-                
-                Uri file_uri = new($"{Settings.P_Host}{name}");
-                HttpResponseMessage response = await client.GetAsync(file_uri, HttpCompletionOption.ResponseHeadersRead);
-                byte[] data = await response.Content.ReadAsByteArrayAsync();
-
-                _completedBytes += dl.CurrentBytes;
-                dl.CurrentBytes = 0;
-                dl.Completed = true;
-
-                if (info.Compressed > 0 && info.Compressed != info.Length) {
-                    data = Functions.DecompressBytes(data);
-                }
-
-                string output_path = Settings.P_Client + info.FileName;
-                string? output_dir = Path.GetDirectoryName(output_path);
-                if (output_dir is null) {
-                    throw new DirectoryNotFoundException("Directory not found");
-                }
-                
-                if (!Directory.Exists(output_dir))
-                    Directory.CreateDirectory(output_dir);
-
-                //first remove the original file if needed
-                string[] special_files = [".dll", ".exe", ".pdb"];
-                if (File.Exists(output_path) && special_files.Contains(Path.GetExtension(output_path).ToLower())) {
-                    string old_filename = Path.Combine(output_dir, "Old__" + Path.GetFileName(output_path));
-                    try {
-                        //if there's another previous backup: delete it first
-                        if (File.Exists(old_filename)) {
-                            File.Delete(old_filename);   
-                        }
-                        
-                        File.Move(output_path, old_filename);
-                        
-                    } catch (UnauthorizedAccessException ex) {
-                        SaveError(ex.ToString());
-                        error_count++;
-                        string error_msg = error_count >= 5 ? "Too many problems occured, no longer displaying future errors" :
-                            $"Problem occured saving this file: {output_path}";
-                        MessageBox.Show(error_msg);
-                        
-                    } catch (Exception ex) {
-                        SaveError(ex.ToString());
-                        error_count++;
-                        string error_msg = error_count >= 5 ? "Too many problems occured, no longer displaying future errors" :
-                            $"Problem occured saving this file: {output_path}";
-                        MessageBox.Show(error_msg);
-                        
-                    } finally {
-                        //Might cause an infinite loop if it can never gain access
-                        Restart = true;
-                    }
-                }
-
-                await File.WriteAllBytesAsync(output_path, data);
-                File.SetLastWriteTime(output_path, info.Creation);
-                
-            } catch (HttpRequestException e) {
-                await File.AppendAllTextAsync(@".\Error.txt",
-                    $"[{DateTime.Now}] {info.FileName} could not be downloaded. ({e.Message}) {Environment.NewLine}");
-                ErrorFound = true;
-                
-            } catch (Exception ex) {
-                SaveError(ex.ToString());
-                error_count++;
-                error_count++;
-                string error_msg = error_count >= 5 ? "Too many problems occured, no longer displaying future errors" :
-                    $"Problem occured saving this file: {dl.Info.FileName}";
-                MessageBox.Show(error_msg);
-                
-            } finally {
-                if (ErrorFound) {
-                    MessageBox.Show($"Failed to download file: {name}");
-                }
-            }
-
-            // BeginDownload();
-        }
+        // private async Task DownloadFile(Download dl) {
+        //first remove the original file if needed
+        // string[] special_files = [".dll", ".exe", ".pdb"];
+        // if (File.Exists(output_path) && special_files.Contains(Path.GetExtension(output_path).ToLower())) {
+        //     string old_filename = Path.Combine(output_dir, "Old__" + Path.GetFileName(output_path));
+        //     try {
+        //         //if there's another previous backup: delete it first
+        //         if (File.Exists(old_filename)) {
+        //             File.Delete(old_filename);   
+        //         }
+        //         
+        //         File.Move(output_path, old_filename);
+        //         
+        //     } catch (UnauthorizedAccessException ex) {
+        //         SaveError(ex.ToString());
+        //         _error_count++;
+        //         string error_msg = _error_count >= 5 ? "Too many problems occured, no longer displaying future errors" :
+        //             $"Problem occured saving this file: {output_path}";
+        //         MessageBox.Show(error_msg);
+        //         
+        //     } catch (Exception ex) {
+        //         SaveError(ex.ToString());
+        //         _error_count++;
+        //         string error_msg = _error_count >= 5 ? "Too many problems occured, no longer displaying future errors" :
+        //             $"Problem occured saving this file: {output_path}";
+        //         MessageBox.Show(error_msg);
+        //         
+        //     } finally {
+        //         //Might cause an infinite loop if it can never gain access
+        //         Restart = true;
+        //     }
+        // }
+        // }
 
         
-        private static async Task<byte[]?> DownloadFile(string file_url) {
-            using HttpClient client = new();
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.AcceptCharset.Clear();
-            client.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
-
-            if (Settings.P_NeedLogin) {
-                string auth_info = Settings.P_Login + ":" + Settings.P_Password;
-                auth_info = Convert.ToBase64String(System.Text.Encoding.Default.GetBytes(auth_info));
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", auth_info);
-            }
-
-            if (Uri.IsWellFormedUriString(file_url, UriKind.Absolute)) {
-                HttpResponseMessage response = await client.GetAsync(new Uri(file_url), HttpCompletionOption.ResponseHeadersRead);
-                await using Stream sm = await response.Content.ReadAsStreamAsync();
-                using MemoryStream ms = new();
-                await sm.CopyToAsync(ms);
-                byte[] data = ms.ToArray();
-                return data;
-            }
-
-            MessageBox.Show("Please Check Launcher HOST Setting is formatted correctly\nCan be caused by missing or extra slashes and spelling mistakes.\nThis error can be ignored if patching is not required.", "Bad HOST Format");
-            return null;
-        }
-        
-        private static FileInformation? GetFileInformation(string file_path) {
+        private static FileInformation? GetFileInformation(string root_dir, string relative_path) {
+            string file_path = Path.Combine(root_dir, relative_path);
             if (!File.Exists(file_path)) return null;
 
             FileInfo info = new FileInfo(file_path);
             return new FileInformation {
-                FileName = file_path.Remove(0, Settings.P_Client.Length),
+                RelativePath = relative_path,
                 Length = (int)info.Length,
                 Creation = info.LastWriteTime
             };
@@ -503,7 +400,7 @@ namespace Launcher
         
         private void InterfaceTimer_Tick(object sender, EventArgs e) {
             try {
-                if (Completed && ActiveDownloads.Count == 0) {
+                if (Completed) {
                     ActionLabel.Text = "";
                     CurrentFile_label.Text = "Up to date.";
                     SpeedLabel.Text = "";
@@ -536,56 +433,22 @@ namespace Launcher
                     return;
                 }
 
-                var currentBytes = 0L;
-                FileInformation? currentFile = null;
-
-                // Remove completed downloads..
-                for (int i = ActiveDownloads.Count - 1; i >= 0; i--) {
-                    Download dl = ActiveDownloads[i];
-                    if (dl.Completed) {
-                        ActiveDownloads.RemoveAt(i);
-                    }
-                }
-
-                for (int i = ActiveDownloads.Count - 1; i >= 0; i--) {
-                    Download dl = ActiveDownloads[i];
-                    if (!dl.Completed)
-                        currentBytes += dl.CurrentBytes;
-                }
-
-                if (Settings.P_Concurrency == 1)
-                {
-                    // Note: Just mimic old behaviour for now until a better UI is done.
-                    if (ActiveDownloads.Count > 0)
-                        currentFile = ActiveDownloads[0].Info;
-                }
-
                 ActionLabel.Visible = true;
                 SpeedLabel.Visible = true;
                 CurrentFile_label.Visible = true;
                 CurrentPercent_label.Visible = true;
                 TotalPercent_label.Visible = true;
 
+                long downloaded_size = _file_downloader!.DownloadedSize;
                 ActionLabel.Text = LabelSwitch ? 
-                    $"{_fileCount - _currentCount} Files Remaining" : 
-                    $"{((_totalBytes) - (_completedBytes + currentBytes)) / 1024 / 1024:#,##0}MB Remaining";
+                    $"{_total_file_count - _valid_file_count} Files Remaining" : 
+                    $"{(_total_size - downloaded_size) / 1024 / 1024:#,##0}MB Remaining";
 
-                if (Settings.P_Concurrency > 1) {
-                    CurrentFile_label.Text = $"<Concurrent> {ActiveDownloads.Count}";
-                    SpeedLabel.Text = ToSize(currentBytes / _stopwatch.Elapsed.TotalSeconds);
-                } else {
-                    if (currentFile != null) {
-                        CurrentFile_label.Text = $"{currentFile.FileName}";
-                        SpeedLabel.Text = ToSize(currentBytes / _stopwatch.Elapsed.TotalSeconds);
-                        CurrentPercent_label.Text = ((int)(100 * currentBytes / currentFile.Length)) + "%";
-                        ProgressCurrent_pb.Width = (int)(5.5f * (100.0f * currentBytes / currentFile.Length));
-                    }
-                }
+                CurrentFile_label.Text = $"<Concurrent> {_download_task_count}";
+                SpeedLabel.Text = ToSize(_file_downloader.DownloadSpeed);
 
-                if (!(_completedBytes is 0 && currentBytes is 0 && _totalBytes is 0)) {
-                    TotalProg_pb.Width = (int)(5.5f * (100.0f * (_completedBytes + currentBytes) / _totalBytes));
-                    TotalPercent_label.Text = $"{(int)(100.0f * (_completedBytes + currentBytes) / _totalBytes)} %";
-                }
+                TotalProg_pb.Width = (int)(5.5f * (100.0f * (downloaded_size) / _total_size));
+                TotalPercent_label.Text = $"{(int)(100.0f * (downloaded_size) / _total_size)} %";
 
             } catch {
                 //to-do 
@@ -637,11 +500,12 @@ namespace Launcher
         private static void RepairOldFiles() {
             var files = Directory.GetFiles(Settings.P_Client, "*", SearchOption.AllDirectories).Where(x => Path.GetFileName(x).StartsWith("Old__"));
 
-            foreach (var oldFilename in files) {
-                if (!File.Exists(oldFilename.Replace("Old__", ""))) {
-                    File.Move(oldFilename, oldFilename.Replace("Old__", ""));
+            foreach (var path in files) {
+                string original_path = path.Replace("Old__", "");
+                if (!File.Exists(original_path)) {
+                    File.Move(path, original_path);
                 } else {
-                    File.Delete(oldFilename);
+                    File.Delete(path);
                 }
             }
         }
@@ -649,12 +513,11 @@ namespace Launcher
         
         private static void MoveOldFilesToCurrent() {
             var files = Directory.GetFiles(Settings.P_Client, "*", SearchOption.AllDirectories).Where(x => Path.GetFileName(x).StartsWith("Old__"));
+            foreach (var path in files) {
+                string original_path = path.Replace("Old__", "");
 
-            foreach (var oldFilename in files) {
-                string originalFilename = Path.Combine(Path.GetDirectoryName(oldFilename)!, (Path.GetFileName(oldFilename).Replace("Old__", "")));
-
-                if (!File.Exists(originalFilename) && File.Exists(oldFilename))
-                    File.Move(oldFilename, originalFilename);
+                if (!File.Exists(original_path))
+                    File.Move(path, original_path);
             }
         }
     } 
