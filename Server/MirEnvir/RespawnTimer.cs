@@ -88,8 +88,8 @@
             writer.Write(BaseSpawnRate);
             writer.Write(CurrentTickcounter);
             writer.Write(Respawn.Count);
-            foreach (RespawnTickOption Option in Respawn)
-                Option.Save(writer);
+            foreach (RespawnTickOption option in Respawn)
+                option.Save(writer);
         }
 
 

@@ -86,7 +86,7 @@ namespace Server.Account
 
             if (FilterItemTextBox.Text.Length > 0)
             {
-                filteredCharacters = SMain.Envir.MatchPlayerbyItem(FilterItemTextBox.Text, MatchFilterCheckBox.Checked);
+                filteredCharacters = SMain.Envir.MatchPlayerByItem(FilterItemTextBox.Text, MatchFilterCheckBox.Checked);
             }
 
             // Clear existing items in CharactersList
