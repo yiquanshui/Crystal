@@ -18,7 +18,7 @@ namespace Server.MirDatabase
         public bool Voting = false;
 
         public int Membercount = 0;
-        public List<GuildRank> Ranks = new List<GuildRank>();
+        public List<GuildRank?> Ranks = [];
         public GuildStorageItem[] StoredItems = new GuildStorageItem[112];
         public List<GuildBuff> BuffList = new List<GuildBuff>();
         public List<string> Notice = new List<string>();

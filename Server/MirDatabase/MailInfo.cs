@@ -14,7 +14,7 @@ namespace Server.MirEnvir
         public string Sender;
 
         public int RecipientIndex;
-        public CharacterInfo RecipientInfo;
+        public CharacterInfo? RecipientInfo;
 
         public string Message = string.Empty;
         public uint Gold = 0;

@@ -66,7 +66,7 @@ namespace Server.MirDatabase
 
         public List<CharacterInfo> Characters = new List<CharacterInfo>();
 
-        public UserItem[] Storage = new UserItem[80];
+        public UserItem?[] Storage = new UserItem[80];
         public bool HasExpandedStorage;
         public DateTime ExpandedStorageExpiryDate;
         public uint Gold;
