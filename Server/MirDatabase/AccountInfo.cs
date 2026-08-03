@@ -7,10 +7,7 @@ namespace Server.MirDatabase
 {
     public class AccountInfo
     {       
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
         protected static MessageQueue MessageQueue => MessageQueue.Instance;
 
         public int Index;
@@ -20,7 +17,7 @@ namespace Server.MirDatabase
         private string password = string.Empty;
         public string Password
         {
-            get { return password; }
+            get => password;
             set
             {                
                 Salt = Crypto.GenerateSalt();
@@ -34,7 +31,7 @@ namespace Server.MirDatabase
         private string storagePassword = string.Empty;
         public string StoragePassword
         {
-            get { return storagePassword; }
+            get => storagePassword;
             set
             {
                 StorageSalt = Crypto.GenerateSalt();
@@ -64,7 +61,7 @@ namespace Server.MirDatabase
         public string LastIP = string.Empty;
         public DateTime LastDate;
 
-        public List<CharacterInfo> Characters = new List<CharacterInfo>();
+        public readonly List<CharacterInfo?> Characters = [];
 
         public UserItem?[] Storage = new UserItem[80];
         public bool HasExpandedStorage;
@@ -72,9 +69,9 @@ namespace Server.MirDatabase
         public uint Gold;
         public uint Credit;
 
-        public MirConnection Connection;
+        public MirConnection? Connection;
         
-        public LinkedList<AuctionInfo> Auctions = new LinkedList<AuctionInfo>();
+        public readonly LinkedList<AuctionInfo> Auctions = new();
         public bool AdminAccount;
 
         public AccountInfo()
@@ -95,6 +92,7 @@ namespace Server.MirDatabase
             BirthDate = p.BirthDate;
             CreationDate = Env.Now;
         }
+        
         public AccountInfo(BinaryReader reader)
         {
             Index = reader.ReadInt32();
@@ -188,12 +186,12 @@ namespace Server.MirDatabase
             if (Env.LoadVersion >= 10) AdminAccount = reader.ReadBoolean();
             if (!AdminAccount)
             {
-                for (int i = 0; i < Characters.Count; i++)
+                foreach (var character in Characters)
                 {
-                    if (Characters[i] == null) continue;
-                    if (Characters[i].Deleted) continue;
-                    if ((Env.Now - Characters[i].LastLogoutDate).TotalDays > 13) continue;
-                    Env.CheckRankUpdate(Characters[i]);
+                    if (character == null) continue;
+                    if (character.Deleted) continue;
+                    if ((Env.Now - character.LastLogoutDate).TotalDays > 13) continue;
+                    Env.CheckRankUpdate(character);
                 }
             }
         }
@@ -229,9 +227,9 @@ namespace Server.MirDatabase
             writer.Write(LastDate.ToBinary());
 
             writer.Write(Characters.Count);
-            for (int i = 0; i < Characters.Count; i++)
+            foreach (var character in Characters.Cast<CharacterInfo>())
             {
-                Characters[i].Save(writer);
+                character.Save(writer);
             }
 
             writer.Write(HasExpandedStorage);
@@ -239,24 +237,21 @@ namespace Server.MirDatabase
             writer.Write(Gold);
             writer.Write(Credit);
             writer.Write(Storage.Length);
-            for (int i = 0; i < Storage.Length; i++)
+            foreach (var entry in Storage)
             {
-                writer.Write(Storage[i] != null);
-                if (Storage[i] == null) continue;
-
-                Storage[i].Save(writer);
+                writer.Write(entry != null);
+                entry?.Save(writer);
             }
             writer.Write(AdminAccount);
         }
 
         public List<SelectInfo> GetSelectInfo()
         {
-            List<SelectInfo> list = new List<SelectInfo>();
+            List<SelectInfo> list = [];
 
-            for (int i = 0; i < Characters.Count; i++)
+            foreach (var character in Characters.OfType<CharacterInfo>().Where(character => !character.Deleted))
             {
-                if (Characters[i].Deleted) continue;
-                list.Add(Characters[i].ToSelectInfo());
+                list.Add(character.ToSelectInfo());
                 if (list.Count >= Globals.MaxCharacterCount) break;
             }
 
