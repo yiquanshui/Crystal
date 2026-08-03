@@ -7,9 +7,9 @@ namespace Server.MirDatabase
 {
     public class CharacterInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public int Index;
@@ -116,7 +116,7 @@ namespace Server.MirDatabase
             Heroes = new HeroInfo[MaximumHeroCount];
 
             CreationIP = c.IPAddress;
-            CreationDate = Envir.Now;
+            CreationDate = Env.Now;
         }
 
         public CharacterInfo(BinaryReader reader, int version, int customVersion)
@@ -195,7 +195,7 @@ namespace Server.MirDatabase
             {
                 if (!reader.ReadBoolean()) continue;
                 UserItem item = new UserItem(reader, version, customVersion);
-                if (Envir.BindItem(item) && i < Inventory.Length)
+                if (Env.BindItem(item) && i < Inventory.Length)
                 {
                     Inventory[i] = item;
                 }
@@ -206,7 +206,7 @@ namespace Server.MirDatabase
             {
                 if (!reader.ReadBoolean()) continue;
                 UserItem item = new UserItem(reader, version, customVersion);
-                if (Envir.BindItem(item) && i < Equipment.Length)
+                if (Env.BindItem(item) && i < Equipment.Length)
                 {
                     Equipment[i] = item;
                 }
@@ -217,7 +217,7 @@ namespace Server.MirDatabase
             {
                 if (!reader.ReadBoolean()) continue;
                 UserItem item = new UserItem(reader, version, customVersion);
-                if (Envir.BindItem(item) && i < QuestInventory.Length)
+                if (Env.BindItem(item) && i < QuestInventory.Length)
                 {
                     QuestInventory[i] = item;
                 }
@@ -270,7 +270,7 @@ namespace Server.MirDatabase
                     Console.WriteLine($"[Load] Skipped orphan QuestProgress (Index={quest?.Index}) for character: {Name}");
                     continue;
                 }
-                if (Envir.BindQuest(quest))
+                if (Env.BindQuest(quest))
                 {
                     CurrentQuests.Add(quest);
                 }
@@ -319,11 +319,11 @@ namespace Server.MirDatabase
 
             if (CurrentRefine != null)
             {
-                Envir.BindItem(CurrentRefine);
+                Env.BindItem(CurrentRefine);
             }
 
             RefineTimeRemaining = reader.ReadInt64();
-            CollectTime = Envir.Time + RefineTimeRemaining;
+            CollectTime = Env.Time + RefineTimeRemaining;
 
             count = reader.ReadInt32();
             for (int i = 0; i < count; i++)
@@ -369,7 +369,7 @@ namespace Server.MirDatabase
                     {
                         int heroIndex = reader.ReadInt32();
                         if (heroIndex > 0)
-                            Heroes[i] = Envir.GetHeroInfo(heroIndex);
+                            Heroes[i] = Env.GetHeroInfo(heroIndex);
                     }
                 }
                 else
@@ -524,7 +524,7 @@ namespace Server.MirDatabase
                 CurrentRefine.Save(writer);
             }
 
-            RefineTimeRemaining = CollectTime - Envir.Time;
+            RefineTimeRemaining = CollectTime - Env.Time;
 
             if (RefineTimeRemaining < 0)
                 RefineTimeRemaining = 0;
@@ -711,9 +711,9 @@ namespace Server.MirDatabase
 
     public class FriendInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public int Index;
@@ -725,7 +725,7 @@ namespace Server.MirDatabase
             {
                 if (_Info == null)
                 {
-                    _Info = Envir.GetCharacterInfo(Index);
+                    _Info = Env.GetCharacterInfo(Index);
                 }
 
                 return _Info;

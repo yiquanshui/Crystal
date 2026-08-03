@@ -13,7 +13,7 @@ namespace Server.MirObjects.Monsters
 
         protected internal VampireSpider(MonsterInfo info) : base(info)
         {
-            ActionTime = Envir.Time + 1000;
+            ActionTime = Env.Time + 1000;
         }
 
         public override string Name
@@ -30,7 +30,7 @@ namespace Server.MirObjects.Monsters
                 {
                     bool selfDestruct = false;
                     if (FindObject(Master.ObjectID, 15) == null) selfDestruct = true;
-                    if (Summoned && Envir.Time > AliveTime) selfDestruct = true;
+                    if (Summoned && Env.Time > AliveTime) selfDestruct = true;
                     if (selfDestruct && Master != null) Die();
                 }
             }
@@ -132,8 +132,8 @@ namespace Server.MirObjects.Monsters
 
             AttackLogic();
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
 
             if (Target.Dead) FindTarget();
@@ -179,7 +179,7 @@ namespace Server.MirObjects.Monsters
         private void MasterVampire(int value, MapObject ob)
         {
             if (Master == null) return;
-            if (Master.VampAmount == 0) ((PlayerObject)Master).VampTime = Envir.Time + 1000;
+            if (Master.VampAmount == 0) ((PlayerObject)Master).VampTime = Env.Time + 1000;
             Master.VampAmount += (ushort)(value * (PetLevel + 1) * 0.25F);
             ob.Broadcast(new S.ObjectEffect { ObjectID = ob.ObjectID, Effect = SpellEffect.Bleeding, EffectType = 0 });
         }

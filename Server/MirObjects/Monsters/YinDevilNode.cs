@@ -50,9 +50,9 @@ namespace Server.MirObjects.Monsters
             ShockTime = 0;
 
             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
-            ActionList.Add(new DelayedAction(DelayedType.Damage, Envir.Time + 500));
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionList.Add(new DelayedAction(DelayedType.Damage, Env.Time + 500));
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
         }
     }
 }

@@ -185,7 +185,7 @@ namespace Server.MirObjects
         public bool ItemRentalFeeLocked = false;
         public bool ItemRentalItemLocked = false;
 
-        private long LastRankUpdate = Envir.Time;
+        private long LastRankUpdate = Env.Time;
 
         private Map LastValidMap;
         private Point LastValidLocation;
@@ -231,11 +231,11 @@ namespace Server.MirObjects
 
             if (Info.GuildIndex != -1)
             {
-                MyGuild = Envir.GetGuild(Info.GuildIndex);
+                MyGuild = Env.GetGuild(Info.GuildIndex);
             }
 
             if (info.CurrentHeroIndex > 0)
-                CurrentHero = Envir.GetHeroInfo(info.CurrentHeroIndex);
+                CurrentHero = Env.GetHeroInfo(info.CurrentHeroIndex);
 
             RefreshStats();
 
@@ -249,7 +249,7 @@ namespace Server.MirObjects
 
                 if (Info.PKPoints >= 200)
                 {
-                    Map temp = Envir.GetMapByNameAndInstance(Settings.PKTownMapName, 1);
+                    Map temp = Env.GetMapByNameAndInstance(Settings.PKTownMapName, 1);
                     Point tempLocation = new Point(Settings.PKTownPositionX, Settings.PKTownPositionY);
 
                     if (temp != null && temp.ValidPoint(tempLocation))
@@ -260,7 +260,7 @@ namespace Server.MirObjects
                 }
             }
 
-            Info.LastLoginDate = Envir.Now;
+            Info.LastLoginDate = Env.Now;
         }
 
         public void StopGame(byte reason)
@@ -331,7 +331,7 @@ namespace Server.MirObjects
                                     {
                                         Info.Pets.Add(new PetInfo(pet)
                                         {
-                                            TameTime = pet.TameTime - Envir.Time
+                                            TameTime = pet.TameTime - Env.Time
                                         });
                                     }
 
@@ -347,7 +347,7 @@ namespace Server.MirObjects
                             break;
                     }
 
-                    Envir.MonsterCount--;
+                    Env.MonsterCount--;
                     pet.CurrentMap.MonsterCount--;
 
                     pet.CurrentMap.RemoveObject(pet);
@@ -364,9 +364,9 @@ namespace Server.MirObjects
             {
                 var magic = Info.Magics[i];
 
-                if (Envir.Time < (magic.CastTime + magic.GetDelay()))
+                if (Env.Time < (magic.CastTime + magic.GetDelay()))
                 {
-                    magic.CastTime -= Envir.Time;
+                    magic.CastTime -= Env.Time;
                 }
                 else
                 {
@@ -397,7 +397,7 @@ namespace Server.MirObjects
                 MyGuild.PlayerLogged(this, false);
             }
 
-            Envir.Players.Remove(this);
+            Env.Players.Remove(this);
 
             CurrentMap.RemoveObject(this);
             Broadcast(new S.ObjectRemove { ObjectID = ObjectID });
@@ -417,15 +417,15 @@ namespace Server.MirObjects
             Fishing = false;
 
             Info.LastIP = Connection.IPAddress;
-            Info.LastLogoutDate = Envir.Now;
+            Info.LastLogoutDate = Env.Now;
 
             Report.Disconnected(logReason);
             Connection.WorldMapSetupSent = false;
 
             if (!IsGM)
             {
-                Envir.OnlineRankingCount[0]--;
-                Envir.OnlineRankingCount[(int)Class + 1]--;
+                Env.OnlineRankingCount[0]--;
+                Env.OnlineRankingCount[(int)Class + 1]--;
             }
 
             CleanUp();
@@ -467,7 +467,7 @@ namespace Server.MirObjects
         }
         protected override void NewCharacter()
         {
-            if (Envir.StartPoints.Count == 0) return;
+            if (Env.StartPoints.Count == 0) return;
 
             SetBind();
 
@@ -482,7 +482,7 @@ namespace Server.MirObjects
 
             base.Process();
 
-            if (Settings.RestedPeriod > 0 && Envir.Time > RestedTime)
+            if (Settings.RestedPeriod > 0 && Env.Time > RestedTime)
             {
                 _restedCounter = InSafeZone ? _restedCounter + 1 : _restedCounter;
 
@@ -493,7 +493,7 @@ namespace Server.MirObjects
                     GiveRestedBonus(count);
                 }
 
-                RestedTime = Envir.Time + Settings.Second;
+                RestedTime = Env.Time + Settings.Second;
             }
 
             if (NewMail)
@@ -503,14 +503,14 @@ namespace Server.MirObjects
                 GetMail();
             }
 
-            if (Account.HasExpandedStorage && Envir.Now > Account.ExpandedStorageExpiryDate)
+            if (Account.HasExpandedStorage && Env.Now > Account.ExpandedStorageExpiryDate)
             {
                 Account.HasExpandedStorage = false;
                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.ExpandedStorageExpired), ChatType.System);
                 Enqueue(new S.ResizeStorage { Size = Account.Storage.Length, HasExpandedStorage = Account.HasExpandedStorage, ExpiryTime = Account.ExpandedStorageExpiryDate });
             }
 
-            if (Fishing && Envir.Time > FishingTime)
+            if (Fishing && Env.Time > FishingTime)
             {
                 _fishCounter++;
                 UpdateFish();
@@ -577,9 +577,9 @@ namespace Server.MirObjects
         }
         public override void Die()
         {
-            if (SpecialMode.HasFlag(SpecialItemMode.Revival) && Envir.Time > LastRevivalTime)
+            if (SpecialMode.HasFlag(SpecialItemMode.Revival) && Env.Time > LastRevivalTime)
             {
-                LastRevivalTime = Envir.Time + 300000;
+                LastRevivalTime = Env.Time + 300000;
 
                 for (var i = (int)EquipmentSlot.RingL; i <= (int)EquipmentSlot.RingR; i++)
                 {
@@ -604,7 +604,7 @@ namespace Server.MirObjects
                 {
                     hitter.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.ProtectedByLaw), ChatType.System);
                 }
-                else if (Envir.Time > BrownTime && PKPoints < 200)
+                else if (Env.Time > BrownTime && PKPoints < 200)
                 {
                     UserItem weapon = hitter.Info.Equipment[(byte)EquipmentSlot.Weapon];
 
@@ -612,7 +612,7 @@ namespace Server.MirObjects
                     hitter.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.MurderPlayer), Name), ChatType.System);
                     ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.MurderedByPlayer), LastHitter.Name), ChatType.System);
 
-                    if (weapon != null && weapon.AddedStats[Stat.Luck] > (Settings.MaxLuck * -1) && Envir.Random.Next(4) == 0)
+                    if (weapon != null && weapon.AddedStats[Stat.Luck] > (Settings.MaxLuck * -1) && Env.Random.Next(4) == 0)
                     {
                         weapon.AddedStats[Stat.Luck]--;
                         hitter.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.WeaponHasBeenCursed), ChatType.System);
@@ -643,8 +643,8 @@ namespace Server.MirObjects
             HP = 0;
             Dead = true;
 
-            LogTime = Envir.Time;
-            BrownTime = Envir.Time;
+            LogTime = Env.Time;
+            BrownTime = Env.Time;
 
             Enqueue(new S.Death { Direction = Direction, Location = CurrentLocation });
             Broadcast(new S.ObjectDied { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
@@ -683,7 +683,7 @@ namespace Server.MirObjects
                     if ((item.WeddingRing != -1) && (Info.Equipment[(int)EquipmentSlot.RingL].UniqueID == item.UniqueID))
                         continue;
 
-                    if (item.SealedInfo != null && item.SealedInfo.ExpiryDate > Envir.Now)
+                    if (item.SealedInfo != null && item.SealedInfo.ExpiryDate > Env.Now)
                         continue;
 
                     if (item.Info.Bind.HasFlag(BindMode.BreakOnDeath))
@@ -696,13 +696,13 @@ namespace Server.MirObjects
 
                     if (item.Count > 1)
                     {
-                        var percent = Envir.RandomRange(10, 4);
+                        var percent = Env.RandomRange(10, 4);
                         var count = (ushort)Math.Ceiling(item.Count / 10F * percent);
 
                         if (count > item.Count)
                             throw new ArgumentOutOfRangeException();
 
-                        var temp2 = Envir.CreateFreshItem(item.Info);
+                        var temp2 = Env.CreateFreshItem(item.Info);
                         temp2.Count = count;
 
                         if (!DropItem(temp2, Settings.DropRange, true))
@@ -716,9 +716,9 @@ namespace Server.MirObjects
 
                         Report.ItemChanged(item, count, 1, "RedDeathDrop");
                     }
-                    else if (Envir.Random.Next(10) == 0)
+                    else if (Env.Random.Next(10) == 0)
                     {
-                        if (Envir.ReturnRentalItem(item, item.RentalInformation?.OwnerName, Info))
+                        if (Env.ReturnRentalItem(item, item.RentalInformation?.OwnerName, Info))
                         {
                             Info.Equipment[i] = null;
                             Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
@@ -733,7 +733,7 @@ namespace Server.MirObjects
                             continue;
 
                         if (item.Info.GlobalDropNotify)
-                            foreach (var player in Envir.Players)
+                            foreach (var player in Env.Players)
                             {
                                 player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerDroppedItem), Name, item.FriendlyName), ChatType.System2);
                             }
@@ -760,10 +760,10 @@ namespace Server.MirObjects
                 if (item.WeddingRing != -1)
                     continue;
 
-                if (item.SealedInfo != null && item.SealedInfo.ExpiryDate > Envir.Now)
+                if (item.SealedInfo != null && item.SealedInfo.ExpiryDate > Env.Now)
                     continue;
 
-                if (Envir.ReturnRentalItem(item, item.RentalInformation?.OwnerName, Info))
+                if (Env.ReturnRentalItem(item, item.RentalInformation?.OwnerName, Info))
                 {
                     Info.Inventory[i] = null;
                     Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
@@ -778,7 +778,7 @@ namespace Server.MirObjects
                     continue;
 
                 if (item.Info.GlobalDropNotify)
-                    foreach (var player in Envir.Players)
+                    foreach (var player in Env.Players)
                     {
                         player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerItemDropped), Name, item.FriendlyName), ChatType.System2);
                     }
@@ -855,8 +855,8 @@ namespace Server.MirObjects
             {
                 if (HasBuff(BuffType.Lover, out Buff buff))
                 {
-                    CharacterInfo lover = Envir.GetCharacterInfo(Info.Married);
-                    PlayerObject loverPlayer = Envir.GetPlayer(lover.Name);
+                    CharacterInfo lover = Env.GetCharacterInfo(Info.Married);
+                    PlayerObject loverPlayer = Env.GetPlayer(lover.Name);
                     if (loverPlayer != null && loverPlayer.CurrentMap == CurrentMap && Functions.InRange(loverPlayer.CurrentLocation, CurrentLocation, Globals.DataRange) && !loverPlayer.Dead)
                     {
                         amount += (uint)Math.Max(0, (amount * Stats[Stat.LoverExpRatePercent]) / 100);
@@ -868,8 +868,8 @@ namespace Server.MirObjects
             {
                 if (HasBuff(BuffType.Mentee, out _))
                 {
-                    CharacterInfo mentor = Envir.GetCharacterInfo(Info.Mentor);
-                    PlayerObject mentorPlayer = Envir.GetPlayer(mentor.Name);
+                    CharacterInfo mentor = Env.GetCharacterInfo(Info.Mentor);
+                    PlayerObject mentorPlayer = Env.GetPlayer(mentor.Name);
                     if (mentorPlayer != null && mentorPlayer.CurrentMap == CurrentMap && Functions.InRange(mentorPlayer.CurrentLocation, CurrentLocation, Globals.DataRange) && !mentorPlayer.Dead)
                     {
                         if (GroupMembers != null && GroupMembers.Contains(mentorPlayer))
@@ -923,10 +923,10 @@ namespace Server.MirObjects
             LevelUp();
 
             if (IsGM) return;
-            if ((LastRankUpdate + 3600 * 1000) > Envir.Time)
+            if ((LastRankUpdate + 3600 * 1000) > Env.Time)
             {
-                LastRankUpdate = Envir.Time;
-                Envir.CheckRankUpdate(Info);
+                LastRankUpdate = Env.Time;
+                Env.CheckRankUpdate(Info);
             }
         }
         public override void LevelUp()
@@ -939,7 +939,7 @@ namespace Server.MirObjects
 
             if (Info.Mentor != 0 && !Info.IsMentor)
             {
-                CharacterInfo Mentor = Envir.GetCharacterInfo(Info.Mentor);
+                CharacterInfo Mentor = Env.GetCharacterInfo(Info.Mentor);
                 if ((Mentor != null) && ((Info.Level + Settings.MentorLevelGap) > Mentor.Level))
                     MentorBreak();
             }
@@ -952,7 +952,7 @@ namespace Server.MirObjects
             Report.Levelled(Level);
 
             if (IsGM) return;
-            Envir.CheckRankUpdate(Info);
+            Env.CheckRankUpdate(Info);
         }
         private void AddQuestItem(UserItem item)
         {
@@ -1016,7 +1016,7 @@ namespace Server.MirObjects
 
             if (Connection.SentMapInfo.Contains(mapInfo)) return;
 
-            var map = Envir.GetMap(mapInfo.Index);
+            var map = Env.GetMap(mapInfo.Index);
             if (map == null) return;
 
             var info = new ClientMapInfo()
@@ -1029,7 +1029,7 @@ namespace Server.MirObjects
 
             foreach (MovementInfo mInfo in mapInfo.Movements.Where(x => x.ShowOnBigMap))
             {
-                Map destMap = Envir.GetMap(mInfo.MapIndex);
+                Map destMap = Env.GetMap(mInfo.MapIndex);
                 if (destMap is null)
                     continue;
                 var cmInfo = new ClientMovementInfo()
@@ -1044,7 +1044,7 @@ namespace Server.MirObjects
                 info.Movements.Add(cmInfo);
             }
 
-            foreach (NPCObject npc in Envir.NPCs.Where(x => x.CurrentMap == map && x.Info.ShowOnBigMap).OrderBy(x => x.Info.BigMapIcon))
+            foreach (NPCObject npc in Env.NPCs.Where(x => x.CurrentMap == map && x.Info.ShowOnBigMap).OrderBy(x => x.Info.BigMapIcon))
             {
                 ClientNPCInfo clientInfo = npc.Info.ClientInformation;
                 clientInfo.ObjectID = npc.ObjectID;
@@ -1056,7 +1056,7 @@ namespace Server.MirObjects
         }
         private void SetBind()
         {
-            SafeZoneInfo szi = Envir.StartPoints[Envir.Random.Next(Envir.StartPoints.Count)];
+            SafeZoneInfo szi = Env.StartPoints[Env.Random.Next(Env.StartPoints.Count)];
 
             BindMapIndex = szi.Info.Index;
             BindLocation = szi.Location;
@@ -1068,11 +1068,11 @@ namespace Server.MirObjects
         }
         public void StartGame()
         {
-            Map temp = Envir.GetMap(CurrentMapIndex);
+            Map temp = Env.GetMap(CurrentMapIndex);
 
             if (temp != null && temp.Info.NoReconnect)
             {
-                Map temp1 = Envir.GetMapByNameAndInstance(temp.Info.NoReconnectMap);
+                Map temp1 = Env.GetMapByNameAndInstance(temp.Info.NoReconnectMap);
                 if (temp1 != null)
                 {
                     temp = temp1;
@@ -1083,12 +1083,12 @@ namespace Server.MirObjects
 
             if (temp == null || !temp.ValidPoint(CurrentLocation))
             {
-                temp = Envir.GetMap(BindMapIndex);
+                temp = Env.GetMap(BindMapIndex);
 
                 if (temp == null || !temp.ValidPoint(BindLocation))
                 {
                     SetBind();
-                    temp = Envir.GetMap(BindMapIndex);
+                    temp = Env.GetMap(BindMapIndex);
 
                     if (temp == null || !temp.ValidPoint(BindLocation))
                     {
@@ -1102,7 +1102,7 @@ namespace Server.MirObjects
             CurrentMapIndex = temp.Info.Index;
             temp.AddObject(this);
             CurrentMap = temp;
-            Envir.Players.Add(this);
+            Env.Players.Add(this);
 
             StartGameSuccess();
 
@@ -1142,9 +1142,9 @@ namespace Server.MirObjects
             for (int i = 0; i < Info.Magics.Count; i++)
             {
                 var magic = Info.Magics[i];
-                magic.CastTime += Envir.Time;
+                magic.CastTime += Env.Time;
 
-                if (magic.CastTime + magic.GetDelay() < Envir.Time)
+                if (magic.CastTime + magic.GetDelay() < Env.Time)
                 {
                     magic.CastTime = int.MinValue;
                 }
@@ -1191,7 +1191,7 @@ namespace Server.MirObjects
             GetFriends();
             GetRelationship();
 
-            if (Info.Mentor != 0 && Info.MentorDate.AddDays(Settings.MentorLength) < Envir.Now)
+            if (Info.Mentor != 0 && Info.MentorDate.AddDays(Settings.MentorLength) < Env.Now)
             {
                 MentorBreak();
             }
@@ -1213,12 +1213,12 @@ namespace Server.MirObjects
 
             SendBaseStats();
             GetObjectsPassive();
-            Enqueue(new S.TimeOfDay { Lights = Envir.Lights });
+            Enqueue(new S.TimeOfDay { Lights = Env.Lights });
             Enqueue(new S.ChangeAMode { Mode = AMode });
             Enqueue(new S.ChangePMode { Mode = PMode });
             Enqueue(new S.SwitchGroup { AllowGroup = AllowGroup });
 
-            Enqueue(new S.DefaultNPC { ObjectID = Envir.DefaultNPC.LoadedObjectID });
+            Enqueue(new S.DefaultNPC { ObjectID = Env.DefaultNPC.LoadedObjectID });
 
             Enqueue(new S.GuildBuffList() { GuildBuffs = Settings.Guild_BuffList });
             RequestedGuildBuffInfo = true;
@@ -1235,7 +1235,7 @@ namespace Server.MirObjects
 
                 PetInfo info = Info.Pets[i];
 
-                var monsterInfo = Envir.GetMonsterInfo(info.MonsterIndex);
+                var monsterInfo = Env.GetMonsterInfo(info.MonsterIndex);
                 if (monsterInfo == null) continue;
 
                 monster = MonsterObject.GetMonster(monsterInfo);
@@ -1251,7 +1251,7 @@ namespace Server.MirObjects
                     case true when Settings.PetSave is true:
                         if (monster.Info.Name == Settings.CloneName)
                         {
-                            monster.ActionTime = Envir.Time + 1000;
+                            monster.ActionTime = Env.Time + 1000;
                             monster.RefreshNameColour(false);
                         }
                         break;
@@ -1262,12 +1262,12 @@ namespace Server.MirObjects
                             case (MirClass.Wizard):
                                 if (monster.Info.Name == Settings.CloneName)
                                 {
-                                    monster.ActionTime = Envir.Time + 1000;
+                                    monster.ActionTime = Env.Time + 1000;
                                     monster.RefreshNameColour(false);
                                 }
                                 else
                                 {
-                                    monster.TameTime = Envir.Time + info.TameTime;
+                                    monster.TameTime = Env.Time + info.TameTime;
                                 }
                                 break;
                         }
@@ -1293,7 +1293,7 @@ namespace Server.MirObjects
             for (int i = 0; i < Buffs.Count; i++)
             {
                 var buff = Buffs[i];
-                buff.LastTime = Envir.Time;
+                buff.LastTime = Env.Time;
                 buff.ObjectID = ObjectID;
 
                 AddBuff(buff.Type, null, (int)buff.ExpireTime, buff.Stats, true, true, buff.Values);
@@ -1303,7 +1303,7 @@ namespace Server.MirObjects
             for (int i = 0; i < PoisonList.Count; i++)
             {
                 var poison = PoisonList[i];
-                poison.TickTime = Envir.Time;
+                poison.TickTime = Env.Time;
             }
 
             if (MyGuild != null)
@@ -1324,7 +1324,7 @@ namespace Server.MirObjects
 
             if (InSafeZone && Info.LastLogoutDate > DateTime.MinValue)
             {
-                double totalMinutes = (Envir.Now - Info.LastLogoutDate).TotalMinutes;
+                double totalMinutes = (Env.Now - Info.LastLogoutDate).TotalMinutes;
                 _restedCounter = (int)(totalMinutes * 60);
             }
 
@@ -1343,10 +1343,10 @@ namespace Server.MirObjects
             }
             else
             {
-                LastRankUpdate = Envir.Time;
-                Envir.CheckRankUpdate(Info);
-                Envir.OnlineRankingCount[0]++;
-                Envir.OnlineRankingCount[(int)Class + 1]++;
+                LastRankUpdate = Env.Time;
+                Env.CheckRankUpdate(Info);
+                Env.OnlineRankingCount[0]++;
+                Env.OnlineRankingCount[(int)Class + 1]++;
             }
         }
 
@@ -1393,17 +1393,17 @@ namespace Server.MirObjects
         {
             if (!Dead) return;
 
-            Map temp = Envir.GetMap(BindMapIndex);
+            Map temp = Env.GetMap(BindMapIndex);
             Point bindLocation = BindLocation;
 
             if (Info.PKPoints >= 200)
             {
-                temp = Envir.GetMapByNameAndInstance(Settings.PKTownMapName, 1);
+                temp = Env.GetMapByNameAndInstance(Settings.PKTownMapName, 1);
                 bindLocation = new Point(Settings.PKTownPositionX, Settings.PKTownPositionY);
 
                 if (temp == null)
                 {
-                    temp = Envir.GetMap(BindMapIndex);
+                    temp = Env.GetMap(BindMapIndex);
                     bindLocation = BindLocation;
                 }
             }
@@ -1560,8 +1560,8 @@ namespace Server.MirObjects
                 DespawnHero();
                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.HeroesNotAllowedOnMap), ChatType.System);
 
-                if (Hero != null && Envir.Heroes.Contains(Hero))
-                    Envir.Heroes.Remove(Hero);
+                if (Hero != null && Env.Heroes.Contains(Hero))
+                    Env.Heroes.Remove(Hero);
             }
 
             // Party UI refresh
@@ -1680,7 +1680,7 @@ namespace Server.MirObjects
                 QuestInventory = new UserItem[Info.QuestInventory.Length],
                 Gold = Account.Gold,
                 Credit = Account.Credit,
-                HasExpandedStorage = Account.ExpandedStorageExpiryDate > Envir.Now ? true : false,
+                HasExpandedStorage = Account.ExpandedStorageExpiryDate > Env.Now ? true : false,
                 HasStoragePassword = Account.HasStoragePassword,
                 RequireStoragePassword = Settings.RequireStoragePassword,
                 StoragePasswordLastSet = Account.StoragePasswordLastSet,
@@ -1726,16 +1726,16 @@ namespace Server.MirObjects
         }
         private void GetQuestInfo()
         {
-            for (int i = 0; i < Envir.QuestInfoList.Count; i++)
+            for (int i = 0; i < Env.QuestInfoList.Count; i++)
             {
-                CheckQuestInfo(Envir.QuestInfoList[i]);
+                CheckQuestInfo(Env.QuestInfoList[i]);
             }
         }
         private void GetRecipeInfo()
         {
-            for (int i = 0; i < Envir.RecipeInfoList.Count; i++)
+            for (int i = 0; i < Env.RecipeInfoList.Count; i++)
             {
-                CheckRecipeInfo(Envir.RecipeInfoList[i]);
+                CheckRecipeInfo(Env.RecipeInfoList[i]);
             }
         }
         private void GetObjects()
@@ -1855,7 +1855,7 @@ namespace Server.MirObjects
                 if (player.PKPoints >= 200)
                     return Color.Red;
 
-                if (Envir.Time < player.BrownTime)
+                if (Env.Time < player.BrownTime)
                     return Color.SaddleBrown;
 
                 if (player.WarZone)
@@ -1903,7 +1903,7 @@ namespace Server.MirObjects
                     UpdateGMBuff();
                     MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.UserIsNowGM), Name));
                     ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.YouHaveBeenMadeGM), ChatType.System);
-                    Envir.RemoveRank(Info);//remove gm chars from ranking to avoid causing bugs in rank list
+                    Env.RemoveRank(Info);//remove gm chars from ranking to avoid causing bugs in rank list
                 }
                 else
                 {
@@ -1916,9 +1916,9 @@ namespace Server.MirObjects
 
             if (Info.ChatBanned)
             {
-                if (Info.ChatBanExpiryDate > Envir.Now)
+                if (Info.ChatBanExpiryDate > Env.Now)
                 {
-                    TimeSpan chatBanRemaining = Info.ChatBanExpiryDate - Envir.Now;
+                    TimeSpan chatBanRemaining = Info.ChatBanExpiryDate - Env.Now;
 
                     if (chatBanRemaining.Days > 0)
                         ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ChatBanRemainingTimeByDay), chatBanRemaining.Days, chatBanRemaining.Hours, chatBanRemaining.Minutes, chatBanRemaining.Seconds), ChatType.System);
@@ -1935,12 +1935,12 @@ namespace Server.MirObjects
             }
             else
             {
-                if (ChatTime > Envir.Time)
+                if (ChatTime > Env.Time)
                 {
                     if (ChatTick >= 5 & !IsGM)
                     {
                         Info.ChatBanned = true;
-                        Info.ChatBanExpiryDate = Envir.Now.AddMinutes(5);
+                        Info.ChatBanExpiryDate = Env.Now.AddMinutes(5);
                         ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.ChatBanDuration5Minutes), ChatType.System);
                         return;
                     }
@@ -1950,7 +1950,7 @@ namespace Server.MirObjects
                 else
                     ChatTick = 0;
 
-                ChatTime = Envir.Time + 2000;
+                ChatTime = Env.Time + 2000;
             }
 
             string[] parts;
@@ -1967,7 +1967,7 @@ namespace Server.MirObjects
 
                 if (parts.Length == 0) return;
 
-                PlayerObject player = Envir.GetPlayer(parts[0]);
+                PlayerObject player = Env.GetPlayer(parts[0]);
 
                 if (player == null)
                 {
@@ -2033,8 +2033,8 @@ namespace Server.MirObjects
 
                 if (Info.Mentor == 0) return;
 
-                CharacterInfo Mentor = Envir.GetCharacterInfo(Info.Mentor);
-                PlayerObject player = Envir.GetPlayer(Mentor.Name);
+                CharacterInfo Mentor = Env.GetCharacterInfo(Info.Mentor);
+                PlayerObject player = Env.GetPlayer(Mentor.Name);
 
                 if (player == null)
                 {
@@ -2050,9 +2050,9 @@ namespace Server.MirObjects
             else if (message.StartsWith("!"))
             {
                 //Shout
-                if (Envir.Time < ShoutTime)
+                if (Env.Time < ShoutTime)
                 {
-                    ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CannotShoutForSeconds), Math.Ceiling((ShoutTime - Envir.Time) / 1000D)), ChatType.System);
+                    ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CannotShoutForSeconds), Math.Ceiling((ShoutTime - Env.Time) / 1000D)), ChatType.System);
                     return;
                 }
                 if (Level < 8 && (!HasMapShout && !HasServerShout))
@@ -2061,7 +2061,7 @@ namespace Server.MirObjects
                     return;
                 }
 
-                ShoutTime = Envir.Time + 10000;
+                ShoutTime = Env.Time + 10000;
                 message = String.Format("(!){0}:{1}", Name, message.Remove(0, 1));
 
                 if (HasMapShout)
@@ -2079,14 +2079,14 @@ namespace Server.MirObjects
                 }
                 else if (HasServerShout)
                 {
-                    message = ProcessChatItems(message, Envir.Players, linkedItems);
+                    message = ProcessChatItems(message, Env.Players, linkedItems);
 
                     p = new S.Chat { Message = message, Type = ChatType.Shout3 };
                     HasServerShout = false;
 
-                    for (int i = 0; i < Envir.Players.Count; i++)
+                    for (int i = 0; i < Env.Players.Count; i++)
                     {
-                        Envir.Players[i].Enqueue(p);
+                        Env.Players[i].Enqueue(p);
                     }
                     return;
                 }
@@ -2123,8 +2123,8 @@ namespace Server.MirObjects
 
                 if (Info.Married == 0) return;
 
-                CharacterInfo Lover = Envir.GetCharacterInfo(Info.Married);
-                PlayerObject player = Envir.GetPlayer(Lover.Name);
+                CharacterInfo Lover = Env.GetCharacterInfo(Info.Married);
+                PlayerObject player = Env.GetPlayer(Lover.Name);
 
                 if (player == null)
                 {
@@ -2143,11 +2143,11 @@ namespace Server.MirObjects
 
                 message = String.Format("(*){0}:{1}", Name, message.Remove(0, 2));
 
-                message = ProcessChatItems(message, Envir.Players, linkedItems);
+                message = ProcessChatItems(message, Env.Players, linkedItems);
 
                 p = new S.Chat { Message = message, Type = ChatType.Announcement };
 
-                Envir.Broadcast(p);
+                Env.Broadcast(p);
             }
             else if (message.StartsWith("@"))
             {
@@ -2184,7 +2184,7 @@ namespace Server.MirObjects
 
                         if (parts.Length >= 2)
                         {
-                            player = Envir.GetPlayer(parts[1]);
+                            player = Env.GetPlayer(parts[1]);
 
                             if (player == null)
                             {
@@ -2218,7 +2218,7 @@ namespace Server.MirObjects
                                     case ObjectType.Monster:
                                         if (ob.Dead) continue;
                                         ob.EXPOwner = this;
-                                        ob.ExpireTime = Envir.Time + MonsterObject.EXPOwnerDelay;
+                                        ob.ExpireTime = Env.Time + MonsterObject.EXPOwnerDelay;
                                         ob.Die();
 
                                         if (ob is PlayerObject killedPlayer)
@@ -2237,7 +2237,7 @@ namespace Server.MirObjects
                     case "CHANGEGENDER":
                         if (!IsGM && !Settings.TestServer) return;
 
-                        data = parts.Length < 2 ? Info : Envir.GetCharacterInfo(parts[1]);
+                        data = parts.Length < 2 ? Info : Env.GetCharacterInfo(parts[1]);
 
                         if (data == null) return;
 
@@ -2273,7 +2273,7 @@ namespace Server.MirObjects
                             if (ushort.TryParse(parts[2], out level))
                             {
                                 if (level == 0) return;
-                                player = Envir.GetPlayer(parts[1]);
+                                player = Env.GetPlayer(parts[1]);
                                 if (player == null) return;
                                 old = player.Level;
                                 player.Level = level;
@@ -2319,7 +2319,7 @@ namespace Server.MirObjects
                             if (ushort.TryParse(parts[2], out level))
                             {
                                 if (level == 0) return;
-                                player = Envir.GetPlayer(parts[1]);
+                                player = Env.GetPlayer(parts[1]);
                                 if (player == null) return;
                                 HeroObject hero = player.GetHero();
                                 if (hero == null) return;
@@ -2368,11 +2368,11 @@ namespace Server.MirObjects
 
                             if (Int32.TryParse(parts[1], out itemIndex))
                             {
-                                iInfo = Envir.GetItemInfo(itemIndex);
+                                iInfo = Env.GetItemInfo(itemIndex);
                             }
                             else
                             {
-                                iInfo = Envir.GetItemInfo(parts[1]);
+                                iInfo = Env.GetItemInfo(parts[1]);
                             }
 
                             if (iInfo == null) return;
@@ -2387,7 +2387,7 @@ namespace Server.MirObjects
                             {
                                 if (iInfo.StackSize >= itemCount)
                                 {
-                                    item = Envir.CreateDropItem(iInfo);
+                                    item = Env.CreateDropItem(iInfo);
                                     item.GMMade = true;
                                     item.Count = itemCount;
 
@@ -2395,7 +2395,7 @@ namespace Server.MirObjects
 
                                     return;
                                 }
-                                item = Envir.CreateDropItem(iInfo);
+                                item = Env.CreateDropItem(iInfo);
                                 item.GMMade = true;
                                 item.Count = iInfo.StackSize;
                                 itemCount -= iInfo.StackSize;
@@ -2421,7 +2421,7 @@ namespace Server.MirObjects
                         player = this;
 
                         if (parts.Length >= 2)
-                            player = Envir.GetPlayer(parts[1]);
+                            player = Env.GetPlayer(parts[1]);
 
                         if (player == null) return;
                         for (int i = 0; i < player.Info.Inventory.Length; i++)
@@ -2472,7 +2472,7 @@ namespace Server.MirObjects
                         if (!IsGM) return;
 
                         if (parts.Length < 2) return;
-                        player = Envir.GetPlayer(parts[1]);
+                        player = Env.GetPlayer(parts[1]);
 
                         if (player == null) return;
 
@@ -2480,7 +2480,7 @@ namespace Server.MirObjects
                         break;
                     case "OBSERVE":
                         if (parts.Length < 2) return;
-                        player = Envir.GetPlayer(parts[1]);
+                        player = Env.GetPlayer(parts[1]);
 
                         if (player == null) return;
                         if ((!player.AllowObserve || !Settings.AllowObserve) && !IsGM) return;
@@ -2503,15 +2503,15 @@ namespace Server.MirObjects
                             return;
                         }
 
-                        if (Envir.Time < LastRecallTime)
+                        if (Env.Time < LastRecallTime)
                         {
-                            ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CannotRecallForSeconds), (LastRecallTime - Envir.Time) / 1000), ChatType.System);
+                            ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CannotRecallForSeconds), (LastRecallTime - Env.Time) / 1000), ChatType.System);
                             return;
                         }
 
                         if (ItemSets.Any(set => set.Set == ItemSet.Recall && set.SetComplete))
                         {
-                            LastRecallTime = Envir.Time + 180000;
+                            LastRecallTime = Env.Time + 180000;
                             for (var i = 1; i < GroupMembers.Count(); i++)
                             {
                                 if (GroupMembers[i].EnableGroupRecall)
@@ -2541,15 +2541,15 @@ namespace Server.MirObjects
                             return;
                         }
 
-                        if (Envir.Time < LastRecallTime)
+                        if (Env.Time < LastRecallTime)
                         {
-                            ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CannotRecallSeconds), (LastRecallTime - Envir.Time) / 1000), ChatType.System);
+                            ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CannotRecallSeconds), (LastRecallTime - Env.Time) / 1000), ChatType.System);
                             return;
                         }
                         if (ItemSets.Any(set => set.Set == ItemSet.Recall && set.SetComplete))
                         {
                             if (parts.Length < 2) return;
-                            player = Envir.GetPlayer(parts[1]);
+                            player = Env.GetPlayer(parts[1]);
 
                             if (player == null || !IsMember(player) || this == player)
                             {
@@ -2562,7 +2562,7 @@ namespace Server.MirObjects
                                 ReceiveChat((GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.BlockingGroupRecall), player.Name)), ChatType.System);
                                 return;
                             }
-                            LastRecallTime = Envir.Time + 60000;
+                            LastRecallTime = Env.Time + 60000;
 
                             if (!player.Teleport(CurrentMap, Front))
                                 player.Teleport(CurrentMap, CurrentLocation);
@@ -2602,11 +2602,11 @@ namespace Server.MirObjects
 
                         if (Info.Equipment[(int)EquipmentSlot.RingL].WeddingRing == Info.Married)
                         {
-                            CharacterInfo Lover = Envir.GetCharacterInfo(Info.Married);
+                            CharacterInfo Lover = Env.GetCharacterInfo(Info.Married);
 
                             if (Lover == null) return;
 
-                            player = Envir.GetPlayer(Lover.Name);
+                            player = Env.GetPlayer(Lover.Name);
 
                             if (!Settings.WeddingRingRecall)
                             {
@@ -2647,14 +2647,14 @@ namespace Server.MirObjects
                                 return;
                             }
 
-                            if ((Envir.Time < LastRecallTime) && (Envir.Time < player.LastRecallTime))
+                            if ((Env.Time < LastRecallTime) && (Env.Time < player.LastRecallTime))
                             {
-                                ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CannotRecallSeconds), (LastRecallTime - Envir.Time) / 1000), ChatType.System);
+                                ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CannotRecallSeconds), (LastRecallTime - Env.Time) / 1000), ChatType.System);
                                 return;
                             }
 
-                            LastRecallTime = Envir.Time + 60000;
-                            player.LastRecallTime = Envir.Time + 60000;
+                            LastRecallTime = Env.Time + 60000;
+                            player.LastRecallTime = Env.Time + 60000;
 
                             if (!player.Teleport(CurrentMap, Front))
                                 player.Teleport(CurrentMap, CurrentLocation);
@@ -2666,11 +2666,11 @@ namespace Server.MirObjects
                         }
                         break;
                     case "TIME":
-                        ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.TheTimeIs), Envir.Now.ToString("hh:mm tt")), ChatType.System);
+                        ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.TheTimeIs), Env.Now.ToString("hh:mm tt")), ChatType.System);
                         break;
 
                     case "ROLL":
-                        int diceNum = Envir.Random.Next(5) + 1;
+                        int diceNum = Env.Random.Next(5) + 1;
 
                         if (GroupMembers == null) { return; }
 
@@ -2691,7 +2691,7 @@ namespace Server.MirObjects
                         {
                             if (!IsGM || parts.Length < 2) return;
 
-                            var info = Envir.GetCharacterInfo(parts[1]);
+                            var info = Env.GetCharacterInfo(parts[1]);
 
                             if (info == null)
                             {
@@ -2699,7 +2699,7 @@ namespace Server.MirObjects
                                 return;
                             }
 
-                            Envir.SaveArchivedCharacter(info);
+                            Env.SaveArchivedCharacter(info);
 
                             ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerHasBeenBackedUp), info.Name), ChatType.System);
                             MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerBackedUpBy), info.Name, Name));
@@ -2710,7 +2710,7 @@ namespace Server.MirObjects
                         {
                             if (!IsGM || parts.Length < 2) return;
 
-                            data = Envir.GetCharacterInfo(parts[1]);
+                            data = Env.GetCharacterInfo(parts[1]);
 
                             if (data == null)
                             {
@@ -2724,7 +2724,7 @@ namespace Server.MirObjects
                                 return;
                             }
 
-                            var account = Envir.GetAccountByCharacter(parts[1]);
+                            var account = Env.GetAccountByCharacter(parts[1]);
 
                             if (account == null)
                             {
@@ -2732,9 +2732,9 @@ namespace Server.MirObjects
                                 return;
                             }
 
-                            Envir.SaveArchivedCharacter(data);
+                            Env.SaveArchivedCharacter(data);
 
-                            Envir.CharacterList.Remove(data);
+                            Env.CharacterList.Remove(data);
                             account.Characters.Remove(data);
 
                             ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerHasBeenArchived), data.Name), ChatType.System);
@@ -2748,7 +2748,7 @@ namespace Server.MirObjects
 
                             if (parts.Length < 2) return;
 
-                            var bak = Envir.GetArchivedCharacter(parts[1]);
+                            var bak = Env.GetArchivedCharacter(parts[1]);
 
                             if (bak == null)
                             {
@@ -2756,7 +2756,7 @@ namespace Server.MirObjects
                                 return;
                             }
 
-                            var info = Envir.GetCharacterInfo(bak.Name);
+                            var info = Env.GetCharacterInfo(bak.Name);
 
                             if (info == null)
                             {
@@ -2785,13 +2785,13 @@ namespace Server.MirObjects
 
                             if (parts.Length > 2)
                             {
-                                if (!Envir.AccountExists(parts[2]))
+                                if (!Env.AccountExists(parts[2]))
                                 {
                                     ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.AccountNotFound), parts[2]), ChatType.System);
                                     return;
                                 }
 
-                                account = Envir.GetAccount(parts[2]);
+                                account = Env.GetAccount(parts[2]);
 
                                 if (account.Characters.Count >= Globals.MaxCharacterCount)
                                 {
@@ -2800,13 +2800,13 @@ namespace Server.MirObjects
                                 }
                             }
 
-                            data = Envir.GetCharacterInfo(parts[1]);
+                            data = Env.GetCharacterInfo(parts[1]);
 
                             if (data == null)
                             {
                                 if (account != null)
                                 {
-                                    data = Envir.GetArchivedCharacter(parts[1]);
+                                    data = Env.GetArchivedCharacter(parts[1]);
 
                                     if (data == null)
                                     {
@@ -2817,12 +2817,12 @@ namespace Server.MirObjects
                                     data.AccountInfo = account;
 
                                     account.Characters.Add(data);
-                                    Envir.CharacterList.Add(data);
+                                    Env.CharacterList.Add(data);
 
                                     data.Deleted = false;
                                     data.DeleteDate = DateTime.MinValue;
 
-                                    data.LastLoginDate = Envir.Now;
+                                    data.LastLoginDate = Env.Now;
                                 }
                                 else
                                 {
@@ -2849,9 +2849,9 @@ namespace Server.MirObjects
                             ReceiveChat((GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotPositionMoveOnMap)), ChatType.System);
                             return;
                         }
-                        if (Envir.Time < LastTeleportTime)
+                        if (Env.Time < LastTeleportTime)
                         {
-                            ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CannotTeleportSecondsLeft), (LastTeleportTime - Envir.Time) / 1000), ChatType.System);
+                            ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CannotTeleportSecondsLeft), (LastTeleportTime - Env.Time) / 1000), ChatType.System);
                             return;
                         }
 
@@ -2860,12 +2860,12 @@ namespace Server.MirObjects
                         if (parts.Length <= 2 || !int.TryParse(parts[1], out x) || !int.TryParse(parts[2], out y))
                         {
                             if (!IsGM)
-                                LastTeleportTime = Envir.Time + 10000;
+                                LastTeleportTime = Env.Time + 10000;
                             TeleportRandom(200, 0);
                             return;
                         }
                         if (!IsGM)
-                            LastTeleportTime = Envir.Time + 10000;
+                            LastTeleportTime = Env.Time + 10000;
                         Teleport(CurrentMap, new Point(x, y));
                         break;
 
@@ -2878,7 +2878,7 @@ namespace Server.MirObjects
 
                         if (instanceID < 1) instanceID = 1;
 
-                        var map = Envir.GetMapByNameAndInstance(parts[1], instanceID);
+                        var map = Env.GetMapByNameAndInstance(parts[1], instanceID);
                         if (map == null)
                         {
                             ReceiveChat((GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.MapCouldNotBeFound), parts[1], instanceID)), ChatType.System);
@@ -2916,7 +2916,7 @@ namespace Server.MirObjects
                         if (!IsGM) return;
 
                         if (parts.Length < 2) return;
-                        player = Envir.GetPlayer(parts[1]);
+                        player = Env.GetPlayer(parts[1]);
 
                         if (player == null) return;
 
@@ -2936,11 +2936,11 @@ namespace Server.MirObjects
 
                         if (Int32.TryParse(parts[1], out monsterIndex))
                         {
-                            mInfo = Envir.GetMonsterInfo(monsterIndex, false);
+                            mInfo = Env.GetMonsterInfo(monsterIndex, false);
                         }
                         else
                         {
-                            mInfo = Envir.GetMonsterInfo(parts[1]);
+                            mInfo = Env.GetMonsterInfo(parts[1]);
                         }
 
                         if (mInfo == null)
@@ -2982,7 +2982,7 @@ namespace Server.MirObjects
                                 monster.Spawn(CurrentMap, Front);
                             else
                                 for (int _ = 0; _ < 20; _++)
-                                    if (monster.Spawn(CurrentMap, CurrentLocation.Add(Envir.Random.Next(-spread, spread + 1), Envir.Random.Next(-spread, spread + 1))))
+                                    if (monster.Spawn(CurrentMap, CurrentLocation.Add(Env.Random.Next(-spread, spread + 1), Env.Random.Next(-spread, spread + 1))))
                                         break;
                         }
 
@@ -2997,11 +2997,11 @@ namespace Server.MirObjects
 
                         if (Int32.TryParse(parts[1], out monsterIndex2))
                         {
-                            mInfo2 = Envir.GetMonsterInfo(monsterIndex2, false);
+                            mInfo2 = Env.GetMonsterInfo(monsterIndex2, false);
                         }
                         else
                         {
-                            mInfo2 = Envir.GetMonsterInfo(parts[1]);
+                            mInfo2 = Env.GetMonsterInfo(parts[1]);
                         }
 
                         if (mInfo2 == null) return;
@@ -3038,7 +3038,7 @@ namespace Server.MirObjects
                             monster.Master = this;
                             monster.MaxPetLevel = 7;
                             monster.Direction = Direction;
-                            monster.ActionTime = Envir.Time + 1000;
+                            monster.ActionTime = Env.Time + 1000;
                             monster.Spawn(CurrentMap, Front);
                             Pets.Add(monster);
                         }
@@ -3049,7 +3049,7 @@ namespace Server.MirObjects
                     case "RELOADDROPS":
                         if (!IsGM) return;
 
-                        Envir.ReloadDrops();
+                        Env.ReloadDrops();
 
                         ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.DropsReloaded), ChatType.Hint);
                         break;
@@ -3057,7 +3057,7 @@ namespace Server.MirObjects
                     case "RELOADNPCS":
                         if (!IsGM) return;
 
-                        Envir.ReloadNPCs();
+                        Env.ReloadNPCs();
 
                         ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NpcScriptsReloaded), ChatType.Hint);
                         break;
@@ -3065,7 +3065,7 @@ namespace Server.MirObjects
                     case "CLEARIPBLOCKS":
                         if (!IsGM) return;
 
-                        Envir.IPBlocks.Clear();
+                        Env.IPBlocks.Clear();
                         break;
 
                     case "GIVEGOLD":
@@ -3078,7 +3078,7 @@ namespace Server.MirObjects
                             if (!IsGM) return;
 
                             if (!uint.TryParse(parts[2], out count)) return;
-                            player = Envir.GetPlayer(parts[1]);
+                            player = Env.GetPlayer(parts[1]);
 
                             if (player == null)
                             {
@@ -3110,7 +3110,7 @@ namespace Server.MirObjects
                             if (!IsGM) return;
 
                             if (!uint.TryParse(parts[2], out count)) return;
-                            player = Envir.GetPlayer(parts[1]);
+                            player = Env.GetPlayer(parts[1]);
 
                             if (player == null)
                             {
@@ -3142,7 +3142,7 @@ namespace Server.MirObjects
                             if (!IsGM) return;
 
                             if (!uint.TryParse(parts[2], out count)) return;
-                            player = Envir.GetPlayer(parts[1]);
+                            player = Env.GetPlayer(parts[1]);
 
                             if (player == null)
                             {
@@ -3182,7 +3182,7 @@ namespace Server.MirObjects
                         {
                             if (!IsGM) return;
 
-                            player = Envir.GetPlayer(parts[1]);
+                            player = Env.GetPlayer(parts[1]);
 
                             if (player == null)
                             {
@@ -3228,14 +3228,14 @@ namespace Server.MirObjects
                     case "FIND":
                         if (!IsGM && !SpecialMode.HasFlag(SpecialItemMode.Probe)) return;
 
-                        if (Envir.Time < LastProbeTime)
+                        if (Env.Time < LastProbeTime)
                         {
-                            ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CannotSearchSeconds), (LastProbeTime - Envir.Time) / 1000), ChatType.System);
+                            ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CannotSearchSeconds), (LastProbeTime - Env.Time) / 1000), ChatType.System);
                             return;
                         }
 
                         if (parts.Length < 2) return;
-                        player = Envir.GetPlayer(parts[1]);
+                        player = Env.GetPlayer(parts[1]);
 
                         if (player == null)
                         {
@@ -3244,7 +3244,7 @@ namespace Server.MirObjects
                         }
                         if (player.CurrentMap == null) return;
                         if (!IsGM)
-                            LastProbeTime = Envir.Time + 180000;
+                            LastProbeTime = Env.Time + 180000;
                         ReceiveChat((GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerLocationInfo), player.Name, player.CurrentMap.Info.Title, player.CurrentLocation.X, player.CurrentLocation.Y)), ChatType.System);
                         break;
 
@@ -3265,7 +3265,7 @@ namespace Server.MirObjects
 
                         if ((!IsGM && !Settings.TestServer) || parts.Length < 2) return;
 
-                        player = parts.Length < 3 ? this : Envir.GetPlayer(parts[1]);
+                        player = parts.Length < 3 ? this : Env.GetPlayer(parts[1]);
 
                         if (player == null)
                         {
@@ -3286,7 +3286,7 @@ namespace Server.MirObjects
                             return;
                         }
 
-                        GuildObject guild = Envir.GetGuild(gName);
+                        GuildObject guild = Env.GetGuild(gName);
                         if (guild != null)
                         {
                             ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.GuildAlreadyExists), gName), ChatType.System);
@@ -3321,7 +3321,7 @@ namespace Server.MirObjects
 
                         if (parts.Length >= 3)
                         {
-                            player = Envir.GetPlayer(parts[2]);
+                            player = Env.GetPlayer(parts[2]);
 
                             if (player == null)
                             {
@@ -3333,7 +3333,7 @@ namespace Server.MirObjects
                             return;
                         }
 
-                        foreach (var pl in Envir.Players)
+                        foreach (var pl in Env.Players)
                         {
                             pl.CallDefaultNPC(DefaultNPCType.Trigger, parts[1]);
                         }
@@ -3383,7 +3383,7 @@ namespace Server.MirObjects
                     case "CLEARFLAGS":
                         if (!IsGM && !Settings.TestServer) return;
 
-                        player = parts.Length > 1 && IsGM ? Envir.GetPlayer(parts[1]) : this;
+                        player = parts.Length > 1 && IsGM ? Env.GetPlayer(parts[1]) : this;
 
                         if (player == null)
                         {
@@ -3401,7 +3401,7 @@ namespace Server.MirObjects
 
                         if (parts.Length > 1)
                         {
-                            map = Envir.GetMapByNameAndInstance(parts[1]);
+                            map = Env.GetMapByNameAndInstance(parts[1]);
 
                             if (map == null) return;
 
@@ -3432,7 +3432,7 @@ namespace Server.MirObjects
                     case "CHANGECLASS": //@changeclass [Player] [Class]
                         if (!IsGM && !Settings.TestServer) return;
 
-                        data = parts.Length <= 2 || !IsGM ? Info : Envir.GetCharacterInfo(parts[1]);
+                        data = parts.Length <= 2 || !IsGM ? Info : Env.GetCharacterInfo(parts[1]);
 
                         if (data == null) return;
 
@@ -3460,7 +3460,7 @@ namespace Server.MirObjects
 
                         if (parts.Length < 2)
                         {
-                            Info.Hair = (byte)Envir.Random.Next(0, 9);
+                            Info.Hair = (byte)Env.Random.Next(0, 9);
                         }
                         else
                         {
@@ -3498,7 +3498,7 @@ namespace Server.MirObjects
                         {
                             if (!IsGM) return;
 
-                            player = Envir.GetPlayer(parts[1]);
+                            player = Env.GetPlayer(parts[1]);
 
                             if (player == null) return;
 
@@ -3531,7 +3531,7 @@ namespace Server.MirObjects
                             {
                                 if (temp == null) continue;
 
-                                ItemInfo realItem = Functions.GetRealItem(temp.Info, Info.Level, Info.Class, Envir.ItemInfoList);
+                                ItemInfo realItem = Functions.GetRealItem(temp.Info, Info.Level, Info.Class, Env.ItemInfoList);
 
                                 if (realItem.Type == type)
                                 {
@@ -3570,7 +3570,7 @@ namespace Server.MirObjects
                             {
                                 if (temp == null) continue;
 
-                                ItemInfo realItem = Functions.GetRealItem(temp.Info, Info.Level, Info.Class, Envir.ItemInfoList);
+                                ItemInfo realItem = Functions.GetRealItem(temp.Info, Info.Level, Info.Class, Env.ItemInfoList);
 
                                 if (realItem.Type == type)
                                 {
@@ -3598,7 +3598,7 @@ namespace Server.MirObjects
                         if (!IsGM) return;
                         if (parts.Length < 2) return;
 
-                        GuildObject enemyGuild = Envir.GetGuild(parts[1]);
+                        GuildObject enemyGuild = Env.GetGuild(parts[1]);
 
                         if (MyGuild == null)
                         {
@@ -3672,14 +3672,14 @@ namespace Server.MirObjects
                                 Account.Gold -= cost;
                                 Account.HasExpandedStorage = true;
 
-                                if (Account.ExpandedStorageExpiryDate > Envir.Now)
+                                if (Account.ExpandedStorageExpiryDate > Env.Now)
                                 {
                                     Account.ExpandedStorageExpiryDate = Account.ExpandedStorageExpiryDate + addedTime;
                                     ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.ExpandedStorageExpiresOn) + Account.ExpandedStorageExpiryDate.ToString(), ChatType.System);
                                 }
                                 else
                                 {
-                                    Account.ExpandedStorageExpiryDate = Envir.Now + addedTime;
+                                    Account.ExpandedStorageExpiryDate = Env.Now + addedTime;
                                     ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.ExpandedStorageExpiresOn) + Account.ExpandedStorageExpiryDate.ToString(), ChatType.System);
                                 }
 
@@ -3702,7 +3702,7 @@ namespace Server.MirObjects
                                 SummonHero();
                         else if (Hero != null)
                         {
-                            long remaining = Hero.LogTime - Envir.Time;
+                            long remaining = Hero.LogTime - Env.Time;
                             if (remaining > 0)
                             {
                                 int remainingSeconds = (int)Math.Ceiling(remaining / 1000D);
@@ -3739,7 +3739,7 @@ namespace Server.MirObjects
                             }
                             else
                             {
-                                ob = Envir.GetPlayer(parts[1]);
+                                ob = Env.GetPlayer(parts[1]);
                             }
 
                             if (ob == null) return;
@@ -3772,7 +3772,7 @@ namespace Server.MirObjects
                     case "CLEARQUESTS":
                         if (!IsGM && !Settings.TestServer) return;
 
-                        player = parts.Length > 1 && IsGM ? Envir.GetPlayer(parts[1]) : this;
+                        player = parts.Length > 1 && IsGM ? Env.GetPlayer(parts[1]) : this;
 
                         if (player == null)
                         {
@@ -3793,7 +3793,7 @@ namespace Server.MirObjects
                     case "SETQUEST":
                         if ((!IsGM && !Settings.TestServer) || parts.Length < 3) return;
 
-                        player = parts.Length > 3 && IsGM ? Envir.GetPlayer(parts[3]) : this;
+                        player = parts.Length > 3 && IsGM ? Env.GetPlayer(parts[3]) : this;
 
                         if (player == null)
                         {
@@ -3870,7 +3870,7 @@ namespace Server.MirObjects
 
                             else if (!int.TryParse(parts[1], out conquestID)) return;
 
-                            ConquestObject tempConq = Envir.Conquests.FirstOrDefault(t => t.Info.Index == conquestID);
+                            ConquestObject tempConq = Env.Conquests.FirstOrDefault(t => t.Info.Index == conquestID);
 
                             if (tempConq != null)
                             {
@@ -3882,7 +3882,7 @@ namespace Server.MirObjects
                             ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.WarStarted), tempConq.Info.Name), ChatType.System);
                             MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.WarStarted), tempConq.Info.Name));
 
-                            foreach (var pl in Envir.Players)
+                            foreach (var pl in Env.Players)
                             {
                                 if (tempConq.WarIsOn)
                                 {
@@ -3916,7 +3916,7 @@ namespace Server.MirObjects
 
                             else if (!int.TryParse(parts[1], out conquestID)) return;
 
-                            ConquestObject resetConq = Envir.Conquests.FirstOrDefault(t => t.Info.Index == conquestID);
+                            ConquestObject resetConq = Env.Conquests.FirstOrDefault(t => t.Info.Index == conquestID);
 
                             if (resetConq != null && !resetConq.WarIsOn)
                             {
@@ -4008,7 +4008,7 @@ namespace Server.MirObjects
                             return;
                         }
 
-                        ushort flag = (ushort)Envir.Random.Next(12);
+                        ushort flag = (ushort)Env.Random.Next(12);
 
                         if (parts.Length > 1)
                         {
@@ -4033,9 +4033,9 @@ namespace Server.MirObjects
                                 return;
                             }
 
-                            byte r1 = (byte)Envir.Random.Next(255);
-                            byte g1 = (byte)Envir.Random.Next(255);
-                            byte b1 = (byte)Envir.Random.Next(255);
+                            byte r1 = (byte)Env.Random.Next(255);
+                            byte g1 = (byte)Env.Random.Next(255);
+                            byte b1 = (byte)Env.Random.Next(255);
 
                             if (parts.Length > 3)
                             {
@@ -4064,7 +4064,7 @@ namespace Server.MirObjects
                         }
                         else
                         {
-                            player = Envir.GetPlayer(parts[1]);
+                            player = Env.GetPlayer(parts[1]);
                             if (player == null) return;
 
                             player.Revive(MaxHealth, true);
@@ -4083,7 +4083,7 @@ namespace Server.MirObjects
                         if (parts.Length > 2)
                         {
                             if (!IsGM) return;
-                            player = Envir.GetPlayer(parts[1]);
+                            player = Env.GetPlayer(parts[1]);
 
                             if (player == null)
                             {
@@ -4148,7 +4148,7 @@ namespace Server.MirObjects
                         break;
                 }
 
-                foreach (string command in Envir.CustomCommands)
+                foreach (string command in Env.CustomCommands)
                 {
                     if (string.Compare(parts[0], command, true) != 0) continue;
 
@@ -4267,7 +4267,7 @@ namespace Server.MirObjects
 
             if (CanMove)
             {
-                ActionTime = Envir.Time + GetDelayTime(TurnDelay);
+                ActionTime = Env.Time + GetDelayTime(TurnDelay);
 
                 Direction = dir;
                 if (CheckMovement(CurrentLocation)) return;
@@ -4316,7 +4316,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            ActionTime = Envir.Time + HarvestDelay;
+            ActionTime = Env.Time + HarvestDelay;
 
             Direction = dir;
 
@@ -4458,7 +4458,7 @@ namespace Server.MirObjects
         }
         public override bool CheckMovement(Point location)
         {
-            if (Envir.Time < MovementTime) return false;
+            if (Env.Time < MovementTime) return false;
 
             //Script triggered coords
             for (int s = 0; s < CurrentMap.Info.ActiveCoords.Count; s++)
@@ -4494,12 +4494,12 @@ namespace Server.MirObjects
 
                 if (info.NeedMove) //use with ENTERMAP npc command
                 {
-                    NPCData["NPCMoveMap"] = Envir.GetMap(info.MapIndex);
+                    NPCData["NPCMoveMap"] = Env.GetMap(info.MapIndex);
                     NPCData["NPCMoveCoord"] = info.Destination;
                     continue;
                 }
 
-                Map temp = Envir.GetMap(info.MapIndex);
+                Map temp = Env.GetMap(info.MapIndex);
 
                 if (temp == null || !temp.ValidPoint(info.Destination)) continue;
 
@@ -4561,7 +4561,7 @@ namespace Server.MirObjects
 
             CurrentMap.AddObject(this);
 
-            MovementTime = Envir.Time + MovementDelay;
+            MovementTime = Env.Time + MovementDelay;
 
             Enqueue(new S.MapChanged
             {
@@ -4609,8 +4609,8 @@ namespace Server.MirObjects
             // Relationship & conquest hooks
             if (Info.Married != 0)
             {
-                CharacterInfo lover = Envir.GetCharacterInfo(Info.Married);
-                PlayerObject ply = Envir.GetPlayer(lover.Name);
+                CharacterInfo lover = Env.GetCharacterInfo(Info.Married);
+                PlayerObject ply = Env.GetPlayer(lover.Name);
                 if (ply != null) ply.GetRelationship(false);
             }
 
@@ -4618,12 +4618,12 @@ namespace Server.MirObjects
         }
         public bool TeleportEscape(int attempts)
         {
-            Map temp = Envir.GetMap(BindMapIndex);
+            Map temp = Env.GetMap(BindMapIndex);
 
             for (int i = 0; i < attempts; i++)
             {
-                Point location = new Point(BindLocation.X + Envir.Random.Next(-100, 100),
-                                           BindLocation.Y + Envir.Random.Next(-100, 100));
+                Point location = new Point(BindLocation.X + Env.Random.Next(-100, 100),
+                                           BindLocation.Y + Env.Random.Next(-100, 100));
 
                 if (Teleport(temp, location)) return true;
             }
@@ -4632,14 +4632,14 @@ namespace Server.MirObjects
         }
         public override bool MagicTeleport(UserMagic magic)
         {
-            Map temp = Envir.GetMap(BindMapIndex);
+            Map temp = Env.GetMap(BindMapIndex);
             int mapSizeX = temp.Width / (magic.Level + 1);
             int mapSizeY = temp.Height / (magic.Level + 1);
 
             for (int i = 0; i < 200; i++)
             {
-                Point location = new Point(BindLocation.X + Envir.Random.Next(-mapSizeX, mapSizeX),
-                                     BindLocation.Y + Envir.Random.Next(-mapSizeY, mapSizeY));
+                Point location = new Point(BindLocation.X + Env.Random.Next(-mapSizeX, mapSizeX),
+                                     BindLocation.Y + Env.Random.Next(-mapSizeY, mapSizeY));
 
                 if (Teleport(temp, location)) return true;
             }
@@ -4667,7 +4667,7 @@ namespace Server.MirObjects
                 case AttackMode.Peace:
                     return false;
                 case AttackMode.RedBrown:
-                    return PKPoints >= 200 || Envir.Time < BrownTime;
+                    return PKPoints >= 200 || Env.Time < BrownTime;
             }
 
             return true;
@@ -4709,7 +4709,7 @@ namespace Server.MirObjects
                 case AttackMode.Peace:
                     return false;
                 case AttackMode.RedBrown:
-                    return PKPoints >= 200 || Envir.Time < BrownTime;
+                    return PKPoints >= 200 || Env.Time < BrownTime;
             }
 
             return true;
@@ -4724,7 +4724,7 @@ namespace Server.MirObjects
                 case AttackMode.Group:
                     return GroupMembers != null && GroupMembers.Contains(ally);
                 case AttackMode.RedBrown:
-                    return PKPoints < 200 & Envir.Time > BrownTime;
+                    return PKPoints < 200 & Env.Time > BrownTime;
                 case AttackMode.Guild:
                     return MyGuild != null && MyGuild == ally.MyGuild;
                 case AttackMode.EnemyGuild:
@@ -5908,7 +5908,7 @@ namespace Server.MirObjects
                             }
                             break;
                         case 1: //TT
-                            if (!Teleport(Envir.GetMap(BindMapIndex), BindLocation))
+                            if (!Teleport(Env.GetMap(BindMapIndex), BindLocation))
                             {
                                 Enqueue(p);
                                 return;
@@ -6013,32 +6013,32 @@ namespace Server.MirObjects
                             }
                             break;
                         case 12://LotteryTicket                                                                                    
-                            if (Envir.Random.Next(item.Info.Effect * 32) == 1) // 1st prize : 1,000,000
+                            if (Env.Random.Next(item.Info.Effect * 32) == 1) // 1st prize : 1,000,000
                             {
                                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.FirstPrizeGoldReward), ChatType.Hint);
                                 GainGold(1000000);
                             }
-                            else if (Envir.Random.Next(item.Info.Effect * 16) == 1)  // 2nd prize : 200,000
+                            else if (Env.Random.Next(item.Info.Effect * 16) == 1)  // 2nd prize : 200,000
                             {
                                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.WonSecondPrizeGold), ChatType.Hint);
                                 GainGold(200000);
                             }
-                            else if (Envir.Random.Next(item.Info.Effect * 8) == 1)  // 3rd prize : 100,000
+                            else if (Env.Random.Next(item.Info.Effect * 8) == 1)  // 3rd prize : 100,000
                             {
                                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.WonThirdPrizeGold), ChatType.Hint);
                                 GainGold(100000);
                             }
-                            else if (Envir.Random.Next(item.Info.Effect * 4) == 1) // 4th prize : 10,000
+                            else if (Env.Random.Next(item.Info.Effect * 4) == 1) // 4th prize : 10,000
                             {
                                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.WonFourthPrizeGold), ChatType.Hint);
                                 GainGold(10000);
                             }
-                            else if (Envir.Random.Next(item.Info.Effect * 2) == 1)  // 5th prize : 1,000
+                            else if (Env.Random.Next(item.Info.Effect * 2) == 1)  // 5th prize : 1,000
                             {
                                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.WonFifthPrizeGold), ChatType.Hint);
                                 GainGold(1000);
                             }
-                            else if (Envir.Random.Next(item.Info.Effect) == 1)  // 6th prize 500
+                            else if (Env.Random.Next(item.Info.Effect) == 1)  // 6th prize 500
                             {
                                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.WonSixthPrizeGold), ChatType.Hint);
                                 GainGold(500);
@@ -6273,7 +6273,7 @@ namespace Server.MirObjects
                     var spawnAsPet = item.Info.Shape == 1;
                     var conquestOnly = item.Info.Shape == 2;
 
-                    var monsterInfo = Envir.GetMonsterInfo(monsterID);
+                    var monsterInfo = Env.GetMonsterInfo(monsterID);
                     if (monsterInfo == null) break;
 
                     MonsterObject monster = MonsterObject.GetMonster(monsterInfo);
@@ -6307,7 +6307,7 @@ namespace Server.MirObjects
                     }
 
                     monster.Direction = Direction;
-                    monster.ActionTime = Envir.Time + 5000;
+                    monster.ActionTime = Env.Time + 5000;
 
                     if (!monster.Spawn(CurrentMap, Front))
                         monster.Spawn(CurrentMap, CurrentLocation);
@@ -6316,7 +6316,7 @@ namespace Server.MirObjects
                     //TODO;
                     break;
                 case ItemType.SealedHero:
-                    HeroInfo heroInfo = Envir.GetHeroInfo(item.AddedStats[Stat.Hero]);
+                    HeroInfo heroInfo = Env.GetHeroInfo(item.AddedStats[Stat.Hero]);
                     if (heroInfo == null || !AddHero(heroInfo))
                     {
                         Enqueue(p);
@@ -6421,7 +6421,7 @@ namespace Server.MirObjects
 
             var originalItem = temp;
 
-            temp = Envir.CreateFreshItem(temp.Info);
+            temp = Env.CreateFreshItem(temp.Info);
             temp.Count = count;
 
             Report.ItemSplit(originalItem, temp, grid);
@@ -6847,15 +6847,15 @@ namespace Server.MirObjects
                         Enqueue(p);
                         return;
                     }
-                    if (tempTo.SealedInfo != null && tempTo.SealedInfo.ExpiryDate > Envir.Now)
+                    if (tempTo.SealedInfo != null && tempTo.SealedInfo.ExpiryDate > Env.Now)
                     {
                         ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.ItemAlreadySealed), ChatType.Hint);
                         Enqueue(p);
                         return;
                     }
-                    if (tempTo.SealedInfo != null && tempTo.SealedInfo.NextSealDate > Envir.Now)
+                    if (tempTo.SealedInfo != null && tempTo.SealedInfo.NextSealDate > Env.Now)
                     {
-                        double remainingSeconds = (tempTo.SealedInfo.NextSealDate - Envir.Now).TotalSeconds;
+                        double remainingSeconds = (tempTo.SealedInfo.NextSealDate - Env.Now).TotalSeconds;
 
                         ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ItemCannotBeResealedFor), Functions.PrintTimeSpanFromSeconds(remainingSeconds, false)), ChatType.Hint);
                         Enqueue(p);
@@ -6999,7 +6999,7 @@ namespace Server.MirObjects
                     successchance = successchance >= tempFrom.Info.Stats[Stat.CriticalRate] ? 0 : (tempFrom.Info.Stats[Stat.CriticalRate] - successchance) + Stats[Stat.GemRatePercent];
 
                     //check if combine will succeed
-                    bool succeeded = Envir.Random.Next(100) < successchance;
+                    bool succeeded = Env.Random.Next(100) < successchance;
                     canUpgrade = true;
 
                     byte itemType = (byte)tempTo.Info.Type;
@@ -7088,7 +7088,7 @@ namespace Server.MirObjects
 
                     if (!succeeded)
                     {
-                        if ((tempFrom.Info.Shape == 3) && (Envir.Random.Next(15) < 3))
+                        if ((tempFrom.Info.Shape == 3) && (Env.Random.Next(15) < 3))
                         {
                             //item destroyed
                             ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.ItemHasBeenDestroyed), ChatType.Hint);
@@ -7129,7 +7129,7 @@ namespace Server.MirObjects
                     case 1:
                     case 2:
                         {
-                            tempTo.MaxDura = (ushort)Math.Max(0, Math.Min(tempTo.MaxDura, tempTo.MaxDura - 100 * Envir.Random.Next(10)));
+                            tempTo.MaxDura = (ushort)Math.Max(0, Math.Min(tempTo.MaxDura, tempTo.MaxDura - 100 * Env.Random.Next(10)));
                         }
                         break;
                     default:
@@ -7161,8 +7161,8 @@ namespace Server.MirObjects
                 var minutes = tempFrom.CurrentDura;
                 tempTo.SealedInfo = new SealedInfo
                 {
-                    ExpiryDate = Envir.Now.AddMinutes(minutes),
-                    NextSealDate = Envir.Now.AddMinutes(minutes).AddMinutes(Settings.ItemSealDelay)
+                    ExpiryDate = Env.Now.AddMinutes(minutes),
+                    NextSealDate = Env.Now.AddMinutes(minutes).AddMinutes(Settings.ItemSealDelay)
                 };
 
                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ItemSealedFor), Functions.PrintTimeSpanFromSeconds(minutes * 60)), ChatType.Hint);
@@ -7388,7 +7388,7 @@ namespace Server.MirObjects
             }
             else
             {
-                currentHero = Envir.Heroes.FirstOrDefault(h => h.Info.Index == Info.CurrentHeroIndex);
+                currentHero = Env.Heroes.FirstOrDefault(h => h.Info.Index == Info.CurrentHeroIndex);
 
                 if (currentHero != null)
                 {
@@ -7446,7 +7446,7 @@ namespace Server.MirObjects
             }
             else
             {
-                UserItem temp2 = Envir.CreateFreshItem(temp.Info);
+                UserItem temp2 = Env.CreateFreshItem(temp.Info);
                 temp2.Count = count;
                 if (!temp.Info.Bind.HasFlag(BindMode.DestroyOnDrop))
                     if (!DropItem(temp2))
@@ -7539,7 +7539,7 @@ namespace Server.MirObjects
         {
             if (itemIndex <= 0 || Connection == null) return;
 
-            var info = Envir.GetItemInfo(itemIndex);
+            var info = Env.GetItemInfo(itemIndex);
             if (info == null) return;
 
             Connection.CheckItemInfo(info);
@@ -7549,7 +7549,7 @@ namespace Server.MirObjects
         {
             if (monsterIndex <= 0 || Connection == null) return;
 
-            var info = Envir.GetMonsterInfo(monsterIndex);
+            var info = Env.GetMonsterInfo(monsterIndex);
             if (info == null) return;
 
             Connection.CheckMonsterInfo(info);
@@ -7559,7 +7559,7 @@ namespace Server.MirObjects
         {
             if (npcIndex <= 0 || Connection == null) return;
 
-            var info = Envir.GetNPCInfo(npcIndex);
+            var info = Env.GetNPCInfo(npcIndex);
             if (info == null) return;
 
             Connection.CheckNPCInfo(info);
@@ -7567,7 +7567,7 @@ namespace Server.MirObjects
 
         public void RequestMapInfo(int mapIndex)
         {
-            var info = Envir.GetMapInfo(mapIndex);
+            var info = Env.GetMapInfo(mapIndex);
             CheckMapInfo(info);
         }
         public void TeleportToNPC(uint objectID)
@@ -7608,7 +7608,7 @@ namespace Server.MirObjects
 
             S.SearchMapResult p = new S.SearchMapResult();
 
-            Map map = Envir.GetWorldMap(text);
+            Map map = Env.GetWorldMap(text);
             if (map != null)
             {
                 CheckMapInfo(map.Info);
@@ -7617,7 +7617,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            NPCObject npc = Envir.GetWorldMapNPC(text);
+            NPCObject npc = Env.GetWorldMapNPC(text);
             if (npc != null)
             {
                 CheckMapInfo(npc.CurrentMap.Info);
@@ -7694,7 +7694,7 @@ namespace Server.MirObjects
         }
         public void GainItemMail(UserItem item, int reason)
         {
-            Envir.MailCharacter(Info, item: item, reason: reason);
+            Env.MailCharacter(Info, item: item, reason: reason);
         }
         public bool CanRemoveItem(MirGridType grid, UserItem item)
         {
@@ -7881,15 +7881,15 @@ namespace Server.MirObjects
 
             key = string.Format("[@_{0}]", key);
 
-            DelayedAction action = new DelayedAction(DelayedType.NPC, Envir.Time, Envir.DefaultNPC.LoadedObjectID, Envir.DefaultNPC.ScriptID, key);
+            DelayedAction action = new DelayedAction(DelayedType.NPC, Env.Time, Env.DefaultNPC.LoadedObjectID, Env.DefaultNPC.ScriptID, key);
             ActionList.Add(action);
 
-            Enqueue(new S.NPCUpdate { NPCID = Envir.DefaultNPC.LoadedObjectID });
+            Enqueue(new S.NPCUpdate { NPCID = Env.DefaultNPC.LoadedObjectID });
         }
 
         public void CallDefaultNPC(string key)
         {
-            if (NPCObjectID != Envir.DefaultNPC.LoadedObjectID) return;
+            if (NPCObjectID != Env.DefaultNPC.LoadedObjectID) return;
 
             var script = NPCScript.Get(NPCScriptID);
             script.Call(this, NPCObjectID, key.ToUpper());
@@ -8047,7 +8047,7 @@ namespace Server.MirObjects
 
                 if (temp.Info.StackSize > 1 && count != temp.Count)
                 {
-                    UserItem item = Envir.CreateFreshItem(temp.Info);
+                    UserItem item = Env.CreateFreshItem(temp.Info);
                     item.Count = count;
 
                     if (item.Price() / 2 + Account.Gold > uint.MaxValue)
@@ -8074,7 +8074,7 @@ namespace Server.MirObjects
                         if (Settings.GoodsBuyBackMaxStored > 0 && callingNPC.BuyBack[Name].Count >= Settings.GoodsBuyBackMaxStored)
                             callingNPC.BuyBack[Name].RemoveAt(0);
 
-                        temp.BuybackExpiryDate = Envir.Now;
+                        temp.BuybackExpiryDate = Env.Now;
                         callingNPC.BuyBack[Name].Add(temp);
                     }
                 }
@@ -8299,7 +8299,7 @@ namespace Server.MirObjects
                 AuctionInfo auction = new AuctionInfo(Info, temp, price, type);
 
                 Account.Auctions.AddLast(auction);
-                Envir.Auctions.AddFirst(auction);
+                Env.Auctions.AddFirst(auction);
 
                 p.Success = true;
                 Enqueue(p);
@@ -8326,7 +8326,7 @@ namespace Server.MirObjects
 
         public void MarketPage(int page)
         {
-            if (Dead || Envir.Time < SearchTime) return;
+            if (Dead || Env.Time < SearchTime) return;
 
             if (MarketPanelType != MarketPanelType.GameShop)
             {
@@ -8334,7 +8334,7 @@ namespace Server.MirObjects
 
                 if (NPCPage == null || (!String.Equals(NPCPage.Key, NPCScript.MarketKey, StringComparison.CurrentCultureIgnoreCase)) || page <= PageSent) return;
 
-                SearchTime = Envir.Time + Globals.SearchDelay;
+                SearchTime = Env.Time + Globals.SearchDelay;
 
                 for (int n = 0; n < CurrentMap.NPCs.Count; n++)
                 {
@@ -8380,7 +8380,7 @@ namespace Server.MirObjects
             MatchType = type;
             PageSent = 0;
 
-            long start = Envir.Stopwatch.ElapsedMilliseconds;
+            long start = Env.Stopwatch.ElapsedMilliseconds;
 
             if (MarketPanelType == MarketPanelType.GameShop)
             {
@@ -8390,7 +8390,7 @@ namespace Server.MirObjects
             }
             else
             {
-                LinkedListNode<AuctionInfo> current = UserMatch ? Account.Auctions.First : Envir.Auctions.First;
+                LinkedListNode<AuctionInfo> current = UserMatch ? Account.Auctions.First : Env.Auctions.First;
 
                 while (current != null)
                 {
@@ -8418,14 +8418,14 @@ namespace Server.MirObjects
 
             Enqueue(new S.NPCMarket { Listings = clientListings, Pages = (Search.Count - 1) / 10 + 1, UserMode = UserMatch });
 
-            MessageQueue.EnqueueDebugging(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.MsToMatchItems), Envir.Stopwatch.ElapsedMilliseconds - start, MarketPanelType == MarketPanelType.GameShop ? Envir.GameShopList.Count : (UserMatch ? Account.Auctions.Count : Envir.Auctions.Count)));
+            MessageQueue.EnqueueDebugging(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.MsToMatchItems), Env.Stopwatch.ElapsedMilliseconds - start, MarketPanelType == MarketPanelType.GameShop ? Env.GameShopList.Count : (UserMatch ? Account.Auctions.Count : Env.Auctions.Count)));
         }
 
         public void MarketSearch(string match, ItemType type)
         {
-            if (Dead || Envir.Time < SearchTime) return;
+            if (Dead || Env.Time < SearchTime) return;
 
-            SearchTime = Envir.Time + Globals.SearchDelay;
+            SearchTime = Env.Time + Globals.SearchDelay;
 
             if (MarketPanelType == MarketPanelType.GameShop)
             {
@@ -8474,7 +8474,7 @@ namespace Server.MirObjects
                         return;
                     }
 
-                    UserItem item = Envir.CreateFreshItem(auction.Item.Info);
+                    UserItem item = Env.CreateFreshItem(auction.Item.Info);
 
                     Account.Credit -= auction.Price;
                     GainItem(item);
@@ -8516,7 +8516,7 @@ namespace Server.MirObjects
                             return;
                         }
 
-                        if (!Envir.Auctions.Contains(auction))
+                        if (!Env.Auctions.Contains(auction))
                         {
                             Enqueue(new S.MarketFail { Reason = 3 });
                             return;
@@ -8549,7 +8549,7 @@ namespace Server.MirObjects
                             Enqueue(new S.LoseGold { Gold = auction.Price });
                             GainItem(auction.Item);
 
-                            Envir.MessageAccount(auction.SellerInfo.AccountInfo, GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.SoldItemForGold), auction.Item.FriendlyName, auction.Price), ChatType.Hint);
+                            Env.MessageAccount(auction.SellerInfo.AccountInfo, GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.SoldItemForGold), auction.Item.FriendlyName, auction.Price), ChatType.Hint);
                             Enqueue(new S.MarketSuccess { Message = GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.BoughtItemForGold), auction.Item.FriendlyName, auction.Price) });
                             MarketSearch(MatchName, MatchType);
                         }
@@ -8565,7 +8565,7 @@ namespace Server.MirObjects
                             {
                                 string message = GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.OutbidRefundGold), auction.Item.FriendlyName, auction.CurrentBid);
 
-                                Envir.MailCharacter(auction.CurrentBuyerInfo, gold: auction.CurrentBid, customMessage: message);
+                                Env.MailCharacter(auction.CurrentBuyerInfo, gold: auction.CurrentBid, customMessage: message);
                             }
 
                             auction.CurrentBid = bidPrice;
@@ -8575,7 +8575,7 @@ namespace Server.MirObjects
                             Account.Gold -= bidPrice;
                             Enqueue(new S.LoseGold { Gold = bidPrice });
 
-                            Envir.MessageAccount(auction.SellerInfo.AccountInfo, GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.SomeoneBidGoldForItem), auction.Item.FriendlyName, auction.CurrentBid), ChatType.Hint);
+                            Env.MessageAccount(auction.SellerInfo.AccountInfo, GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.SomeoneBidGoldForItem), auction.Item.FriendlyName, auction.CurrentBid), ChatType.Hint);
                             Enqueue(new S.MarketSuccess { Message = GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YouBidGoldForItem), auction.Item.FriendlyName, auction.CurrentBid) });
                             MarketSearch(MatchName, MatchType);
                         }
@@ -8629,7 +8629,7 @@ namespace Server.MirObjects
                         return;
                     }
 
-                    if (auction.Expired || auction.Sold || Envir.Now >= auction.ConsignmentDate.AddDays(Globals.ConsignmentLength))
+                    if (auction.Expired || auction.Sold || Env.Now >= auction.ConsignmentDate.AddDays(Globals.ConsignmentLength))
                     {
                         Enqueue(new S.MarketFail { Reason = 10 });
                         return;
@@ -8649,11 +8649,11 @@ namespace Server.MirObjects
 
                     string message = GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YouWonItemForGold), auction.Item.FriendlyName, auction.CurrentBid);
 
-                    Envir.MailCharacter(auction.CurrentBuyerInfo, item: auction.Item, customMessage: message);
-                    Envir.MessageAccount(auction.CurrentBuyerInfo.AccountInfo, GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YouBoughtItemForGold), auction.Item.FriendlyName, auction.CurrentBid), ChatType.Hint);
+                    Env.MailCharacter(auction.CurrentBuyerInfo, item: auction.Item, customMessage: message);
+                    Env.MessageAccount(auction.CurrentBuyerInfo.AccountInfo, GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YouBoughtItemForGold), auction.Item.FriendlyName, auction.CurrentBid), ChatType.Hint);
 
                     Account.Auctions.Remove(auction);
-                    Envir.Auctions.Remove(auction);
+                    Env.Auctions.Remove(auction);
                     GainGold(gold);
                     Enqueue(new S.MarketSuccess { Message = GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YouSoldItemGoldEarningsCommission), auction.Item.FriendlyName, cost, gold, cost - gold) });
                     MarketSearch(MatchName, MatchType);
@@ -8699,7 +8699,7 @@ namespace Server.MirObjects
                         {
                             string message = GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.AuctionOutbidRefund), auction.Item.FriendlyName, auction.CurrentBid);
 
-                            Envir.MailCharacter(auction.CurrentBuyerInfo, gold: auction.CurrentBid, customMessage: message);
+                            Env.MailCharacter(auction.CurrentBuyerInfo, gold: auction.CurrentBid, customMessage: message);
                         }
 
                         GainItem(auction.Item);
@@ -8754,7 +8754,7 @@ namespace Server.MirObjects
                         if (TakeAuction(auction))
                         {
                             Account.Auctions.Remove(auction);
-                            Envir.Auctions.Remove(auction);
+                            Env.Auctions.Remove(auction);
                             MarketSearch(MatchName, MatchType);
                             return;
                         }
@@ -8774,7 +8774,7 @@ namespace Server.MirObjects
                             if (TakeAuction(auction))
                             {
                                 Account.Auctions.Remove(node);
-                                Envir.Auctions.Remove(auction);
+                                Env.Auctions.Remove(auction);
                                 count++;
                             }
                         }
@@ -8794,7 +8794,7 @@ namespace Server.MirObjects
 
         public void RequestUserName(uint id)
         {
-            CharacterInfo Character = Envir.GetCharacterInfo((int)id);
+            CharacterInfo Character = Env.GetCharacterInfo((int)id);
             if (Character != null)
                 Enqueue(new S.UserName { Id = (uint)Character.Index, Name = Character.Name });
         }
@@ -8907,7 +8907,7 @@ namespace Server.MirObjects
                                     ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.RemoveFailedLevel0), item.FriendlyName), ChatType.System);
                                     break;
                                 case 1:
-                                    ushort maxDura = (Envir.Random.Next(20) == 0) ? (ushort)(item.MaxDura - 1000) : item.MaxDura;
+                                    ushort maxDura = (Env.Random.Next(20) == 0) ? (ushort)(item.MaxDura - 1000) : item.MaxDura;
                                     if (maxDura < 1000) maxDura = 1000;
 
                                     Info.Inventory[i].CurrentDura = (Info.Inventory[i].CurrentDura >= maxDura) ? maxDura : Info.Inventory[i].CurrentDura;
@@ -8951,12 +8951,12 @@ namespace Server.MirObjects
                 if (Info.AccountInfo.Gold >= item.DisassemblePrice())
                 {
                     List<ItemInfo> dropList = new List<ItemInfo>();
-                    foreach (DropInfo drop in Envir.AwakeningDrops)
+                    foreach (DropInfo drop in Env.AwakeningDrops)
                     {
                         if (drop.Item.Grade == item.Info.Grade - 1 ||
                             drop.Item.Grade == item.Info.Grade + 1)
                         {
-                            if (Envir.Random.Next((drop.Chance <= 0) ? 1 : drop.Chance) == 0)
+                            if (Env.Random.Next((drop.Chance <= 0) ? 1 : drop.Chance) == 0)
                             {
                                 dropList.Add(drop.Item);
                             }
@@ -8970,9 +8970,9 @@ namespace Server.MirObjects
 
                     if (dropList.Count == 0) continue;
 
-                    UserItem gainItem = Envir.CreateDropItem(dropList[Envir.Random.Next(dropList.Count)]);
+                    UserItem gainItem = Env.CreateDropItem(dropList[Env.Random.Next(dropList.Count)]);
                     if (gainItem == null) continue;
-                    gainItem.Count = (ushort)Envir.Random.Next(Math.Min(ushort.MaxValue, (int)((((byte)item.Info.Grade * item.Info.RequiredAmount) / 10) + item.Quality())));
+                    gainItem.Count = (ushort)Env.Random.Next(Math.Min(ushort.MaxValue, (int)((((byte)item.Info.Grade * item.Info.RequiredAmount) / 10) + item.Quality())));
                     if (gainItem.Count < 1) gainItem.Count = 1;
 
                     GainItem(gainItem);
@@ -9011,7 +9011,7 @@ namespace Server.MirObjects
 
                             UserItem newItem = new UserItem(item.Info);
 
-                            ushort maxDura = (Envir.Random.Next(20) == 0) ? (ushort)(item.MaxDura - 1000) : item.MaxDura;
+                            ushort maxDura = (Env.Random.Next(20) == 0) ? (ushort)(item.MaxDura - 1000) : item.MaxDura;
                             if (maxDura < 1000) maxDura = 1000;
 
                             newItem.UniqueID = item.UniqueID;
@@ -9068,7 +9068,7 @@ namespace Server.MirObjects
 
                         ItemInfo[] materials = new ItemInfo[2];
 
-                        foreach (ItemInfo info in Envir.ItemInfoList)
+                        foreach (ItemInfo info in Env.ItemInfoList)
                         {
                             if (item.Info.Grade == info.Grade &&
                                 info.Type == ItemType.Awakening)
@@ -9272,8 +9272,8 @@ namespace Server.MirObjects
 
         public void AddMember(string name)
         {
-            if (Envir.Time < NextGroupInviteTime) return;
-            NextGroupInviteTime = Envir.Time + Settings.GroupInviteDelay;
+            if (Env.Time < NextGroupInviteTime) return;
+            NextGroupInviteTime = Env.Time + Settings.GroupInviteDelay;
 
             if (GroupMembers != null && GroupMembers[0] != this)
             {
@@ -9294,7 +9294,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            PlayerObject player = Envir.GetPlayer(name);
+            PlayerObject player = Env.GetPlayer(name);
 
             if (player == null)
             {
@@ -9446,7 +9446,7 @@ namespace Server.MirObjects
 
                 if (CurrentMap == member.CurrentMap && Functions.InRange(CurrentLocation, member.CurrentLocation, Globals.DataRange))
                 {
-                    byte time = Math.Min(byte.MaxValue, (byte)Math.Max(5, (RevTime - Envir.Time) / 1000));
+                    byte time = Math.Min(byte.MaxValue, (byte)Math.Max(5, (RevTime - Env.Time) / 1000));
 
                     member.Enqueue(new S.ObjectHealth { ObjectID = ObjectID, Percent = PercentHealth, Expire = time });
                     Enqueue(new S.ObjectHealth { ObjectID = member.ObjectID, Percent = member.PercentHealth, Expire = time });
@@ -9553,14 +9553,14 @@ namespace Server.MirObjects
         {
             if (IsGM || Node == null) return;
 
-            Map targetMap = LastValidMap ?? Envir.GetMap(BindMapIndex);
+            Map targetMap = LastValidMap ?? Env.GetMap(BindMapIndex);
             Point targetLocation = LastValidLocation != Point.Empty ? LastValidLocation : BindLocation;
 
             // Fallbacks to ensure non-RG and valid point
             if (targetMap == null || targetMap.Info == null || targetMap.Info.RequiredGroup)
             {
                 SetBind(); // ensures a sane, non-RG bind for your server
-                targetMap = Envir.GetMap(BindMapIndex);
+                targetMap = Env.GetMap(BindMapIndex);
                 targetLocation = BindLocation;
             }
             if (targetMap == null || !targetMap.ValidPoint(targetLocation))
@@ -9589,7 +9589,7 @@ namespace Server.MirObjects
         #region Heroes
         public void NewHero(C.NewHero p)
         {
-            if (!Envir.CanCreateHero(p, Connection, IsGM))
+            if (!Env.CanCreateHero(p, Connection, IsGM))
                 return;
 
             int heroCount = Info.Heroes.Count(x => x != null);
@@ -9600,7 +9600,7 @@ namespace Server.MirObjects
             }
 
             bool passedItemCheck = true;
-            ItemInfo itemInfo = Envir.GetItemInfo(Settings.HeroSealItemName);
+            ItemInfo itemInfo = Env.GetItemInfo(Settings.HeroSealItemName);
             if (itemInfo != null && FreeSpace(Info.Inventory) == 0)
                 passedItemCheck = false;
 
@@ -9610,12 +9610,12 @@ namespace Server.MirObjects
                 return;
             }
 
-            var info = new HeroInfo(p) { Index = ++Envir.NextHeroID };
-            Envir.HeroList.Add(info);
+            var info = new HeroInfo(p) { Index = ++Env.NextHeroID };
+            Env.HeroList.Add(info);
 
             if (itemInfo != null)
             {
-                UserItem item = Envir.CreateFreshItem(itemInfo);
+                UserItem item = Env.CreateFreshItem(itemInfo);
                 item.AddedStats[Stat.Hero] = info.Index;
                 GainItem(item);
             }
@@ -9652,7 +9652,7 @@ namespace Server.MirObjects
         {
             if (!HeroSpawned || !Hero.AutoPot) return;
 
-            if (Envir.GetItemInfo(ItemIndex) == null)
+            if (Env.GetItemInfo(ItemIndex) == null)
                 ItemIndex = 0;
 
             if (Grid == MirGridType.HeroHPItem)
@@ -9708,7 +9708,7 @@ namespace Server.MirObjects
         public bool CreateGuild(string guildName)
         {
             if ((MyGuild != null) || (Info.GuildIndex != -1)) return false;
-            if (Envir.GetGuild(guildName) != null) return false;
+            if (Env.GetGuild(guildName) != null) return false;
 
             if (Info.Level < Settings.Guild_RequiredLevel)
             {
@@ -9818,8 +9818,8 @@ namespace Server.MirObjects
             }
 
             //make the guild
-            var guildInfo = new GuildInfo(this, guildName) { GuildIndex = ++Envir.NextGuildID };
-            Envir.GuildList.Add(guildInfo);
+            var guildInfo = new GuildInfo(this, guildName) { GuildIndex = ++Env.NextGuildID };
+            Env.GuildList.Add(guildInfo);
 
             GuildObject guild = new GuildObject(guildInfo);
             Info.GuildIndex = guildInfo.GuildIndex;
@@ -9855,7 +9855,7 @@ namespace Server.MirObjects
 
                     if (Name == "") return;
 
-                    PlayerObject player = Envir.GetPlayer(Name);
+                    PlayerObject player = Env.GetPlayer(Name);
                     if (player == null)
                     {
                         ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerIsNotOnline), Name), ChatType.System);
@@ -10047,7 +10047,7 @@ namespace Server.MirObjects
                 CanCreateGuild = false;
                 return;
             }
-            GuildObject guild = Envir.GetGuild(Name);
+            GuildObject guild = Env.GetGuild(Name);
             if (guild != null)
             {
                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.GuildAlreadyExists), Name), ChatType.System);
@@ -10284,7 +10284,7 @@ namespace Server.MirObjects
         {
             if (MyGuild == null || MyGuildRank != MyGuild.Ranks[0]) return;
 
-            GuildObject enemyGuild = Envir.GetGuild(Name);
+            GuildObject enemyGuild = Env.GetGuild(Name);
 
             if (enemyGuild == null)
             {
@@ -10364,7 +10364,7 @@ namespace Server.MirObjects
                         ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoCorrectGuildRank), ChatType.System);
                         return;
                     }
-                    GuildBuffInfo BuffInfo = Envir.FindGuildBuffInfo(id);
+                    GuildBuffInfo BuffInfo = Env.FindGuildBuffInfo(id);
                     if (BuffInfo == null)
                     {
                         ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.BuffNotExist), ChatType.System);
@@ -10443,18 +10443,18 @@ namespace Server.MirObjects
 
             if (page < 0) return;
 
-            var max = Math.Min(Envir.GTMapList.Count, (page + 1) * 7);
+            var max = Math.Min(Env.GTMapList.Count, (page + 1) * 7);
             for (int i = page * 7; i < max; i++)
             {
-                tempList.Add(Envir.GTMapList[i].ToClientGTMap());
+                tempList.Add(Env.GTMapList[i].ToClientGTMap());
             }
 
-            Enqueue(new S.GuildTerritoryPage { Listings = tempList, length = Envir.GTMapList.Count });
+            Enqueue(new S.GuildTerritoryPage { Listings = tempList, length = Env.GTMapList.Count });
         }
 
         public void PurchaseGuildTerritory(string owner)
         {
-            var gt = Envir.GTMapList.FirstOrDefault(x => x.Owner == owner);
+            var gt = Env.GTMapList.FirstOrDefault(x => x.Owner == owner);
 
             if (gt == null)
             {
@@ -10496,7 +10496,7 @@ namespace Server.MirObjects
             MyGuild.SendServerPacket(new S.GuildStorageGoldChange { Type = 2, Amount = (uint)gt.Price });
             ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.GuildTerritoryPurchaseProcess24Hrs), ChatType.System);
 
-            GuildObject guild = Envir.GetGuild(gt.Owner);
+            GuildObject guild = Env.GetGuild(gt.Owner);
             if (guild != null)
             {
                 guild.Gold += (uint)gt.Price;
@@ -10512,7 +10512,7 @@ namespace Server.MirObjects
             MyGuild.GTIndex = gt.Index;
             MyGuild.GTRent = DateTime.Now.AddDays(Settings.GTDays + 1);
             MyGuild.GTBegin = DateTime.Now.AddDays(1);
-            MyGuild.GTKey = Envir.Random.Next(100, int.MaxValue - 100);
+            MyGuild.GTKey = Env.Random.Next(100, int.MaxValue - 100);
             MyGuild.GTPrice = 0;
             gt.Owner = MyGuild.Name;
             gt.Leader = MyGuild.Ranks[0].Members[0].Name;
@@ -10520,8 +10520,8 @@ namespace Server.MirObjects
                 gt.Leader = MyGuild.Ranks[0].Members[1].Name;
             gt.Price = 0;
             gt.Key = MyGuild.GTKey;
-            gt.Days = (Envir.Now - MyGuild.GTRent).Days;
-            gt.Begin = (MyGuild.GTBegin - Envir.Now).Seconds;
+            gt.Days = (Env.Now - MyGuild.GTRent).Days;
+            gt.Begin = (MyGuild.GTBegin - Env.Now).Seconds;
         }
         #endregion
 
@@ -10622,8 +10622,8 @@ namespace Server.MirObjects
 
         public void TradeRequest()
         {
-            if (Envir.Time < NextTradeTime) return;
-            NextTradeTime = Envir.Time + Settings.TradeDelay;
+            if (Env.Time < NextTradeTime) return;
+            NextTradeTime = Env.Time + Settings.TradeDelay;
 
             if (TradePartner != null)
             {
@@ -10648,7 +10648,7 @@ namespace Server.MirObjects
                 MapObject ob = cell.Objects[i];
                 if (ob.Race != ObjectType.Player) continue;
 
-                player = Envir.GetPlayer(ob.Name);
+                player = Env.GetPlayer(ob.Name);
             }
 
             if (player == null)
@@ -11017,7 +11017,7 @@ namespace Server.MirObjects
             {
                 if (temp == null) continue;
 
-                ItemInfo realItem = Functions.GetRealItem(temp.Info, Info.Level, Info.Class, Envir.ItemInfoList);
+                ItemInfo realItem = Functions.GetRealItem(temp.Info, Info.Level, Info.Class, Env.ItemInfoList);
 
                 switch (realItem.Type)
                 {
@@ -11054,9 +11054,9 @@ namespace Server.MirObjects
                 }
             }
 
-            FishingNibbleChance = 5 + Envir.Random.Next(nibbleMin, nibbleMax);
+            FishingNibbleChance = 5 + Env.Random.Next(nibbleMin, nibbleMax);
 
-            if (cast) FishingChance = Settings.FishingSuccessStart + (int)successStat + (FishingChanceCounter != 0 ? Envir.Random.Next(failedAddSuccessMin, failedAddSuccessMax) : 0) + (FishingChanceCounter * Settings.FishingSuccessMultiplier); //10 //10
+            if (cast) FishingChance = Settings.FishingSuccessStart + (int)successStat + (FishingChanceCounter != 0 ? Env.Random.Next(failedAddSuccessMin, failedAddSuccessMax) : 0) + (FishingChanceCounter * Settings.FishingSuccessMultiplier); //10 //10
             if (FishingChanceCounter != 0) DamagedFishingItem(FishingSlot.Finder, 1);
             FishingChance += Stats[Stat.FishRatePercent];
 
@@ -11064,7 +11064,7 @@ namespace Server.MirObjects
             FishingNibbleChance = Math.Min(100, Math.Max(0, FishingNibbleChance));
             FishingAutoReelChance = Math.Min(100, Math.Max(0, FishingAutoReelChance));
 
-            FishingTime = Envir.Time + FishingCastDelay + Settings.FishingDelay;
+            FishingTime = Env.Time + FishingCastDelay + Settings.FishingDelay;
 
             if (cast)
             {
@@ -11101,17 +11101,17 @@ namespace Server.MirObjects
 
                 if (FishFound)
                 {
-                    int getChance = FishingChance + Envir.Random.Next(10, 24) + (FishingProgress > 50 ? flexibilityStat / 2 : 0);
+                    int getChance = FishingChance + Env.Random.Next(10, 24) + (FishingProgress > 50 ? flexibilityStat / 2 : 0);
                     getChance = Math.Min(100, Math.Max(0, getChance));
 
-                    if (Envir.Random.Next(0, 100) <= getChance)
+                    if (Env.Random.Next(0, 100) <= getChance)
                     {
                         FishingChanceCounter = 0;
 
                         UserItem dropItem = null;
                         UserItem reel = rod.Slots[(int)FishingSlot.Reel];
 
-                        foreach (DropInfo drop in Envir.FishingDrops.Where(x => x.Type == fishingCell.FishingAttribute))
+                        foreach (DropInfo drop in Env.FishingDrops.Where(x => x.Type == fishingCell.FishingAttribute))
                         {
                             var reward = drop.AttemptDrop(EXPOwner?.Stats[Stat.ItemDropRatePercent] ?? 0, EXPOwner?.Stats[Stat.GoldDropRatePercent] ?? 0);
 
@@ -11119,7 +11119,7 @@ namespace Server.MirObjects
                             {
                                 foreach (var dropitems in reward.Items)
                                 {
-                                    dropItem = Envir.CreateDropItem(drop.Item);
+                                    dropItem = Env.CreateDropItem(drop.Item);
                                     break;
                                 }
                             }
@@ -11140,9 +11140,9 @@ namespace Server.MirObjects
                             Report.ItemChanged(dropItem, dropItem.Count, 2);
                         }
 
-                        if (Envir.Random.Next(100 - Settings.FishingMobSpawnChance) == 0)
+                        if (Env.Random.Next(100 - Settings.FishingMobSpawnChance) == 0)
                         {
-                            MonsterObject mob = MonsterObject.GetMonster(Envir.GetMonsterInfo(Settings.FishingMonster));
+                            MonsterObject mob = MonsterObject.GetMonster(Env.GetMonsterInfo(Settings.FishingMonster));
 
                             if (mob == null) return;
 
@@ -11171,8 +11171,8 @@ namespace Server.MirObjects
 
             if (FishingAutocast && !cast && !cancel)
             {
-                FishingTime = Envir.Time + (FishingCastDelay * 2);
-                FishingFoundTime = Envir.Time;
+                FishingTime = Env.Time + (FishingCastDelay * 2);
+                FishingFoundTime = Env.Time;
                 FishingAutoReelChance = 0;
                 FishingNibbleChance = 0;
                 FishFirstFound = false;
@@ -11200,8 +11200,8 @@ namespace Server.MirObjects
         {
             if (FishFound != true && FishFirstFound != true)
             {
-                FishFound = Envir.Random.Next(0, 100) <= FishingNibbleChance;
-                FishingFoundTime = FishFound ? Envir.Time + 3000 : Envir.Time;
+                FishFound = Env.Random.Next(0, 100) <= FishingNibbleChance;
+                FishingFoundTime = FishFound ? Env.Time + 3000 : Env.Time;
 
                 if (FishFound)
                 {
@@ -11211,16 +11211,16 @@ namespace Server.MirObjects
             }
             else
             {
-                if (FishingAutoReelChance != 0 && Envir.Random.Next(0, 100) <= FishingAutoReelChance)
+                if (FishingAutoReelChance != 0 && Env.Random.Next(0, 100) <= FishingAutoReelChance)
                 {
                     FishingCast(false);
                 }
             }
 
-            if (FishingFoundTime < Envir.Time)
+            if (FishingFoundTime < Env.Time)
                 FishFound = false;
 
-            FishingTime = Envir.Time + FishingDelay;
+            FishingTime = Env.Time + FishingDelay;
 
             Enqueue(GetFishInfo());
 
@@ -11254,7 +11254,7 @@ namespace Server.MirObjects
 
             if (CurrentQuests.Exists(e => e.Index == index)) return; //e.Info.NpcIndex == npcIndex && 
 
-            QuestInfo info = Envir.QuestInfoList.FirstOrDefault(d => d.Index == index);
+            QuestInfo info = Env.QuestInfoList.FirstOrDefault(d => d.Index == index);
 
             NPCObject npc = null;
 
@@ -11295,7 +11295,7 @@ namespace Server.MirObjects
                     break;
                 }
 
-                tempInfo = Envir.QuestInfoList.FirstOrDefault(d => d.Index == tempInfo.RequiredQuest);
+                tempInfo = Env.QuestInfoList.FirstOrDefault(d => d.Index == tempInfo.RequiredQuest);
             }
 
             if (!canAccept)
@@ -11312,7 +11312,7 @@ namespace Server.MirObjects
 
                     while (count > 0)
                     {
-                        UserItem item = Envir.CreateFreshItem(carryItem.Item);
+                        UserItem item = Env.CreateFreshItem(carryItem.Item);
 
                         if (item.Info.StackSize > count)
                         {
@@ -11375,7 +11375,7 @@ namespace Server.MirObjects
 
                 while (count > 0)
                 {
-                    rewardItem = Envir.CreateFreshItem(reward.Item);
+                    rewardItem = Env.CreateFreshItem(reward.Item);
                     if (reward.Item.StackSize >= count)
                     {
                         rewardItem.Count = count;
@@ -11402,7 +11402,7 @@ namespace Server.MirObjects
 
                     while (count > 0)
                     {
-                        rewardItem = Envir.CreateFreshItem(quest.Info.SelectRewards[i].Item);
+                        rewardItem = Env.CreateFreshItem(quest.Info.SelectRewards[i].Item);
                         if (quest.Info.SelectRewards[i].Item.StackSize >= count)
                         {
                             rewardItem.Count = count;
@@ -11673,13 +11673,13 @@ namespace Server.MirObjects
 
         public void SendMail(string name, string message)
         {
-            if (Envir.Time < NextMailTime)
+            if (Env.Time < NextMailTime)
             {
                 //not even an error: users shouldnt be sending mails so fast only bots do.
                 return;
             }
 
-            NextMailTime = Envir.Time + 10000;
+            NextMailTime = Env.Time + 10000;
 
             if (message.Length > 500)
             {
@@ -11687,7 +11687,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            CharacterInfo player = Envir.GetCharacterInfo(name);
+            CharacterInfo player = Env.GetCharacterInfo(name);
 
             if (player == null)
             {
@@ -11726,13 +11726,13 @@ namespace Server.MirObjects
 
         public void SendMail(string name, string message, uint gold, ulong[] items, bool stamped)
         {
-            if (Envir.Time < NextMailTime)
+            if (Env.Time < NextMailTime)
             {
                 //not even an error: users shouldnt be sending mails so fast only bots do.
                 return;
             }
 
-            NextMailTime = Envir.Time + 10000;
+            NextMailTime = Env.Time + 10000;
 
             if (message.Length > 500)
             {
@@ -11740,7 +11740,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            CharacterInfo player = Envir.GetCharacterInfo(name);
+            CharacterInfo player = Env.GetCharacterInfo(name);
 
             if (player == null)
             {
@@ -11832,7 +11832,7 @@ namespace Server.MirObjects
             //Create parcel
             MailInfo mail = new MailInfo(player.Index, true)
             {
-                MailID = ++Envir.NextMailID,
+                MailID = ++Env.NextMailID,
                 Sender = Info.Name,
                 Message = message,
                 Gold = gold,
@@ -11850,7 +11850,7 @@ namespace Server.MirObjects
 
             if (mail == null) return;
 
-            mail.DateOpened = Envir.Now;
+            mail.DateOpened = Env.Now;
 
             GetMail();
         }
@@ -12020,7 +12020,7 @@ namespace Server.MirObjects
             {
                 if (Info.IntelligentCreatures[i].PetType != pType) continue;
 
-                MonsterInfo mInfo = Envir.GetMonsterInfo(64, (byte)pType);
+                MonsterInfo mInfo = Env.GetMonsterInfo(64, (byte)pType);
                 if (mInfo == null) return;
 
                 MonsterObject monster = MonsterObject.GetMonster(mInfo);
@@ -12030,7 +12030,7 @@ namespace Server.MirObjects
                 monster.Master = this;
                 monster.MaxPetLevel = 7;
                 monster.Direction = Direction;
-                monster.ActionTime = Envir.Time + 1000;
+                monster.ActionTime = Env.Time + 1000;
 
                 var pet = (IntelligentCreatureObject)monster;
 
@@ -12140,17 +12140,17 @@ namespace Server.MirObjects
         {
             if (Info.IntelligentCreatures.Count == 0) return;
 
-            if (Envir.Time > CreatureTimeLeftTicker)
+            if (Env.Time > CreatureTimeLeftTicker)
             {
                 //ExpireTime
                 List<int> releasedPets = new List<int>();
-                CreatureTimeLeftTicker = Envir.Time + Settings.Second;
+                CreatureTimeLeftTicker = Env.Time + Settings.Second;
 
                 for (int i = 0; i < Info.IntelligentCreatures.Count; i++)
                 {
                     if (Info.IntelligentCreatures[i].Expire == DateTime.MinValue) continue; //permanent
 
-                    if (Info.IntelligentCreatures[i].Expire < Envir.Now)
+                    if (Info.IntelligentCreatures[i].Expire < Env.Now)
                     {
                         //Info.IntelligentCreatures[i].ExpireTime = 0;
 
@@ -12240,17 +12240,17 @@ namespace Server.MirObjects
         }
         public bool IntelligentCreatureProduceBlackStone()
         {
-            ItemInfo iInfo = Envir.GetItemInfo(Settings.CreatureBlackStoneName);
+            ItemInfo iInfo = Env.GetItemInfo(Settings.CreatureBlackStoneName);
             if (iInfo == null) return false;
 
-            UserItem item = Envir.CreateDropItem(iInfo);
+            UserItem item = Env.CreateDropItem(iInfo);
             item.Count = 1;
 
             if (!CanGainItem(item))
             {
                 MailInfo mail = new MailInfo(Info.Index)
                 {
-                    MailID = ++Envir.NextMailID,
+                    MailID = ++Env.NextMailID,
                     Sender = "BlackStone",
                     Message = GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.PetProducedBlackStoneInventoryFull),
                     Items = new List<UserItem> { item },
@@ -12286,15 +12286,15 @@ namespace Server.MirObjects
             int highRate = int.MaxValue;
             UserItem dropItem = null;
 
-            foreach (DropInfo drop in Envir.StrongboxDrops)
+            foreach (DropInfo drop in Env.StrongboxDrops)
             {
-                int rate = (int)(Envir.Random.Next(0, drop.Chance) / Settings.DropRate);
+                int rate = (int)(Env.Random.Next(0, drop.Chance) / Settings.DropRate);
                 if (rate < 1) rate = 1;
 
                 if (highRate > rate)
                 {
                     highRate = rate;
-                    dropItem = Envir.CreateFreshItem(drop.Item);
+                    dropItem = Env.CreateFreshItem(drop.Item);
                 }
             }
 
@@ -12309,7 +12309,7 @@ namespace Server.MirObjects
                 dropItem = CreateDynamicWonderDrug(boxtype, dropItem);
             }
             else
-                dropItem = Envir.CreateDropItem(dropItem.Info);
+                dropItem = Env.CreateDropItem(dropItem.Info);
 
             if (FreeSpace(Info.Inventory) < 1)
             {
@@ -12324,14 +12324,14 @@ namespace Server.MirObjects
         {
             int highRate = int.MaxValue;
             UserItem dropItem = null;
-            foreach (DropInfo drop in Envir.BlackstoneDrops)
+            foreach (DropInfo drop in Env.BlackstoneDrops)
             {
-                int rate = (int)(Envir.Random.Next(0, drop.Chance) / Settings.DropRate); if (rate < 1) rate = 1;
+                int rate = (int)(Env.Random.Next(0, drop.Chance) / Settings.DropRate); if (rate < 1) rate = 1;
 
                 if (highRate > rate)
                 {
                     highRate = rate;
-                    dropItem = Envir.CreateDropItem(drop.Item);
+                    dropItem = Env.CreateDropItem(drop.Item);
                 }
             }
             if (FreeSpace(Info.Inventory) < 1)
@@ -12425,7 +12425,7 @@ namespace Server.MirObjects
         #region Friends
         public void AddFriend(string name, bool blocked = false)
         {
-            CharacterInfo info = Envir.GetCharacterInfo(name);
+            CharacterInfo info = Env.GetCharacterInfo(name);
 
             if (info == null)
             {
@@ -12623,7 +12623,7 @@ namespace Server.MirObjects
 
                         MailInfo mail = new MailInfo(Info.Index)
                         {
-                            MailID = ++Envir.NextMailID,
+                            MailID = ++Env.NextMailID,
                             Sender = "Refiner",
                             Message = GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.RefiningCancelledItemNotReturned),
                             Items = new List<UserItem> { temp },
@@ -12703,7 +12703,7 @@ namespace Server.MirObjects
 
             Info.CurrentRefine = Info.Inventory[index];
             Info.Inventory[index] = null;
-            Info.CollectTime = (Envir.Time + (Settings.RefineTime * Settings.Minute));
+            Info.CollectTime = (Env.Time + (Settings.RefineTime * Settings.Minute));
             Enqueue(new S.RefineItem { UniqueID = uniqueID });
 
 
@@ -12866,9 +12866,9 @@ namespace Server.MirObjects
                 return;
             }
 
-            if (Info.CollectTime > Envir.Time)
+            if (Info.CollectTime > Env.Time)
             {
-                ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ItemReadyInMinutes), Info.CurrentRefine.FriendlyName, ((Info.CollectTime - Envir.Time) / Settings.Minute)), ChatType.System);
+                ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ItemReadyInMinutes), Info.CurrentRefine.FriendlyName, ((Info.CollectTime - Env.Time) / Settings.Minute)), ChatType.System);
                 Enqueue(p);
                 return;
             }
@@ -12922,12 +12922,12 @@ namespace Server.MirObjects
                 return;
             }
 
-            if (Envir.Random.Next(1, 100) > Info.Inventory[index].RefineSuccessChance)
+            if (Env.Random.Next(1, 100) > Info.Inventory[index].RefineSuccessChance)
             {
                 Info.Inventory[index].RefinedValue = RefinedValue.None;
             }
 
-            if (Envir.Random.Next(1, 100) < Settings.RefineCritChance)
+            if (Env.Random.Next(1, 100) < Settings.RefineCritChance)
             {
                 Info.Inventory[index].RefineAdded = (byte)(Info.Inventory[index].RefineAdded * Settings.RefineCritIncrease);
             }
@@ -12983,11 +12983,11 @@ namespace Server.MirObjects
                 return;
             }
 
-            CharacterInfo lover = Envir.GetCharacterInfo(Info.Married);
-            PlayerObject player = Envir.GetPlayer(lover.Name);
+            CharacterInfo lover = Env.GetCharacterInfo(Info.Married);
+            PlayerObject player = Env.GetPlayer(lover.Name);
 
             Info.Married = 0;
-            Info.MarriedDate = Envir.Now;
+            Info.MarriedDate = Env.Now;
 
             if (Info.Equipment[(int)EquipmentSlot.RingL] != null)
             {
@@ -12998,7 +12998,7 @@ namespace Server.MirObjects
             GetRelationship(false);
 
             lover.Married = 0;
-            lover.MarriedDate = Envir.Now;
+            lover.MarriedDate = Env.Now;
             if (lover.Equipment[(int)EquipmentSlot.RingL] != null)
                 lover.Equipment[(int)EquipmentSlot.RingL].WeddingRing = -1;
 
@@ -13137,7 +13137,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            if (Info.MarriedDate.AddDays(Settings.MarriageCooldown) > Envir.Now)
+            if (Info.MarriedDate.AddDays(Settings.MarriageCooldown) > Env.Now)
             {
                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.MarriageCooldownAfterDivorce), Settings.MarriageCooldown), ChatType.System);
                 return;
@@ -13162,7 +13162,7 @@ namespace Server.MirObjects
                 MapObject ob = cell.Objects[i];
                 if (ob.Race != ObjectType.Player) continue;
 
-                player = Envir.GetPlayer(ob.Name);
+                player = Env.GetPlayer(ob.Name);
             }
 
 
@@ -13183,7 +13183,7 @@ namespace Server.MirObjects
                     return;
                 }
 
-                if (player.Info.MarriedDate.AddDays(Settings.MarriageCooldown) > Envir.Now)
+                if (player.Info.MarriedDate.AddDays(Settings.MarriageCooldown) > Env.Now)
                 {
                     ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.MarriageCooldownAfterDivorceOther), player.Name, Settings.MarriageCooldown), ChatType.System);
                     return;
@@ -13266,10 +13266,10 @@ namespace Server.MirObjects
 
 
             MarriageProposal.Info.Married = Info.Index;
-            MarriageProposal.Info.MarriedDate = Envir.Now;
+            MarriageProposal.Info.MarriedDate = Env.Now;
 
             Info.Married = MarriageProposal.Info.Index;
-            Info.MarriedDate = Envir.Now;
+            Info.MarriedDate = Env.Now;
 
             GetRelationship(false);
             MarriageProposal.GetRelationship(false);
@@ -13302,7 +13302,7 @@ namespace Server.MirObjects
                 MapObject ob = cell.Objects[i];
                 if (ob.Race != ObjectType.Player) continue;
 
-                player = Envir.GetPlayer(ob.Name);
+                player = Env.GetPlayer(ob.Name);
             }
 
             if (player == null)
@@ -13376,7 +13376,7 @@ namespace Server.MirObjects
             }
 
             DivorceProposal.Info.Married = 0;
-            DivorceProposal.Info.MarriedDate = Envir.Now;
+            DivorceProposal.Info.MarriedDate = Env.Now;
             if (DivorceProposal.Info.Equipment[(int)EquipmentSlot.RingL] != null)
             {
                 DivorceProposal.Info.Equipment[(int)EquipmentSlot.RingL].WeddingRing = -1;
@@ -13384,7 +13384,7 @@ namespace Server.MirObjects
             }
 
             Info.Married = 0;
-            Info.MarriedDate = Envir.Now;
+            Info.MarriedDate = Env.Now;
             if (Info.Equipment[(int)EquipmentSlot.RingL] != null)
             {
                 Info.Equipment[(int)EquipmentSlot.RingL].WeddingRing = -1;
@@ -13407,15 +13407,15 @@ namespace Server.MirObjects
             }
             else
             {
-                CharacterInfo Lover = Envir.GetCharacterInfo(Info.Married);
+                CharacterInfo Lover = Env.GetCharacterInfo(Info.Married);
 
-                PlayerObject player = Envir.GetPlayer(Lover.Name);
+                PlayerObject player = Env.GetPlayer(Lover.Name);
 
                 if (player == null)
-                    Enqueue(new S.LoverUpdate { Name = Lover.Name, Date = Info.MarriedDate, MapName = "", MarriedDays = (short)(Envir.Now - Info.MarriedDate).TotalDays });
+                    Enqueue(new S.LoverUpdate { Name = Lover.Name, Date = Info.MarriedDate, MapName = "", MarriedDays = (short)(Env.Now - Info.MarriedDate).TotalDays });
                 else
                 {
-                    Enqueue(new S.LoverUpdate { Name = Lover.Name, Date = Info.MarriedDate, MapName = player.CurrentMap.Info.Title, MarriedDays = (short)(Envir.Now - Info.MarriedDate).TotalDays });
+                    Enqueue(new S.LoverUpdate { Name = Lover.Name, Date = Info.MarriedDate, MapName = player.CurrentMap.Info.Title, MarriedDays = (short)(Env.Now - Info.MarriedDate).TotalDays });
                     if (CheckOnline)
                     {
                         player.GetRelationship(false);
@@ -13427,7 +13427,7 @@ namespace Server.MirObjects
         public void LogoutRelationship()
         {
             if (Info.Married == 0) return;
-            CharacterInfo lover = Envir.GetCharacterInfo(Info.Married);
+            CharacterInfo lover = Env.GetCharacterInfo(Info.Married);
 
             if (lover == null)
             {
@@ -13435,10 +13435,10 @@ namespace Server.MirObjects
                 return;
             }
 
-            PlayerObject player = Envir.GetPlayer(lover.Name);
+            PlayerObject player = Env.GetPlayer(lover.Name);
             if (player != null)
             {
-                player.Enqueue(new S.LoverUpdate { Name = Info.Name, Date = player.Info.MarriedDate, MapName = "", MarriedDays = (short)(Envir.Now - Info.MarriedDate).TotalDays });
+                player.Enqueue(new S.LoverUpdate { Name = Info.Name, Date = player.Info.MarriedDate, MapName = "", MarriedDays = (short)(Env.Now - Info.MarriedDate).TotalDays });
                 player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerHasGoneOffline), Info.Name), ChatType.System);
             }
         }
@@ -13455,12 +13455,12 @@ namespace Server.MirObjects
                 return;
             }
 
-            CharacterInfo partner = Envir.GetCharacterInfo(Info.Mentor);
-            PlayerObject partnerP = Envir.GetPlayer(partner.Name);
+            CharacterInfo partner = Env.GetCharacterInfo(Info.Mentor);
+            PlayerObject partnerP = Env.GetPlayer(partner.Name);
 
             if (force)
             {
-                Info.MentorDate = Envir.Now.AddDays(Settings.MentorLength);
+                Info.MentorDate = Env.Now.AddDays(Settings.MentorLength);
                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YouHaveMentorshipCooldown), Settings.MentorLength), ChatType.System);
             }
             else
@@ -13535,13 +13535,13 @@ namespace Server.MirObjects
                 return;
             }
 
-            if (Info.MentorDate > Envir.Now)
+            if (Info.MentorDate > Env.Now)
             {
                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.YouCantStartNewMentorship), ChatType.System);
                 return;
             }
 
-            PlayerObject mentor = Envir.GetPlayer(Name);
+            PlayerObject mentor = Env.GetPlayer(Name);
 
             if (mentor == null)
             {
@@ -13557,7 +13557,7 @@ namespace Server.MirObjects
                     return;
                 }
 
-                if (mentor.Info.MentorDate > Envir.Now)
+                if (mentor.Info.MentorDate > Env.Now)
                 {
                     ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerCantStartMentorshipYet), mentor.Info.Name), ChatType.System);
                     return;
@@ -13608,7 +13608,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            PlayerObject student = Envir.GetPlayer(MentorRequest.Info.Name);
+            PlayerObject student = Env.GetPlayer(MentorRequest.Info.Name);
             MentorRequest = null;
 
             if (student == null)
@@ -13638,8 +13638,8 @@ namespace Server.MirObjects
                 student.Info.IsMentor = false;
                 Info.Mentor = student.Info.Index;
                 Info.IsMentor = true;
-                student.Info.MentorDate = Envir.Now;
-                Info.MentorDate = Envir.Now;
+                student.Info.MentorDate = Env.Now;
+                Info.MentorDate = Env.Now;
 
                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YouAreMentorOf), student.Info.Name), ChatType.System);
                 student.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YouAreMentoredBy), Info.Name), ChatType.System);
@@ -13656,9 +13656,9 @@ namespace Server.MirObjects
             }
             else
             {
-                CharacterInfo mentor = Envir.GetCharacterInfo(Info.Mentor);
+                CharacterInfo mentor = Env.GetCharacterInfo(Info.Mentor);
 
-                PlayerObject player = Envir.GetPlayer(mentor.Name);
+                PlayerObject player = Env.GetPlayer(mentor.Name);
 
                 Enqueue(new S.MentorUpdate { Name = mentor.Name, Level = mentor.Level, Online = player != null, MenteeEXP = Info.MentorExp });
 
@@ -13674,7 +13674,7 @@ namespace Server.MirObjects
         {
             if (Info.Mentor == 0) return;
 
-            CharacterInfo mentor = Envir.GetCharacterInfo(Info.Mentor);
+            CharacterInfo mentor = Env.GetCharacterInfo(Info.Mentor);
 
             if (mentor == null)
             {
@@ -13682,7 +13682,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            PlayerObject player = Envir.GetPlayer(mentor.Name);
+            PlayerObject player = Env.GetPlayer(mentor.Name);
 
             if (!Info.IsMentor)
             {
@@ -13711,7 +13711,7 @@ namespace Server.MirObjects
             }
             else //Server Stock
             {
-                Envir.GameshopLog.TryGetValue(item.Info.Index, out purchased);
+                Env.GameshopLog.TryGetValue(item.Info.Index, out purchased);
             }
 
             if (item.Stock - purchased >= 0)
@@ -13726,7 +13726,7 @@ namespace Server.MirObjects
         {
             if (Quantity < 1 || Quantity > 99) return;
 
-            List<GameShopItem> shopList = Envir.GameShopList;
+            List<GameShopItem> shopList = Env.GameShopList;
             GameShopItem Product = null;
 
             int purchased;
@@ -13764,7 +13764,7 @@ namespace Server.MirObjects
                 }
                 else //Server Stock
                 {
-                    Envir.GameshopLog.TryGetValue(Product.Info.Index, out purchased);
+                    Env.GameshopLog.TryGetValue(Product.Info.Index, out purchased);
                 }
 
                 if (Product.Stock - purchased - Quantity >= 0)
@@ -13848,14 +13848,14 @@ namespace Server.MirObjects
                     }
                 }
 
-                Envir.GameshopLog.TryGetValue(Product.Info.Index, out purchased);
+                Env.GameshopLog.TryGetValue(Product.Info.Index, out purchased);
                 if (purchased == 0)
                 {
-                    Envir.GameshopLog[Product.GIndex] = Quantity;
+                    Env.GameshopLog[Product.GIndex] = Quantity;
                 }
                 else
                 {
-                    Envir.GameshopLog[Product.GIndex] += Quantity;
+                    Env.GameshopLog[Product.GIndex] += Quantity;
                 }
 
                 if (Product.Stock != 0) GameShopStock(Product);
@@ -13873,7 +13873,7 @@ namespace Server.MirObjects
             {
                 for (int i = 0; i < Quantity; i++)
                 {
-                    UserItem mailItem = Envir.CreateFreshItem(Envir.GetItemInfo(Product.Info.Index));
+                    UserItem mailItem = Env.CreateFreshItem(Env.GetItemInfo(Product.Info.Index));
 
                     mailItems.Add(mailItem);
                 }
@@ -13882,7 +13882,7 @@ namespace Server.MirObjects
             {
                 while (quantity > 0)
                 {
-                    UserItem mailItem = Envir.CreateFreshItem(Envir.GetItemInfo(Product.Info.Index));
+                    UserItem mailItem = Env.CreateFreshItem(Env.GetItemInfo(Product.Info.Index));
                     mailItem.Count = 0;
                     for (int i = 0; i < mailItem.Info.StackSize; i++)
                     {
@@ -13899,7 +13899,7 @@ namespace Server.MirObjects
 
             MailInfo mail = new MailInfo(Info.Index)
             {
-                MailID = ++Envir.NextMailID,
+                MailID = ++Env.NextMailID,
                 Sender = "Gameshop",
                 Message = GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.ThankYouPurchaseGameshop),
                 Items = mailItems,
@@ -13915,9 +13915,9 @@ namespace Server.MirObjects
             int purchased;
             int stockLevel;
 
-            for (int i = 0; i < Envir.GameShopList.Count; i++)
+            for (int i = 0; i < Env.GameShopList.Count; i++)
             {
-                var item = Envir.GameShopList[i];
+                var item = Env.GameShopList[i];
 
                 if (item.Stock != 0)
                 {
@@ -13927,7 +13927,7 @@ namespace Server.MirObjects
                     }
                     else //Server Stock
                     {
-                        Envir.GameshopLog.TryGetValue(item.Info.Index, out purchased);
+                        Env.GameshopLog.TryGetValue(item.Info.Index, out purchased);
                     }
 
                     if (item.Stock - purchased >= 0)
@@ -14013,7 +14013,7 @@ namespace Server.MirObjects
                 if (mapObject.Race != ObjectType.Player)
                     continue;
 
-                targetPlayer = Envir.GetPlayer(mapObject.Name);
+                targetPlayer = Env.GetPlayer(mapObject.Name);
             }
 
             if (targetPlayer == null)
@@ -14416,7 +14416,7 @@ namespace Server.MirObjects
             item.RentalInformation = new RentalInformation
             {
                 OwnerName = Name,
-                ExpiryDate = Envir.Now.AddDays(ItemRentalPeriodLength),
+                ExpiryDate = Env.Now.AddDays(ItemRentalPeriodLength),
                 BindingFlags = BindMode.DontDrop | BindMode.DontStore | BindMode.DontSell | BindMode.DontTrade | BindMode.UnableToRent | BindMode.DontUpgrade | BindMode.UnableToDisassemble
             };
 
@@ -14455,9 +14455,9 @@ namespace Server.MirObjects
         {
             var timerKey = Name + "-" + key;
 
-            if (Envir.Timers.ContainsKey(timerKey))
+            if (Env.Timers.ContainsKey(timerKey))
             {
-                return Envir.Timers[timerKey];
+                return Env.Timers[timerKey];
             }
 
             return null;
@@ -14470,7 +14470,7 @@ namespace Server.MirObjects
 
             Timer t = new Timer(timerKey, seconds, type);
 
-            Envir.Timers[timerKey] = t;
+            Env.Timers[timerKey] = t;
 
             Enqueue(new S.SetTimer { Key = t.Key, Seconds = t.Seconds, Type = t.Type });
         }
@@ -14478,9 +14478,9 @@ namespace Server.MirObjects
         {
             var timerKey = Name + "-" + key;
 
-            if (Envir.Timers.ContainsKey(timerKey))
+            if (Env.Timers.ContainsKey(timerKey))
             {
-                Envir.Timers.Remove(timerKey);
+                Env.Timers.Remove(timerKey);
             }
 
             Enqueue(new S.ExpireTimer { Key = timerKey });
@@ -14515,7 +14515,7 @@ namespace Server.MirObjects
                 _ => new HeroObject(CurrentHero, this)
             };
 
-            hero.ActionTime = Envir.Time + 1000;
+            hero.ActionTime = Env.Time + 1000;
             hero.RefreshNameColour();
 
             if (!hero.Dead)
@@ -14535,7 +14535,7 @@ namespace Server.MirObjects
             for (int i = 0; i < hero.Buffs.Count; i++)
             {
                 var buff = hero.Buffs[i];
-                buff.LastTime = Envir.Time;
+                buff.LastTime = Env.Time;
                 buff.ObjectID = hero.ObjectID;
 
                 hero.AddBuff(buff.Type, null, (int)buff.ExpireTime, buff.Stats, true, true, buff.Values);
@@ -14591,7 +14591,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            ItemInfo itemInfo = Envir.GetItemInfo(Settings.HeroSealItemName);
+            ItemInfo itemInfo = Env.GetItemInfo(Settings.HeroSealItemName);
             if (itemInfo == null) return;
 
             if (Hero != null)
@@ -14601,7 +14601,7 @@ namespace Server.MirObjects
                 Enqueue(new S.UpdateHeroSpawnState { State = HeroSpawnState.None });
             }
 
-            UserItem item = Envir.CreateFreshItem(itemInfo);
+            UserItem item = Env.CreateFreshItem(itemInfo);
             item.AddedStats[Stat.Hero] = CurrentHero.Index;
             if (CanGainItem(item))
                 GainItem(item);

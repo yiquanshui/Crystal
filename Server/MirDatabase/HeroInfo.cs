@@ -21,7 +21,7 @@ namespace Server.MirDatabase
 
             Inventory = new UserItem[10];
 
-            CreationDate = Envir.Now;
+            CreationDate = Env.Now;
         }
 
         public HeroInfo(BinaryReader reader, int version, int customVersion) : base(reader, version, customVersion) { }
@@ -53,7 +53,7 @@ namespace Server.MirDatabase
             {
                 if (!reader.ReadBoolean()) continue;
                 UserItem item = new UserItem(reader, version, customVersion);
-                if (Envir.BindItem(item) && i < Inventory.Length)
+                if (Env.BindItem(item) && i < Inventory.Length)
                 {
                     Inventory[i] = item;
                 }
@@ -64,7 +64,7 @@ namespace Server.MirDatabase
             {
                 if (!reader.ReadBoolean()) continue;
                 UserItem item = new UserItem(reader, version, customVersion);
-                if (Envir.BindItem(item) && i < Equipment.Length)
+                if (Env.BindItem(item) && i < Equipment.Length)
                 {
                     Equipment[i] = item;
                 }

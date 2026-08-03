@@ -32,7 +32,7 @@ namespace Server.MirObjects.Monsters
 
         public override void Die()
         {
-            ActionList.Add(new DelayedAction(DelayedType.Die, Envir.Time + 300));
+            ActionList.Add(new DelayedAction(DelayedType.Die, Env.Time + 300));
             base.Die();
         }
 

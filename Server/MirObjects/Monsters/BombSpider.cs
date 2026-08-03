@@ -10,16 +10,16 @@ namespace Server.MirObjects.Monsters
         protected internal BombSpider(MonsterInfo info) 
             : base(info)
         {
-            ExplosionTime = Envir.Time + 1000 * 60 * 5;
+            ExplosionTime = Env.Time + 1000 * 60 * 5;
         }
 
         protected override void ProcessTarget()
         {
             if (Target == null) { Die(); return; }
             if (InAttackRange()) { Die(); return; }
-            if (Envir.Time > ExplosionTime) { Die(); return; }
+            if (Env.Time > ExplosionTime) { Die(); return; }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -30,7 +30,7 @@ namespace Server.MirObjects.Monsters
 
         public override void Die()
         {
-            ActionList.Add(new DelayedAction(DelayedType.Die, Envir.Time + 500));
+            ActionList.Add(new DelayedAction(DelayedType.Die, Env.Time + 500));
             base.Die();
         }
 
@@ -46,9 +46,9 @@ namespace Server.MirObjects.Monsters
 
                 if (targets[i].Attacked(this, damage, DefenceType.ACAgility) <= 0) continue;
 
-                if (Envir.Random.Next(Settings.PoisonResistWeight) >= targets[i].Stats[Stat.PoisonResist])
+                if (Env.Random.Next(Settings.PoisonResistWeight) >= targets[i].Stats[Stat.PoisonResist])
                 {
-                    if (Envir.Random.Next(5) == 0)
+                    if (Env.Random.Next(5) == 0)
                     {
                         targets[i].ApplyPoison(new Poison { Owner = this, Duration = 5, PType = PoisonType.Green, Value = GetAttackPower(Stats[Stat.MinSC], Stats[Stat.MaxSC]), TickSpeed = 2000 }, this);
                     }

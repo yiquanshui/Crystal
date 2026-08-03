@@ -29,7 +29,7 @@ namespace Server.MirObjects.Monsters
         protected internal Yimoogi(MonsterInfo info)
             : base(info)
         {
-            SpawnTime = Envir.Time + 4000;
+            SpawnTime = Env.Time + 4000;
             NoAttack = true;
         }
 
@@ -77,24 +77,24 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             bool ranged = CurrentLocation == Target.CurrentLocation || !InAttackRange();
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
-            if (!ranged && Envir.Random.Next(5) > 0)
+            if (!ranged && Env.Random.Next(5) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
                 if (damage == 0) return;
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.MACAgility);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.MACAgility);
                 ActionList.Add(action);
             }
             else
             {
-                AttackTime = Envir.Time + AttackSpeed + 500;
+                AttackTime = Env.Time + AttackSpeed + 500;
                 if (damage == 0) return;
 
-                if (InRangedAttackRange(PoisonAttackRange) && Envir.Random.Next(6) == 0)
+                if (InRangedAttackRange(PoisonAttackRange) && Env.Random.Next(6) == 0)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 
@@ -105,7 +105,7 @@ namespace Server.MirObjects.Monsters
                 {
                     Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID });
 
-                    DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 500, Target, damage, DefenceType.MAC);
+                    DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 500, Target, damage, DefenceType.MAC);
                     ActionList.Add(action);
                 }
             }
@@ -126,19 +126,19 @@ namespace Server.MirObjects.Monsters
                     MonsterObject mob = null;
                     for (int i = 0; i < WhiteSnakeCount; i++)
                     {
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.WhiteSnake));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.WhiteSnake));
                         if (mob == null) continue;
 
                         if (!mob.Spawn(CurrentMap, teleportlocation)) continue;
 
                         mob.Target = Target;
-                        mob.ActionTime = Envir.Time + 2000;
+                        mob.ActionTime = Env.Time + 2000;
                     }
                     Target = null;
                 }
             }
 
-            if (!IsChild && !ChildSpawned && Envir.Time > SpawnTime)
+            if (!IsChild && !ChildSpawned && Env.Time > SpawnTime)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 2 });
                 SpawnSlave();
@@ -169,7 +169,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -180,10 +180,10 @@ namespace Server.MirObjects.Monsters
 
         protected void SpawnSlave()
         {
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
-            MonsterObject mob = GetMonster(Envir.GetMonsterInfo(Info.Name));
+            MonsterObject mob = GetMonster(Env.GetMonsterInfo(Info.Name));
 
             if (mob == null)
             {
@@ -204,7 +204,7 @@ namespace Server.MirObjects.Monsters
 
             childmob.IsChild = true;
             childmob.SisterMob = this;
-            childmob.ActionTime = Envir.Time + 2000;
+            childmob.ActionTime = Env.Time + 2000;
             SisterMob = childmob;
             ChildSpawned = true;
         }
@@ -216,10 +216,10 @@ namespace Server.MirObjects.Monsters
                 Point location;
 
                 if (distance <= 0)
-                    location = new Point(Envir.Random.Next(CurrentMap.Width), Envir.Random.Next(CurrentMap.Height));
+                    location = new Point(Env.Random.Next(CurrentMap.Width), Env.Random.Next(CurrentMap.Height));
                 else
-                    location = new Point(CurrentLocation.X + Envir.Random.Next(-distance, distance + 1),
-                                         CurrentLocation.Y + Envir.Random.Next(-distance, distance + 1));
+                    location = new Point(CurrentLocation.X + Env.Random.Next(-distance, distance + 1),
+                                         CurrentLocation.Y + Env.Random.Next(-distance, distance + 1));
 
                 if (Teleport(CurrentMap, location, true, 1)) return true;
             }

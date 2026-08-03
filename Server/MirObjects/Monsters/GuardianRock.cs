@@ -40,14 +40,14 @@ namespace Server.MirObjects.Monsters
             Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID });
             PullAttack();
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
         }
 
         private void PullAttack()
         {
             MirDirection pushdir = Functions.DirectionFromPoint(Target.CurrentLocation, CurrentLocation);
-            if (Envir.Random.Next(Settings.MagicResistWeight) < Target.Stats[Stat.MagicResist]) return;
+            if (Env.Random.Next(Settings.MagicResistWeight) < Target.Stats[Stat.MagicResist]) return;
             int distance = Functions.MaxDistance(Target.CurrentLocation, CurrentLocation) -1;
             if (distance <= 0) return;
             if (distance > 4) distance = 4;
@@ -61,11 +61,11 @@ namespace Server.MirObjects.Monsters
             if (!Active) return;
             if (InAttackRange() && CanAttack)
             {
-                ActionList.Add(new DelayedAction(DelayedType.Damage, Envir.Time + 500));
+                ActionList.Add(new DelayedAction(DelayedType.Damage, Env.Time + 500));
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;

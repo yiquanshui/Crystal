@@ -629,7 +629,7 @@ namespace Server.MirObjects
         }
         protected virtual bool CanRegen
         {
-            get { return Envir.Time >= RegenTime; }
+            get { return Env.Time >= RegenTime; }
         }
         protected virtual bool CanMove
         {
@@ -637,9 +637,9 @@ namespace Server.MirObjects
             {
                 return 
                     !Dead && 
-                    Envir.Time > MoveTime && 
-                    Envir.Time > ActionTime && 
-                    Envir.Time > ShockTime &&
+                    Env.Time > MoveTime && 
+                    Env.Time > ActionTime && 
+                    Env.Time > ShockTime &&
                     (Master == null || Master.PMode == PetMode.MoveOnly || Master.PMode == PetMode.Both || Master.PMode == PetMode.FocusMasterTarget) && 
                     !CurrentPoison.HasFlag(PoisonType.Paralysis) && 
                     !CurrentPoison.HasFlag(PoisonType.LRParalysis) &&
@@ -653,8 +653,8 @@ namespace Server.MirObjects
             {
                 return 
                     !Dead &&
-                    Envir.Time > AttackTime &&
-                    Envir.Time > ActionTime &&
+                    Env.Time > AttackTime &&
+                    Env.Time > ActionTime &&
                     (Master == null || Master.PMode == PetMode.AttackOnly || Master.PMode == PetMode.Both || Master.PMode == PetMode.FocusMasterTarget) &&
                     !CurrentPoison.HasFlag(PoisonType.Paralysis) &&
                     !CurrentPoison.HasFlag(PoisonType.LRParalysis) &&
@@ -671,15 +671,15 @@ namespace Server.MirObjects
 
             Undead = Info.Undead;
             AutoRev = info.AutoRev;
-            CoolEye = info.CoolEye > Envir.Random.Next(100);
-            Direction = (MirDirection)Envir.Random.Next(8);
+            CoolEye = info.CoolEye > Env.Random.Next(100);
+            Direction = (MirDirection)Env.Random.Next(8);
 
             AMode = AttackMode.All;
             PMode = PetMode.Both;
 
-            RegenTime = Envir.Random.Next(RegenDelay) + Envir.Time;
-            SearchTime = Envir.Random.Next(SearchDelay) + Envir.Time;
-            RoamTime = Envir.Random.Next(RoamDelay) + Envir.Time;
+            RegenTime = Env.Random.Next(RegenDelay) + Env.Time;
+            SearchTime = Env.Random.Next(SearchDelay) + Env.Time;
+            RoamTime = Env.Random.Next(RoamDelay) + Env.Time;
         }
 
         public void SetMonsterType(MonsterType type)
@@ -699,7 +699,7 @@ namespace Server.MirObjects
             SetHP(Stats[Stat.HP]);
 
             Spawned();
-            Envir.MonsterCount++;
+            Env.MonsterCount++;
             CurrentMap.MonsterCount++;
             return true;
         }
@@ -710,7 +710,7 @@ namespace Server.MirObjects
             if (Respawn.Map == null) return false;
             if (Respawn.WalkableCells == null || Respawn.WalkableCells.Count == 0) return false;
 
-            var spawnPoint = Respawn.WalkableCells[Envir.Random.Next(Respawn.WalkableCells.Count)];
+            var spawnPoint = Respawn.WalkableCells[Env.Random.Next(Respawn.WalkableCells.Count)];
 
             CurrentLocation = spawnPoint;
 
@@ -727,17 +727,17 @@ namespace Server.MirObjects
             Spawned();
             Respawn.Count++;
             respawn.Map.MonsterCount++;
-            Envir.MonsterCount++;
+            Env.MonsterCount++;
             return true;
         }
 
         public override void Spawned()
         {
-            ActionTime = Envir.Time + 2000;
+            ActionTime = Env.Time + 2000;
 
-            if (Info.HasSpawnScript && (Envir.MonsterNPC != null))
+            if (Info.HasSpawnScript && (Env.MonsterNPC != null))
             {
-                Envir.MonsterNPC.Call(this,string.Format("[@_SPAWN({0})]",Info.Index));
+                Env.MonsterNPC.Call(this,string.Format("[@_SPAWN({0})]",Info.Index));
             }
 
             base.Spawned();
@@ -850,7 +850,7 @@ namespace Server.MirObjects
         }
         public virtual void RefreshNameColour(bool send = true)
         {
-            if (ShockTime < Envir.Time) BindingShotCenter = false;
+            if (ShockTime < Env.Time) BindingShotCenter = false;
 
             Color colour = Color.White;
 
@@ -886,11 +886,11 @@ namespace Server.MirObjects
                 colour = GetRarityProfile().NameColour;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
                 colour = Color.Peru;
-            else if (Envir.Time < RageTime)
+            else if (Env.Time < RageTime)
                 colour = Color.Red;
-            else if (Envir.Time < HallucinationTime)
+            else if (Env.Time < HallucinationTime)
                 colour = Color.MediumOrchid;
 
             if (colour == NameColour || !send) return;
@@ -970,13 +970,13 @@ namespace Server.MirObjects
             HP = 0;
             Dead = true;
 
-            DeadTime = Envir.Time + DeadDelay;
+            DeadTime = Env.Time + DeadDelay;
 
             Broadcast(new S.ObjectDied { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 
-            if (Info.HasDieScript && (Envir.MonsterNPC != null))
+            if (Info.HasDieScript && (Env.MonsterNPC != null))
             {
-                Envir.MonsterNPC.Call(this, string.Format("[@_DIE({0})]", Info.Index));
+                Env.MonsterNPC.Call(this, string.Format("[@_DIE({0})]", Info.Index));
             }
 
             if (EXPOwner != null && EXPOwner.Node != null && Master == null && (EXPOwner.Race == ObjectType.Player || EXPOwner.Race == ObjectType.Hero))
@@ -1000,7 +1000,7 @@ namespace Server.MirObjects
             Master = null;
 
             PoisonList.Clear();
-            Envir.MonsterCount--;
+            Env.MonsterCount--;
             if (CurrentMap != null)
             CurrentMap.MonsterCount--;
         }
@@ -1021,14 +1021,14 @@ namespace Server.MirObjects
             SetHP(hp);
 
             Dead = false;
-            ActionTime = Envir.Time + RevivalDelay;
+            ActionTime = Env.Time + RevivalDelay;
 
             Broadcast(new S.ObjectRevived { ObjectID = ObjectID, Effect = effect });
 
             if (Respawn != null)
                 Respawn.Count++;
 
-            Envir.MonsterCount++;
+            Env.MonsterCount++;
             CurrentMap.MonsterCount++;
         }
 
@@ -1070,8 +1070,8 @@ namespace Server.MirObjects
                 result++;
             }
 
-            ActionTime = Envir.Time + 300 * result;
-            MoveTime = Envir.Time + 500 * result;
+            ActionTime = Env.Time + 300 * result;
+            MoveTime = Env.Time + 500 * result;
 
             if (result > 0)
             {
@@ -1118,7 +1118,7 @@ namespace Server.MirObjects
 
                     foreach (var dropItem in reward.Items)
                     {
-                        UserItem item = Envir.CreateDropItem(dropItem);
+                        UserItem item = Env.CreateDropItem(dropItem);
 
                         if (item == null) continue;
 
@@ -1152,13 +1152,13 @@ namespace Server.MirObjects
             ItemObject ob = new ItemObject(this, item)
             {
                 Owner = EXPOwner,
-                OwnerTime = Envir.Time + Settings.Minute,
+                OwnerTime = Env.Time + Settings.Minute,
             };
 
             if (!item.Info.GlobalDropNotify)
                 return ob.Drop(Settings.DropRange);
 
-            foreach (var player in Envir.Players)
+            foreach (var player in Env.Players)
             {
                 player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerHasDroppedItem), Name, item.FriendlyName), ChatType.System2);
             }
@@ -1180,7 +1180,7 @@ namespace Server.MirObjects
                 ItemObject ob = new ItemObject(this, i != count - 1 ? Settings.MaxDropGold : gold % Settings.MaxDropGold)
                 {
                     Owner = EXPOwner,
-                    OwnerTime = Envir.Time + Settings.Minute,
+                    OwnerTime = Env.Time + Settings.Minute,
                 };
 
                 ob.Drop(Settings.DropRange);
@@ -1202,7 +1202,7 @@ namespace Server.MirObjects
                 if (SlaveList[i].Dead || SlaveList[i].Node == null)
                     SlaveList.RemoveAt(i);
 
-            if (Dead && Envir.Time >= DeadTime)
+            if (Dead && Env.Time >= DeadTime)
             {
                 CurrentMap.RemoveObject(this);
                 if (Master != null)
@@ -1215,7 +1215,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            if (Master != null && TameTime > 0 && Envir.Time >= TameTime)
+            if (Master != null && TameTime > 0 && Env.Time >= TameTime)
             {
                 Master.Pets.Remove(this);
                 Master = null;
@@ -1231,81 +1231,81 @@ namespace Server.MirObjects
 
         public override void SetOperateTime()
         {
-            long time = Envir.Time + 2000;
+            long time = Env.Time + 2000;
 
-            if (AloneTime < time && AloneTime > Envir.Time)
+            if (AloneTime < time && AloneTime > Env.Time)
                 time = AloneTime;
 
-            if (DeadTime < time && DeadTime > Envir.Time)
+            if (DeadTime < time && DeadTime > Env.Time)
                 time = DeadTime;
 
-            if (OwnerTime < time && OwnerTime > Envir.Time)
+            if (OwnerTime < time && OwnerTime > Env.Time)
                 time = OwnerTime;
 
-            if (ExpireTime < time && ExpireTime > Envir.Time)
+            if (ExpireTime < time && ExpireTime > Env.Time)
                 time = ExpireTime;
 
-            if (PKPointTime < time && PKPointTime > Envir.Time)
+            if (PKPointTime < time && PKPointTime > Env.Time)
                 time = PKPointTime;
 
-            if (LastHitTime < time && LastHitTime > Envir.Time)
+            if (LastHitTime < time && LastHitTime > Env.Time)
                 time = LastHitTime;
 
-            if (EXPOwnerTime < time && EXPOwnerTime > Envir.Time)
+            if (EXPOwnerTime < time && EXPOwnerTime > Env.Time)
                 time = EXPOwnerTime;
 
-            if (SearchTime < time && SearchTime > Envir.Time)
+            if (SearchTime < time && SearchTime > Env.Time)
                 time = SearchTime;
 
-            if (RoamTime < time && RoamTime > Envir.Time)
+            if (RoamTime < time && RoamTime > Env.Time)
                 time = RoamTime;
 
-            if (ShockTime < time && ShockTime > Envir.Time)
+            if (ShockTime < time && ShockTime > Env.Time)
                 time = ShockTime;
 
-            if (RegenTime < time && RegenTime > Envir.Time && Health < MaxHealth)
+            if (RegenTime < time && RegenTime > Env.Time && Health < MaxHealth)
                 time = RegenTime;
 
-            if (RageTime < time && RageTime > Envir.Time)
+            if (RageTime < time && RageTime > Env.Time)
                 time = RageTime;
 
-            if (HallucinationTime < time && HallucinationTime > Envir.Time)
+            if (HallucinationTime < time && HallucinationTime > Env.Time)
                 time = HallucinationTime;
 
-            if (ActionTime < time && ActionTime > Envir.Time)
+            if (ActionTime < time && ActionTime > Env.Time)
                 time = ActionTime;
 
-            if (MoveTime < time && MoveTime > Envir.Time)
+            if (MoveTime < time && MoveTime > Env.Time)
                 time = MoveTime;
 
-            if (AttackTime < time && AttackTime > Envir.Time)
+            if (AttackTime < time && AttackTime > Env.Time)
                 time = AttackTime;
 
-            if (HealTime < time && HealTime > Envir.Time && HealAmount > 0)
+            if (HealTime < time && HealTime > Env.Time && HealAmount > 0)
                 time = HealTime;
 
-            if (BrownTime < time && BrownTime > Envir.Time)
+            if (BrownTime < time && BrownTime > Env.Time)
                 time = BrownTime;
 
             for (int i = 0; i < ActionList.Count; i++)
             {
-                if (ActionList[i].Time >= time && ActionList[i].Time > Envir.Time) continue;
+                if (ActionList[i].Time >= time && ActionList[i].Time > Env.Time) continue;
                 time = ActionList[i].Time;
             }
 
             for (int i = 0; i < PoisonList.Count; i++)
             {
-                if (PoisonList[i].TickTime >= time && PoisonList[i].TickTime > Envir.Time) continue;
+                if (PoisonList[i].TickTime >= time && PoisonList[i].TickTime > Env.Time) continue;
                 time = PoisonList[i].TickTime;
             }
 
             for (int i = 0; i < Buffs.Count; i++)
             {
-                if (Buffs[i].NextTime >= time && Buffs[i].NextTime > Envir.Time) continue;
+                if (Buffs[i].NextTime >= time && Buffs[i].NextTime > Env.Time) continue;
                 time = Buffs[i].NextTime;
             }
 
-            if (OperateTime <= Envir.Time || time < OperateTime)
+            if (OperateTime <= Env.Time || time < OperateTime)
                 OperateTime = time;
         }
 
@@ -1419,7 +1419,7 @@ namespace Server.MirObjects
 
             if (CanRegen)
             {
-                RegenTime = Envir.Time + RegenDelay;
+                RegenTime = Env.Time + RegenDelay;
 
 
                 if (HP < Stats[Stat.HP])
@@ -1427,9 +1427,9 @@ namespace Server.MirObjects
             }
 
 
-            if (Envir.Time > HealTime)
+            if (Env.Time > HealTime)
             {
-                HealTime = Envir.Time + HealDelay;
+                HealTime = Env.Time + HealDelay;
 
                 if (HealAmount > 5)
                 {
@@ -1467,16 +1467,16 @@ namespace Server.MirObjects
                     {
                         MoveSpeed = Info.MoveSpeed;
                         AttackSpeed = Info.AttackSpeed;
-                        AttackTime = Envir.Time + AttackSpeed;
+                        AttackTime = Env.Time + AttackSpeed;
                     }
                     PoisonList.RemoveAt(i);
                     continue;
                 }
 
-                if (Envir.Time > poison.TickTime)
+                if (Env.Time > poison.TickTime)
                 {
                     poison.Time++;
-                    poison.TickTime = Envir.Time + poison.TickSpeed;
+                    poison.TickTime = Env.Time + poison.TickSpeed;
 
                     if (poison.Time >= poison.Duration)
                     {
@@ -1484,7 +1484,7 @@ namespace Server.MirObjects
                         {
                             MoveSpeed = Info.MoveSpeed;
                             AttackSpeed = Info.AttackSpeed;
-                            AttackTime = Envir.Time + AttackSpeed;
+                            AttackTime = Env.Time + AttackSpeed;
                         }
                         PoisonList.RemoveAt(i);
                         continue;
@@ -1495,10 +1495,10 @@ namespace Server.MirObjects
                         if (EXPOwner == null || EXPOwner.Dead)
                         {
                             EXPOwner = poison.Owner;
-                            EXPOwnerTime = Envir.Time + EXPOwnerDelay;
+                            EXPOwnerTime = Env.Time + EXPOwnerDelay;
                         }
                         else if (EXPOwner == poison.Owner)
-                            EXPOwnerTime = Envir.Time + EXPOwnerDelay;
+                            EXPOwnerTime = Env.Time + EXPOwnerDelay;
 
                         if (poison.PType == PoisonType.Bleeding)
                         {
@@ -1509,14 +1509,14 @@ namespace Server.MirObjects
                         PoisonDamage(-poison.Value, poison.Owner);
                         BroadcastDamageIndicator(DamageType.Hit, -poison.Value);
                         if (PoisonStopRegen)
-                            RegenTime = Envir.Time + RegenDelay;
+                            RegenTime = Env.Time + RegenDelay;
                         if (poison.Owner != null && Target == null)
                             Target = poison.Owner;
                     }
 
                     if (poison.PType == PoisonType.DelayedExplosion)
                     {
-                        if (Envir.Time > ExplosionInflictedTime) ExplosionInflictedStage++;
+                        if (Env.Time > ExplosionInflictedTime) ExplosionInflictedStage++;
 
                         if (!ProcessDelayedExplosion(poison))
                         {
@@ -1550,7 +1550,7 @@ namespace Server.MirObjects
                             MoveSpeed = Info.MoveSpeed;
                             AttackSpeed = Info.AttackSpeed;
                             //Reset the Attack time
-                            AttackTime = Envir.Time + AttackSpeed;
+                            AttackTime = Env.Time + AttackSpeed;
                         }
                         break;
                 }
@@ -1579,7 +1579,7 @@ namespace Server.MirObjects
             }
             if (ExplosionInflictedStage == 1)
             {
-                if (Envir.Time > ExplosionInflictedTime)
+                if (Env.Time > ExplosionInflictedTime)
                     ExplosionInflictedTime = poison.TickTime + 3000;
                 Broadcast(new S.ObjectEffect { ObjectID = ObjectID, Effect = SpellEffect.DelayedExplosion, EffectType = 1 });
                 return true;
@@ -1593,7 +1593,7 @@ namespace Server.MirObjects
                     {
                         case ObjectType.Player:
                             PlayerObject caster = (PlayerObject)poison.Owner;
-                            DelayedAction action = new DelayedAction(DelayedType.Magic, Envir.Time, poison.Owner, caster.GetMagic(Spell.DelayedExplosion), poison.Value, this.CurrentLocation);
+                            DelayedAction action = new DelayedAction(DelayedType.Magic, Env.Time, poison.Owner, caster.GetMagic(Spell.DelayedExplosion), poison.Value, this.CurrentLocation);
                             CurrentMap.ActionList.Add(action);
                             //Attacked((PlayerObject)poison.Owner, poison.Value, DefenceType.MAC, false);
                             break;
@@ -1615,16 +1615,16 @@ namespace Server.MirObjects
             {
                 Buff buff = Buffs[i];
 
-                if (buff.NextTime > Envir.Time) continue;
+                if (buff.NextTime > Env.Time) continue;
 
                 if (!buff.Paused && buff.StackType != BuffStackType.Infinite)
                 {
-                    var change = Envir.Time - buff.LastTime;
+                    var change = Env.Time - buff.LastTime;
                     buff.ExpireTime -= change;
                 }
 
-                buff.LastTime = Envir.Time;
-                buff.NextTime = Envir.Time + 1000;
+                buff.LastTime = Env.Time;
+                buff.NextTime = Env.Time + 1000;
 
                 if ((buff.ExpireTime > 0 || buff.StackType == BuffStackType.Infinite) && !buff.FlagForRemoval) continue;
 
@@ -1734,9 +1734,9 @@ namespace Server.MirObjects
 
         protected virtual void CheckAlone()
         {
-            if (Envir.Time < AloneTime) return;
+            if (Env.Time < AloneTime) return;
 
-            AloneTime = Envir.Time + AloneDelay;
+            AloneTime = Env.Time + AloneDelay;
 
             if (Route.Count > 0)
             {
@@ -1774,7 +1774,7 @@ namespace Server.MirObjects
                 {
                     MirDirection dir = Direction;
 
-                    switch (Envir.Random.Next(3)) // favour Clockwise
+                    switch (Env.Random.Next(3)) // favour Clockwise
                     {
                         case 0:
                             for (int i = 0; i < 7; i++)
@@ -1803,18 +1803,18 @@ namespace Server.MirObjects
 
         protected virtual void ProcessSearch()
         {
-            if (Envir.Time < SearchTime) return;
+            if (Env.Time < SearchTime) return;
             if (Master != null && (Master.PMode == PetMode.MoveOnly || Master.PMode == PetMode.None || Master.PMode == PetMode.FocusMasterTarget)) return;
 
-            SearchTime = Envir.Time + SearchDelay;
+            SearchTime = Env.Time + SearchDelay;
 
-            if (Target == null || Envir.Random.Next(3) == 0)
+            if (Target == null || Env.Random.Next(3) == 0)
                 FindTarget();
         }
 
         protected virtual void ProcessRoam()
         {
-            if (Target != null || Envir.Time < RoamTime) return;
+            if (Target != null || Env.Time < RoamTime) return;
 
             if (ProcessRoute()) return;
 
@@ -1824,14 +1824,14 @@ namespace Server.MirObjects
                 return;
             }
 
-            RoamTime = Envir.Time + RoamDelay;
+            RoamTime = Env.Time + RoamDelay;
 
-            if (Envir.Random.Next(10) != 0) return;
+            if (Env.Random.Next(10) != 0) return;
 
-            switch (Envir.Random.Next(3)) //Face Walk
+            switch (Env.Random.Next(3)) //Face Walk
             {
                 case 0:
-                    Turn((MirDirection)Envir.Random.Next(8));
+                    Turn((MirDirection)Env.Random.Next(8));
                     break;
                 default:
                     Walk(Direction);
@@ -1855,7 +1855,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -1876,7 +1876,7 @@ namespace Server.MirObjects
             int recallRange = Math.Max(1, Settings.MonsterRecallRange);
             int recallCooldown = Math.Max(0, Settings.MonsterRecallCooldown);
 
-            if (Envir.Time < NextRecallTime) return false;
+            if (Env.Time < NextRecallTime) return false;
 
             bool needsRecall = Target.CurrentMap != CurrentMap ||
                                !Functions.InRange(CurrentLocation, Target.CurrentLocation, recallRange);
@@ -1889,8 +1889,8 @@ namespace Server.MirObjects
             if (!Teleport(Target.CurrentMap, destination, true))
                 return false;
 
-            NextRecallTime = Envir.Time + recallCooldown;
-            ActionTime = Envir.Time + 1000;
+            NextRecallTime = Env.Time + recallCooldown;
+            ActionTime = Env.Time + 1000;
             return true;
         }
 
@@ -1971,7 +1971,7 @@ namespace Server.MirObjects
 
                                     PlayerObject playerob = (PlayerObject)ob;
                                     if (!ob.IsAttackTarget(this)) continue;
-                                    if (playerob.GMGameMaster || ob.Hidden && (!CoolEye || Level < ob.Level) || Envir.Time < HallucinationTime) continue;
+                                    if (playerob.GMGameMaster || ob.Hidden && (!CoolEye || Level < ob.Level) || Env.Time < HallucinationTime) continue;
 
                                     Target = ob;
 
@@ -2000,14 +2000,14 @@ namespace Server.MirObjects
         {
             if (Route.Count < 1) return false;
 
-            RoamTime = Envir.Time + 500;
+            RoamTime = Env.Time + 500;
 
             if (CurrentLocation == Route[RoutePoint].Location)
             {
                 if (Route[RoutePoint].Delay > 0 && !Waiting)
                 {
                     Waiting = true;
-                    RoamTime = Envir.Time + RoamDelay + Route[RoutePoint].Delay;
+                    RoamTime = Env.Time + RoamDelay + Route[RoutePoint].Delay;
                     return true;
                 }
 
@@ -2047,7 +2047,7 @@ namespace Server.MirObjects
 
             if (Walk(dir)) return;
 
-            switch (Envir.Random.Next(2)) //No favour
+            switch (Env.Random.Next(2)) //No favour
             {
                 case 0:
                     for (int i = 0; i < 7; i++)
@@ -2124,9 +2124,9 @@ namespace Server.MirObjects
                 RemoveBuff(BuffType.Hiding);
             }
 
-            CellTime = Envir.Time + 500;
-            ActionTime = Envir.Time + 300;
-            MoveTime = Envir.Time + MoveSpeed;
+            CellTime = Env.Time + 500;
+            ActionTime = Env.Time + 300;
+            MoveTime = Env.Time + MoveSpeed;
             if (MoveTime > AttackTime)
                 AttackTime = MoveTime;
 
@@ -2162,13 +2162,13 @@ namespace Server.MirObjects
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage == 0) return;
 
-            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility);
+            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility);
             ActionList.Add(action);
         }
 
@@ -2457,7 +2457,7 @@ namespace Server.MirObjects
                         return (master.MyGuild != null && attacker.MyGuild != null) && master.MyGuild.IsEnemy(attacker.MyGuild);
                     }
                 case AttackMode.RedBrown:
-                    return Master.PKPoints >= 200 || Envir.Time < Master.BrownTime;
+                    return Master.PKPoints >= 200 || Env.Time < Master.BrownTime;
                 default:
                     return true;
             }
@@ -2487,7 +2487,7 @@ namespace Server.MirObjects
                 if (Master == attacker.Master)
                     return false;
 
-                if (Envir.Time < ShockTime) //Shocked
+                if (Env.Time < ShockTime) //Shocked
                     return false;
 
                 if (Master.Race == ObjectType.Player && attacker.Master.Race == ObjectType.Player && (Master.InSafeZone || attacker.Master.InSafeZone)) return false;
@@ -2502,7 +2502,7 @@ namespace Server.MirObjects
                     case AttackMode.EnemyGuild:
                         break;
                     case AttackMode.RedBrown:
-                        if (attacker.Master.PKPoints < 200 || Envir.Time > attacker.Master.BrownTime) return false;
+                        if (attacker.Master.PKPoints < 200 || Env.Time > attacker.Master.BrownTime) return false;
                         break;
                     case AttackMode.Peace:
                         return false;
@@ -2521,7 +2521,7 @@ namespace Server.MirObjects
             }
             else if (attacker.Master != null) //Pet Attacking Wild Monster
             {
-                if (Envir.Time < ShockTime) //Shocked
+                if (Env.Time < ShockTime) //Shocked
                     return false;
 
                 for (int i = 0; i < attacker.Master.Pets.Count; i++)
@@ -2534,9 +2534,9 @@ namespace Server.MirObjects
                     return true;
             }
 
-            if (Envir.Time < attacker.HallucinationTime) return true;
+            if (Env.Time < attacker.HallucinationTime) return true;
 
-            return Envir.Time < attacker.RageTime;
+            return Env.Time < attacker.RageTime;
         }
         public override bool IsFriendlyTarget(HumanObject ally)
         {
@@ -2552,7 +2552,7 @@ namespace Server.MirObjects
                 case AttackMode.EnemyGuild:
                     return true;
                 case AttackMode.RedBrown:
-                    return Master.PKPoints < 200 & Envir.Time > Master.BrownTime;
+                    return Master.PKPoints < 200 & Env.Time > Master.BrownTime;
             }
             return true;
         }
@@ -2591,7 +2591,7 @@ namespace Server.MirObjects
                 return 0;
             }
 
-            if (Envir.Random.Next(100) < (attacker.Stats[Stat.CriticalRate] * Settings.CriticalRateWeight))
+            if (Env.Random.Next(100) < (attacker.Stats[Stat.CriticalRate] * Settings.CriticalRateWeight))
             {
                 Broadcast(new S.ObjectEffect { ObjectID = ObjectID, Effect = SpellEffect.Critical });
                 damage = Math.Min(int.MaxValue, damage + (int)Math.Floor(damage * (((double)attacker.Stats[Stat.CriticalDamage] / (double)Settings.CriticalDamageWeight) * 10)));
@@ -2621,8 +2621,8 @@ namespace Server.MirObjects
             }
 
             if (Master != null && Master != attacker && (Master.Race != ObjectType.Hero || Master.Race == ObjectType.Hero && attacker != ((HeroObject)Master).Owner))
-                if (Envir.Time > Master.BrownTime && Master.PKPoints < 200)
-                    attacker.BrownTime = Envir.Time + Settings.Minute;
+                if (Env.Time > Master.BrownTime && Master.PKPoints < 200)
+                    attacker.BrownTime = Env.Time + Settings.Minute;
 
             if (EXPOwner == null || EXPOwner.Dead)
             {
@@ -2630,7 +2630,7 @@ namespace Server.MirObjects
             }
 
             if (EXPOwner == attacker)
-                EXPOwnerTime = Envir.Time + EXPOwnerDelay;
+                EXPOwnerTime = Env.Time + EXPOwnerDelay;
 
             ushort levelOffset = (ushort)(Level > attacker.Level ? 0 : Math.Min(10, attacker.Level - Level));
 
@@ -2655,8 +2655,8 @@ namespace Server.MirObjects
             {
                 if (attacker.HasBuff(BuffType.Mentor, out _))
                 {
-                    CharacterInfo mentee = Envir.GetCharacterInfo(attacker.Info.Mentor);
-                    PlayerObject player = Envir.GetPlayer(mentee.Name);
+                    CharacterInfo mentee = Env.GetCharacterInfo(attacker.Info.Mentor);
+                    PlayerObject player = Env.GetPlayer(mentee.Name);
                     if (player != null && player.CurrentMap == attacker.CurrentMap && Functions.InRange(player.CurrentLocation, attacker.CurrentLocation, Globals.DataRange) && !player.Dead)
                     {
                         if (GroupMembers != null && GroupMembers.Contains(player))
@@ -2665,9 +2665,9 @@ namespace Server.MirObjects
                 }
             }
 
-            if (Master != null && Master != attacker && Master.Race == ObjectType.Player && Envir.Time > Master.BrownTime && Master.PKPoints < 200 && !((PlayerObject)Master).AtWar(attacker))
+            if (Master != null && Master != attacker && Master.Race == ObjectType.Player && Env.Time > Master.BrownTime && Master.PKPoints < 200 && !((PlayerObject)Master).AtWar(attacker))
             {
-                attacker.BrownTime = Envir.Time + Settings.Minute;
+                attacker.BrownTime = Env.Time + Settings.Minute;
             }
 
             for (int i = 0; i < attacker.Pets.Count; i++)
@@ -2734,7 +2734,7 @@ namespace Server.MirObjects
                         };
 
                     if (EXPOwner == attacker.Master)
-                        EXPOwnerTime = Envir.Time + EXPOwnerDelay;
+                        EXPOwnerTime = Env.Time + EXPOwnerDelay;
                 }
 
             }
@@ -2786,8 +2786,8 @@ namespace Server.MirObjects
 
             if (Master != null && p.Owner != null && p.Owner.Race == ObjectType.Player && p.Owner != Master)
             {
-                if (Envir.Time > Master.BrownTime && Master.PKPoints < 200)
-                    p.Owner.BrownTime = Envir.Time + Settings.Minute;
+                if (Env.Time > Master.BrownTime && Master.PKPoints < 200)
+                    p.Owner.BrownTime = Env.Time + Settings.Minute;
             }
 
             if (!ignoreDefence && (p.PType == PoisonType.Green))
@@ -2815,7 +2815,7 @@ namespace Server.MirObjects
 
             if (p.PType == PoisonType.DelayedExplosion)
             {
-                ExplosionInflictedTime = Envir.Time + 4000;
+                ExplosionInflictedTime = Env.Time + 4000;
                 Broadcast(new S.ObjectEffect { ObjectID = ObjectID, Effect = SpellEffect.DelayedExplosion });
             }
             else if (p.PType == PoisonType.Dazed)
@@ -2871,7 +2871,7 @@ namespace Server.MirObjects
                 Skeleton = Harvested,
                 Poison = CurrentPoison,
                 Hidden = Hidden,
-                ShockTime = (ShockTime > 0 ? ShockTime - Envir.Time : 0),
+                ShockTime = (ShockTime > 0 ? ShockTime - Env.Time : 0),
                 BindingShotCenter = BindingShotCenter,
                 Buffs = Buffs.Where(d => d.Info.Visible).Select(e => e.Type).ToList(),
                 MasterObjectId = Master?.ObjectID ?? 0,
@@ -3494,8 +3494,8 @@ namespace Server.MirObjects
 
         public override void SendHealth(HumanObject player)
         {
-            if (!player.IsMember(Master) && !(player.IsMember(EXPOwner) && AutoRev) && Envir.Time > RevTime) return;
-            byte time = Math.Min(byte.MaxValue, (byte)Math.Max(5, (RevTime - Envir.Time) / 1000));
+            if (!player.IsMember(Master) && !(player.IsMember(EXPOwner) && AutoRev) && Env.Time > RevTime) return;
+            byte time = Math.Min(byte.MaxValue, (byte)Math.Max(5, (RevTime - Env.Time) / 1000));
             player.Enqueue(new S.ObjectHealth { ObjectID = ObjectID, Percent = PercentHealth, Expire = time });
         }
 
@@ -3528,9 +3528,9 @@ namespace Server.MirObjects
         {
             int value = GetAttackPower(Stats[Stat.MinSC], Stats[Stat.MaxSC]);
 
-            if (Envir.Random.Next(Settings.PoisonResistWeight) >= target.Stats[Stat.PoisonResist])
+            if (Env.Random.Next(Settings.PoisonResistWeight) >= target.Stats[Stat.PoisonResist])
             {
-                if (Envir.Random.Next(chanceToPoison) == 0)
+                if (Env.Random.Next(chanceToPoison) == 0)
                 {
                     target.ApplyPoison(new Poison { Owner = this, Duration = poisonDuration, PType = poison, Value = value, TickSpeed = poisonTickSpeed }, this, noResist, ignoreDefence);
                 }
@@ -3597,7 +3597,7 @@ namespace Server.MirObjects
 
                         int delay = Functions.MaxDistance(CurrentLocation, ob.CurrentLocation) * 50 + additionalDelay; //50 MS per Step
 
-                        DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + delay, ob, damage, defenceType);
+                        DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + delay, ob, damage, defenceType);
 
                         ActionList.Add(action);
                     }
@@ -3632,7 +3632,7 @@ namespace Server.MirObjects
                         }
 
                         int delay = Functions.MaxDistance(CurrentLocation, ob.CurrentLocation) * 50 + additionalDelay; //50 MS per Step
-                        DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + delay, ob, damage, defenceType);
+                        DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + delay, ob, damage, defenceType);
                         ActionList.Add(action);
                     }
                     else continue;
@@ -3701,7 +3701,7 @@ namespace Server.MirObjects
                             }
 
                             int delay = Functions.MaxDistance(CurrentLocation, ob.CurrentLocation) * 50 + additionalDelay; //50 MS per Step
-                            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + delay, ob, damage, defenceType);
+                            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + delay, ob, damage, defenceType);
                             ActionList.Add(action);
                         }
                         else continue;
@@ -3732,7 +3732,7 @@ namespace Server.MirObjects
                     if (ob.Race != ObjectType.Player && ob.Race != ObjectType.Monster && ob.Race != ObjectType.Hero) continue;
                     if (!ob.IsAttackTarget(this)) continue;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + delay, ob, damage, defenceType);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + delay, ob, damage, defenceType);
                     ActionList.Add(action);
                     break;
                 }
@@ -3760,7 +3760,7 @@ namespace Server.MirObjects
                     if (ob.Race != ObjectType.Player && ob.Race != ObjectType.Monster && ob.Race != ObjectType.Hero) continue;
                     if (!ob.IsAttackTarget(this)) continue;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + delay, ob, damage, defenceType);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + delay, ob, damage, defenceType);
                     ActionList.Add(action);
                     break;
                 }
@@ -3823,7 +3823,7 @@ namespace Server.MirObjects
                             pushed = true;
                         }
 
-                        DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + delay, ob, damage, defenceType);
+                        DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + delay, ob, damage, defenceType);
                         ActionList.Add(action);
                         break;
                     }
@@ -3835,7 +3835,7 @@ namespace Server.MirObjects
         {
             int delay = Functions.MaxDistance(CurrentLocation, Target.CurrentLocation) * 50 + additionalDelay;
 
-            DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + delay, Target, damage, type);
+            DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + delay, Target, damage, type);
             ActionList.Add(action);
         }
 
@@ -3851,17 +3851,17 @@ namespace Server.MirObjects
             {
                 if (Target.Pushed(this, Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation), pushDistance) > 0)
                 {
-                    AttackTime = Envir.Time + AttackSpeed + 300;
+                    AttackTime = Env.Time + AttackSpeed + 300;
                     if (damage == 0) return;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + delay, Target, damage, type);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + delay, Target, damage, type);
                     ActionList.Add(action);
                 }
                 else
                 {
                     if (damage == 0) return;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + delay, Target, damage, type);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + delay, Target, damage, type);
                     ActionList.Add(action);
                 }
             }

@@ -10,9 +10,9 @@ namespace Server.Helpers
     internal static class ChatSystem
     {
 
-         static Envir Envir
+         static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public static void SystemMessage(string chatMessage, bool triggerBroadcastInfo = false)
@@ -22,7 +22,7 @@ namespace Server.Helpers
                 return;
             }
 
-            foreach (var pl in Envir.Players)
+            foreach (var pl in Env.Players)
             {
                 pl.ReceiveChat(chatMessage, ChatType.System);
 

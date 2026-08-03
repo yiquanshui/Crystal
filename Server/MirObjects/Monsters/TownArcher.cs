@@ -11,7 +11,7 @@ namespace Server.MirObjects.Monsters
 
         protected override bool CanMove
         {
-            get { return Route.Count > 0 && !Dead && Envir.Time > MoveTime && Envir.Time > ActionTime && Envir.Time > ShockTime; }
+            get { return Route.Count > 0 && !Dead && Env.Time > MoveTime && Env.Time > ActionTime && Env.Time > ShockTime; }
         }
 
         protected internal TownArcher(MonsterInfo info) : base(info) { }
@@ -38,8 +38,8 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID });
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage == 0) return;
@@ -51,15 +51,15 @@ namespace Server.MirObjects.Monsters
         {
             if (Target == null || !CanAttack) return;
 
-            if (InAttackRange() && Envir.Time < FearTime)
+            if (InAttackRange() && Env.Time < FearTime)
             {
                 Attack();
                 return;
             }
 
-            FearTime = Envir.Time + 2000;
+            FearTime = Env.Time + 2000;
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;

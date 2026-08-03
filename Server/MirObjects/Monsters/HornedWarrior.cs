@@ -37,8 +37,8 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             bool ranged = CurrentLocation == Target.CurrentLocation || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 1);
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
 
             if (HasBuff(BuffType.HornedWarriorShield, out _))
@@ -48,9 +48,9 @@ namespace Server.MirObjects.Monsters
 
             var hpPercent = (HP * 100) / MaxHealth;
 
-            if (Envir.Time > _ShieldTime && hpPercent < 50)
+            if (Env.Time > _ShieldTime && hpPercent < 50)
             {
-                _ShieldTime = Envir.Time + 15000 + Envir.Random.Next(0, 5000);
+                _ShieldTime = Env.Time + 15000 + Env.Random.Next(0, 5000);
 
                 var stats = new Stats
                 {
@@ -68,11 +68,11 @@ namespace Server.MirObjects.Monsters
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage == 0) return;
 
-            if (!ranged && Envir.Random.Next(3) > 0)
+            if (!ranged && Env.Random.Next(3) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility);
                 ActionList.Add(action);
             }
             else
@@ -95,7 +95,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -109,7 +109,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Envir.Random.Next(2)) //No favour
+                switch (Env.Random.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)

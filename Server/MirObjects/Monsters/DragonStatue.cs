@@ -41,7 +41,7 @@ namespace Server.MirObjects.Monsters
 
         protected override void ProcessAI()
         {
-            if (!Dead && Sleeping && Envir.Time > WakeUpTime)
+            if (!Dead && Sleeping && Env.Time > WakeUpTime)
             {
                 Sleeping = false;
                 HP = Stats[Stat.HP];
@@ -78,11 +78,11 @@ namespace Server.MirObjects.Monsters
             if (!CanAttack) return;
             if (!FindNearby(Info.ViewRange)) return;
 
-            ActionList.Add(new DelayedAction(DelayedType.Damage, Envir.Time + 500));
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionList.Add(new DelayedAction(DelayedType.Damage, Env.Time + 500));
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -113,7 +113,7 @@ namespace Server.MirObjects.Monsters
             if (Dead || Sleeping) return;
 
             Sleeping = true;
-            WakeUpTime = Envir.Time + WakeDelay;
+            WakeUpTime = Env.Time + WakeDelay;
         }
     }
 }

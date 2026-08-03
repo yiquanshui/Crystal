@@ -20,25 +20,25 @@ namespace Server.MirObjects.Monsters
             }
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage == 0) return;
 
-            if (Envir.Random.Next(2) > 0)
+            if (Env.Random.Next(2) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 600, Target, damage, DefenceType.ACAgility, false);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 600, Target, damage, DefenceType.ACAgility, false);
                 ActionList.Add(action);
             }
             else
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 600, Target, damage, DefenceType.AC, true);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 600, Target, damage, DefenceType.AC, true);
                 ActionList.Add(action);
             }
         }

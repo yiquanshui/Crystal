@@ -53,18 +53,18 @@ namespace Server.MirObjects.Monsters
         {
             if (Target == null) return;
             //remark: does this mean nobody gets teleported if the main target is standing closeby + does it mean it always try's to teleport the person with lowest x/y coords?)
-            if (Functions.MaxDistance(CurrentLocation, Target.CurrentLocation) > 3 && Envir.Random.Next(10) == 0 && Envir.Time >= RecallTime)
+            if (Functions.MaxDistance(CurrentLocation, Target.CurrentLocation) > 3 && Env.Random.Next(10) == 0 && Env.Time >= RecallTime)
             {
-                RecallTime = Envir.Time + 10000;
+                RecallTime = Env.Time + 10000;
                 List<MapObject> targets = FindAllTargets(30, CurrentLocation);
-                if (targets.Count != 0 && Envir.Random.Next(4) > 0)
+                if (targets.Count != 0 && Env.Random.Next(4) > 0)
                 {
                     for (int i = 0; i < targets.Count; i++)
                     {
                         if (Functions.MaxDistance(CurrentLocation, targets[i].CurrentLocation) > 3)
                         {
-                            if (Envir.Random.Next(Settings.MagicResistWeight) < targets[i].Stats[Stat.MagicResist]) continue;
-                            if (!targets[i].Teleport(CurrentMap, Functions.PointMove(CurrentLocation, (MirDirection)((byte)Envir.Random.Next(7)), 1)))
+                            if (Env.Random.Next(Settings.MagicResistWeight) < targets[i].Stats[Stat.MagicResist]) continue;
+                            if (!targets[i].Teleport(CurrentMap, Functions.PointMove(CurrentLocation, (MirDirection)((byte)Env.Random.Next(7)), 1)))
                             targets[i].Teleport(CurrentMap, CurrentLocation);
                             return;
                         }
@@ -82,7 +82,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -101,8 +101,8 @@ namespace Server.MirObjects.Monsters
             if (damage == 0) return;
 
             ShockTime = 0;
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             bool ranged = CurrentLocation == Target.CurrentLocation || Functions.MaxDistance(CurrentLocation, Target.CurrentLocation) > 2;
             
@@ -117,7 +117,7 @@ namespace Server.MirObjects.Monsters
                 Target = targets[i];
                 if (ranged) Broadcast(new S.ObjectEffect { ObjectID = Target.ObjectID, Effect = SpellEffect.GreatFoxSpirit });
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.MAC);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.MAC);
                 ActionList.Add(action);
             }
         }

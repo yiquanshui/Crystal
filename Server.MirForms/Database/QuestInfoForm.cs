@@ -8,7 +8,7 @@ namespace Server
     {
         public string QuestListPath = Path.Combine(Settings.ExportPath, "QuestList.csv");
 
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
 
         private List<QuestInfo> _selectedQuestInfos;
 
@@ -27,7 +27,7 @@ namespace Server
 
         private void AddButton_Click(object sender, EventArgs e)
         {
-            Envir.CreateQuestInfo();
+            Env.CreateQuestInfo();
 
             if (!string.IsNullOrWhiteSpace(QuestSearchBox.Text))
                 QuestSearchBox.Text = string.Empty;
@@ -35,7 +35,7 @@ namespace Server
             RefreshQuestList(preserveSelection: false);
 
             QuestInfoListBox.ClearSelected();
-            int index = Envir.QuestInfoList.Count - 1;
+            int index = Env.QuestInfoList.Count - 1;
             if (index >= 0)
             {
                 QuestInfoListBox.SelectedIndex = index;
@@ -50,9 +50,9 @@ namespace Server
 
             if (MessageBox.Show("Are you sure you want to remove the selected Quests?", "Remove Quests?", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
 
-            for (int i = 0; i < _selectedQuestInfos.Count; i++) Envir.Remove(_selectedQuestInfos[i]);
+            for (int i = 0; i < _selectedQuestInfos.Count; i++) Env.Remove(_selectedQuestInfos[i]);
 
-            if (Envir.QuestInfoList.Count == 0) Envir.QuestIndex = 0;
+            if (Env.QuestInfoList.Count == 0) Env.QuestIndex = 0;
 
             RefreshQuestList();
             QuestInfoListBox.ClearSelected();
@@ -91,11 +91,11 @@ namespace Server
             if (Convert.ToInt32(RequiredMaxLevelTextBox.Text) <= 0)
                 RequiredMaxLevelTextBox.Text = byte.MaxValue.ToString();
 
-            QuestInfo tempQuest = Envir.QuestInfoList.FirstOrDefault(c => c.Index == info.RequiredQuest);
+            QuestInfo tempQuest = Env.QuestInfoList.FirstOrDefault(c => c.Index == info.RequiredQuest);
 
             RequiredQuestComboBox.Items.Clear();
             RequiredQuestComboBox.Items.Add(new QuestInfo { Index = 0, Name = "None" });
-            RequiredQuestComboBox.Items.AddRange(Envir.QuestInfoList.ToArray());
+            RequiredQuestComboBox.Items.AddRange(Env.QuestInfoList.ToArray());
             RequiredQuestComboBox.SelectedItem = tempQuest ?? RequiredQuestComboBox.Items[0];
             RequiredClassComboBox.SelectedItem = info.RequiredClass;
 
@@ -183,7 +183,7 @@ namespace Server
 
             QuestInfoListBox.Items.Clear();
             // Fast add
-            QuestInfoListBox.Items.AddRange(Envir.QuestInfoList.ToArray());
+            QuestInfoListBox.Items.AddRange(Env.QuestInfoList.ToArray());
 
             // Clear selection, then optionally restore
             QuestInfoListBox.ClearSelected();
@@ -206,7 +206,7 @@ namespace Server
 
         private void QuestInfoForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Envir.SaveDB();
+            Env.SaveDB();
         }
 
         private void PasteMButton_Click(object sender, EventArgs e)
@@ -232,7 +232,7 @@ namespace Server
 
         private void ExportAllButton_Click(object sender, EventArgs e)
         {
-            ExportQuests(Envir.QuestInfoList);
+            ExportQuests(Env.QuestInfoList);
         }
 
         private void ExportSelected_Click(object sender, EventArgs e)
@@ -466,7 +466,7 @@ namespace Server
             QuestInfoListBox.Items.Clear();
 
             // Filter quests based on search text
-            foreach (var quest in Envir.QuestInfoList)
+            foreach (var quest in Env.QuestInfoList)
             {
                 if (!string.IsNullOrEmpty(quest.Name) && quest.Name.ToLower().Contains(searchText) ||
                     !string.IsNullOrEmpty(quest.FileName) && quest.FileName.ToLower().Contains(searchText))

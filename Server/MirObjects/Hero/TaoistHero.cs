@@ -121,7 +121,7 @@ namespace Server.MirObjects
                     return;
                 }
 
-                if (Target.AutoRev == false && Envir.Time > Target.RevTime) 
+                if (Target.AutoRev == false && Env.Time > Target.RevTime) 
                 {
                     magic = GetMagic(Spell.Revelation);
                     if (CanUseMagic(magic) && amuletItem != null)

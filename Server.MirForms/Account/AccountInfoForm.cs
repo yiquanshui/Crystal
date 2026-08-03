@@ -10,7 +10,7 @@ namespace Server
     {
         private List<AccountInfo> _selectedAccountInfos;
 
-        public Envir AccountEnvir => SMain.Envir;
+        public Env AccountEnv => SMain.Env;
         public AccountInfoForm()
         {
             InitializeComponent();
@@ -91,7 +91,7 @@ namespace Server
                 return;
             }
 
-            List<AccountInfo> accounts = SMain.Envir.AccountList;
+            List<AccountInfo> accounts = SMain.Env.AccountList;
 
             long totalGold = accounts
             .Where(account => !account.AdminAccount && !account.Banned)
@@ -107,13 +107,13 @@ namespace Server
             ServerCreditTextBox.Text = totalCredit.ToString("N0", CultureInfo.GetCultureInfo("en-GB"));
 
             if (FilterTextBox.Text.Length > 0)
-                accounts = SMain.Envir.MatchAccounts(FilterTextBox.Text, MatchFilterCheckBox.Checked);
+                accounts = SMain.Env.MatchAccounts(FilterTextBox.Text, MatchFilterCheckBox.Checked);
 
             else if (FilterPlayerTextBox.Text.Length > 0)
-                accounts = SMain.Envir.MatchAccountsByPlayer(FilterPlayerTextBox.Text, MatchFilterCheckBox.Checked);
+                accounts = SMain.Env.MatchAccountsByPlayer(FilterPlayerTextBox.Text, MatchFilterCheckBox.Checked);
 
             else if (FilterIPTextBox.Text.Length > 0)
-                accounts = SMain.Envir.MatchAccountsByIP(FilterIPTextBox.Text, MatchFilterCheckBox.Checked);
+                accounts = SMain.Env.MatchAccountsByIP(FilterIPTextBox.Text, MatchFilterCheckBox.Checked);
 
             if (AccountInfoListView.Items.Count != accounts.Count)
             {
@@ -214,7 +214,7 @@ namespace Server
                     GuildObject guild = null;
                     if (character.GuildIndex != -1)
                     {
-                        guild = AccountEnvir.GetGuild(character.GuildIndex);
+                        guild = AccountEnv.GetGuild(character.GuildIndex);
                         if (guild != null)
                         {
                             listItem.SubItems.Add(guild.Name.ToString());
@@ -229,7 +229,7 @@ namespace Server
 
                     if (character.LastLoginDate > character.LastLogoutDate)
                     {
-                        status = $"Online: {(SMain.Envir.Now - character.LastLoginDate).TotalMinutes.ToString("##")} minutes";
+                        status = $"Online: {(SMain.Env.Now - character.LastLoginDate).TotalMinutes.ToString("##")} minutes";
                         listItem.ForeColor = Color.Green;
                     }
                     else
@@ -257,9 +257,9 @@ namespace Server
 
         private void CreateButton_Click(object sender, EventArgs e)
         {
-            lock (Envir.AccountLock)
+            lock (Env.AccountLock)
             {
-                SMain.Envir.CreateAccountInfo();
+                SMain.Env.CreateAccountInfo();
                 RefreshInterface();
             }
         }
@@ -269,9 +269,9 @@ namespace Server
             if (ActiveControl != sender) return;
             if (_selectedAccountInfos.Count != 1) return;
 
-            lock (Envir.AccountLock)
+            lock (Env.AccountLock)
             {
-                if (SMain.Envir.AccountExists(ActiveControl.Text))
+                if (SMain.Env.AccountExists(ActiveControl.Text))
                 {
                     ActiveControl.BackColor = Color.Red;
                     return;
@@ -348,7 +348,7 @@ namespace Server
         {
             if (MessageBox.Show("Are you sure you want to ban the selected Accounts?", "Ban Selected.", MessageBoxButtons.YesNoCancel) != DialogResult.Yes) return;
 
-            DateTime expiry = SMain.Envir.Now.AddDays(1);
+            DateTime expiry = SMain.Env.Now.AddDays(1);
 
             AccountInfoListView.BeginUpdate();
             for (int i = 0; i < _selectedAccountInfos.Count; i++)
@@ -367,7 +367,7 @@ namespace Server
         {
             if (MessageBox.Show("Are you sure you want to ban the selected Accounts?", "Ban Selected.", MessageBoxButtons.YesNoCancel) != DialogResult.Yes) return;
 
-            DateTime expiry = SMain.Envir.Now.AddDays(7);
+            DateTime expiry = SMain.Env.Now.AddDays(7);
 
             AccountInfoListView.BeginUpdate();
             for (int i = 0; i < _selectedAccountInfos.Count; i++)
@@ -460,9 +460,9 @@ namespace Server
 
         private void AccountInfoForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (SMain.Envir.Running) return;
+            if (SMain.Env.Running) return;
 
-            SMain.Envir.SaveAccounts();
+            SMain.Env.SaveAccounts();
         }
 
         private void AdminCheckBox_CheckedChanged(object sender, EventArgs e)
@@ -481,7 +481,7 @@ namespace Server
 
         private void WipeCharButton_Click(object sender, EventArgs e)
         {
-            if (SMain.Envir.Running)
+            if (SMain.Env.Running)
             {
                 MessageBox.Show("Cannot wipe characters whilst the server is running", "Notice",
                 MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
@@ -491,15 +491,15 @@ namespace Server
             if (MessageBox.Show("Are you sure you want to wipe all characters from the database?", "Notice",
                  MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
             {
-                for (int i = 0; i < SMain.Envir.AccountList.Count; i++)
+                for (int i = 0; i < SMain.Env.AccountList.Count; i++)
                 {
-                    AccountInfo account = SMain.Envir.AccountList[i];
+                    AccountInfo account = SMain.Env.AccountList[i];
 
                     account.Characters.Clear();
                 }
 
-                SMain.Envir.Auctions.Clear();
-                SMain.Envir.GuildList.Clear();
+                SMain.Env.Auctions.Clear();
+                SMain.Env.GuildList.Clear();
 
                 MessageBox.Show("All characters and associated data has been cleared", "Notice", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
@@ -627,9 +627,9 @@ namespace Server
                     AccountInfo accInfo = (AccountInfo)AccountInfoListView.SelectedItems[0].Tag;
 
                     // Remove the selected account from AccountList
-                    if (SMain.Envir.AccountList.Contains(accInfo))
+                    if (SMain.Env.AccountList.Contains(accInfo))
                     {
-                        SMain.Envir.AccountList.Remove(accInfo);
+                        SMain.Env.AccountList.Remove(accInfo);
                     }
 
                     // Remove the selected item from AccountInfoListView

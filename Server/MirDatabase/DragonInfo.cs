@@ -5,9 +5,9 @@ namespace Server.MirDatabase
 {
     public class DragonInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         protected static MessageQueue MessageQueue
@@ -165,7 +165,7 @@ namespace Server.MirDatabase
                 else
                 {
                     if (parts.Length < 3) return null;
-                    info.Item = Envir.GetItemInfo(parts[1]);
+                    info.Item = Env.GetItemInfo(parts[1]);
                     if (info.Item == null) return null;
                     if (!byte.TryParse(parts[2], out info.level)) return null;
                 }

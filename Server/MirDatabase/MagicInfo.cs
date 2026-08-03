@@ -5,9 +5,9 @@ namespace Server.MirDatabase
 {
     public class MagicInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public string Name;
@@ -87,9 +87,9 @@ namespace Server.MirDatabase
 
     public class UserMagic
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public Spell Spell;
@@ -102,9 +102,9 @@ namespace Server.MirDatabase
 
         private MagicInfo GetMagicInfo(Spell spell)
         {
-            for (int i = 0; i < Envir.MagicInfoList.Count; i++)
+            for (int i = 0; i < Env.MagicInfoList.Count; i++)
             {
-                MagicInfo info = Envir.MagicInfoList[i];
+                MagicInfo info = Env.MagicInfoList[i];
                 if (info.Spell != spell) continue;
                 return info;
             }
@@ -173,7 +173,7 @@ namespace Server.MirDatabase
                     IsTempSpell = IsTempSpell,
                     Delay = GetDelay(),
                     Range = Info.Range,
-                    CastTime = CastTime - Envir.Time
+                    CastTime = CastTime - Env.Time
             };
         }
 
@@ -196,7 +196,7 @@ namespace Server.MirDatabase
         {
             if (Info.MPowerBonus > 0)
             {
-                return Envir.Random.Next(Info.MPowerBase, Info.MPowerBonus + Info.MPowerBase);
+                return Env.Random.Next(Info.MPowerBase, Info.MPowerBonus + Info.MPowerBase);
             }
             else
                 return Info.MPowerBase;
@@ -205,7 +205,7 @@ namespace Server.MirDatabase
         {
             if (Info.PowerBonus > 0)
             {
-                return Envir.Random.Next(Info.PowerBase, Info.PowerBonus + Info.PowerBase);
+                return Env.Random.Next(Info.PowerBase, Info.PowerBonus + Info.PowerBase);
             }
             else
                 return Info.PowerBase;

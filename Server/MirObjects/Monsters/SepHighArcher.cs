@@ -32,8 +32,8 @@ namespace Server.MirObjects.Monsters
             }
 
             ShockTime = 0;
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage == 0) return;
@@ -45,7 +45,7 @@ namespace Server.MirObjects.Monsters
             int delay = distance * 50 + 500; //50 MS per Step
 
 
-            if (Envir.Random.Next(3) == 0 && Functions.InRange(CurrentLocation, Target.CurrentLocation, 2))
+            if (Env.Random.Next(3) == 0 && Functions.InRange(CurrentLocation, Target.CurrentLocation, 2))
             {
                 Broadcast(new S.ObjectMagic { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Spell = Spell.BackStep, TargetID = Target.ObjectID, Target = Target.CurrentLocation, Cast = true, Level = 3 });
                 int travel = 0;
@@ -92,7 +92,7 @@ namespace Server.MirObjects.Monsters
             bool hasPoisonBuff = (Buffs.Where(x => x.Type == BuffType.PoisonShot).ToList().Count() > 0);
 
 
-            if (hasPoisonBuff && Envir.Random.Next(2) == 0)
+            if (hasPoisonBuff && Env.Random.Next(2) == 0)
             {
                 Broadcast(new S.ObjectMagic { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Spell = Spell.CrippleShot, TargetID = Target.ObjectID, Target = Target.CurrentLocation, Cast = true, Level = 3 });
 
@@ -121,7 +121,7 @@ namespace Server.MirObjects.Monsters
                                 targetob.Attacked(this, damage, DefenceType.MAC);
                                 targetob.ApplyPoison(new Poison
                                 {
-                                    Duration = (Envir.Random.Next(1, 3) + 1) * 7,
+                                    Duration = (Env.Random.Next(1, 3) + 1) * 7,
                                     Owner = this,
                                     PType = PoisonType.Green,
                                     TickSpeed = 2000,
@@ -138,7 +138,7 @@ namespace Server.MirObjects.Monsters
 
 
             Broadcast(new S.ObjectMagic { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Spell = Spell.PoisonShot, TargetID = Target.ObjectID, Target = Target.CurrentLocation, Cast = true, Level = 3 });
-            if (Envir.Random.Next(10) <= 4)
+            if (Env.Random.Next(10) <= 4)
             {
                 if (!hasPoisonBuff)
                 {
@@ -146,7 +146,7 @@ namespace Server.MirObjects.Monsters
                 }
             }
 
-            action = new DelayedAction(DelayedType.Damage, Envir.Time + delay, Target, damage, DefenceType.ACAgility);
+            action = new DelayedAction(DelayedType.Damage, Env.Time + delay, Target, damage, DefenceType.ACAgility);
             ActionList.Add(action);
 
             if (Target.Dead)
@@ -161,8 +161,8 @@ namespace Server.MirObjects.Monsters
             {
                 if (CurrentLocation == Target.CurrentLocation)
                 {
-                    MirDirection direction = (MirDirection)Envir.Random.Next(8);
-                    int rotation = Envir.Random.Next(2) == 0 ? 1 : -1;
+                    MirDirection direction = (MirDirection)Env.Random.Next(8);
+                    int rotation = Env.Random.Next(2) == 0 ? 1 : -1;
 
                     for (int d = 0; d < 8; d++)
                     {
@@ -177,15 +177,15 @@ namespace Server.MirObjects.Monsters
 
             if (!CanAttack) return;
 
-            if (InAttackRange() && Envir.Time < FearTime)
+            if (InAttackRange() && Env.Time < FearTime)
             {
                 Attack();
                 return;
             }
 
-            FearTime = Envir.Time + 5000;
+            FearTime = Env.Time + 5000;
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -199,7 +199,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Envir.Random.Next(2)) //No favour
+                switch (Env.Random.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)
@@ -301,9 +301,9 @@ namespace Server.MirObjects.Monsters
             }
 
 
-            CellTime = Envir.Time + 500;
-            ActionTime = Envir.Time + 300;
-            MoveTime = Envir.Time + MoveSpeed;
+            CellTime = Env.Time + 500;
+            ActionTime = Env.Time + 300;
+            MoveTime = Env.Time + MoveSpeed;
             if (MoveTime > AttackTime)
                 AttackTime = MoveTime;
 
@@ -352,7 +352,7 @@ namespace Server.MirObjects.Monsters
             Master = null;
 
             PoisonList.Clear();
-            Envir.MonsterCount--;
+            Env.MonsterCount--;
 
             if (CurrentMap != null)
                 CurrentMap.MonsterCount--;
@@ -378,10 +378,10 @@ namespace Server.MirObjects.Monsters
                 Name = master != null ? master.Name : Name,
                 NameColour = NameColour,
                 Class = MirClass.Archer,
-                Gender = master != null ? master.Gender : Envir.Random.Next(2) == 0 ? MirGender.Male : MirGender.Female,
+                Gender = master != null ? master.Gender : Env.Random.Next(2) == 0 ? MirGender.Male : MirGender.Female,
                 Location = CurrentLocation,
                 Direction = Direction,
-                Hair = master != null ? master.Hair : (byte)Envir.Random.Next(0, 5),
+                Hair = master != null ? master.Hair : (byte)Env.Random.Next(0, 5),
                 Weapon = 218,
                 Armour = 41,
                 Light = master != null ? master.Light : Light,

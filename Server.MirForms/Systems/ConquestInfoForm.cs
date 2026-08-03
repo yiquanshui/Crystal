@@ -5,7 +5,7 @@ namespace Server
 {
     public partial class ConquestInfoForm : Form
     {
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
 
         private ConquestInfo selectedConquest;
         private ConquestArcherInfo selectedArcher;
@@ -19,30 +19,30 @@ namespace Server
         {
             InitializeComponent();
 
-            for (int i = 0; i < Envir.MapInfoList.Count; i++)
+            for (int i = 0; i < Env.MapInfoList.Count; i++)
             {
-                ConquestMap_combo.Items.Add(Envir.MapInfoList[i]);
-                PalaceMap_combo.Items.Add(Envir.MapInfoList[i]);
-                ExtraMaps_combo.Items.Add(Envir.MapInfoList[i]);
+                ConquestMap_combo.Items.Add(Env.MapInfoList[i]);
+                PalaceMap_combo.Items.Add(Env.MapInfoList[i]);
+                ExtraMaps_combo.Items.Add(Env.MapInfoList[i]);
             }
 
             WarType_combo.Items.AddRange(Enum.GetValues(typeof(ConquestType)).Cast<object>().ToArray());
             WarMode_combo.Items.AddRange(Enum.GetValues(typeof(ConquestGame)).Cast<object>().ToArray());
             WarType_combo.Items.Remove(ConquestType.Forced);
 
-            for (int i = 0; i < Envir.MonsterInfoList.Count; i++)
+            for (int i = 0; i < Env.MonsterInfoList.Count; i++)
             {
-                if (Envir.MonsterInfoList[i].AI == 80)
-                    ArcherIndex_combo.Items.Add(Envir.MonsterInfoList[i]);
+                if (Env.MonsterInfoList[i].AI == 80)
+                    ArcherIndex_combo.Items.Add(Env.MonsterInfoList[i]);
 
-                if (Envir.MonsterInfoList[i].AI == 81)
-                    GateIndex_combo.Items.Add(Envir.MonsterInfoList[i]);
+                if (Env.MonsterInfoList[i].AI == 81)
+                    GateIndex_combo.Items.Add(Env.MonsterInfoList[i]);
 
-                if (Envir.MonsterInfoList[i].AI == 82)
-                    WallIndex_combo.Items.Add(Envir.MonsterInfoList[i]);
+                if (Env.MonsterInfoList[i].AI == 82)
+                    WallIndex_combo.Items.Add(Env.MonsterInfoList[i]);
 
-                if (Envir.MonsterInfoList[i].AI == 213)
-                    SiegeIndex_combo.Items.Add(Envir.MonsterInfoList[i]);
+                if (Env.MonsterInfoList[i].AI == 213)
+                    SiegeIndex_combo.Items.Add(Env.MonsterInfoList[i]);
             }
 
             UpdateInterface();
@@ -64,7 +64,7 @@ namespace Server
             if (selectedArcher != null)
             {
                 Archer_gb.Enabled = true;
-                ArcherIndex_combo.SelectedItem = Envir.MonsterInfoList.FirstOrDefault(x => x.Index == selectedArcher.MobIndex);
+                ArcherIndex_combo.SelectedItem = Env.MonsterInfoList.FirstOrDefault(x => x.Index == selectedArcher.MobIndex);
                 ArchXLoc_textbox.Text = selectedArcher.Location.X.ToString();
                 ArchYLoc_textbox.Text = selectedArcher.Location.Y.ToString();
                 ArcherName_textbox.Text = selectedArcher.Name;
@@ -105,7 +105,7 @@ namespace Server
             if (selectedGate != null)
             {
                 Gates_gb.Enabled = true;
-                GateIndex_combo.SelectedItem = Envir.MonsterInfoList.FirstOrDefault(x => x.Index == selectedGate.MobIndex);
+                GateIndex_combo.SelectedItem = Env.MonsterInfoList.FirstOrDefault(x => x.Index == selectedGate.MobIndex);
                 GateXLoc_textbox.Text = selectedGate.Location.X.ToString();
                 GateYLoc_textbox.Text = selectedGate.Location.Y.ToString();
                 GateName_textbox.Text = selectedGate.Name;
@@ -127,7 +127,7 @@ namespace Server
             if (selectedWall != null)
             {
                 Walls_gb.Enabled = true;
-                WallIndex_combo.SelectedItem = Envir.MonsterInfoList.FirstOrDefault(x => x.Index == selectedWall.MobIndex);
+                WallIndex_combo.SelectedItem = Env.MonsterInfoList.FirstOrDefault(x => x.Index == selectedWall.MobIndex);
                 WallXLoc_textbox.Text = selectedWall.Location.X.ToString();
                 WallYLoc_textbox.Text = selectedWall.Location.Y.ToString();
                 WallName_textbox.Text = selectedWall.Name;
@@ -149,7 +149,7 @@ namespace Server
             if (selectedSiege != null)
             {
                 Siege_gb.Enabled = true;
-                SiegeIndex_combo.SelectedItem = Envir.MonsterInfoList.FirstOrDefault(x => x.Index == selectedSiege.MobIndex);
+                SiegeIndex_combo.SelectedItem = Env.MonsterInfoList.FirstOrDefault(x => x.Index == selectedSiege.MobIndex);
                 SiegeXLoc_textbox.Text = selectedSiege.Location.X.ToString();
                 SiegeYLoc_textbox.Text = selectedSiege.Location.Y.ToString();
                 SiegeName_textbox.Text = selectedSiege.Name;
@@ -188,13 +188,13 @@ namespace Server
 
         private void UpdateInterface()
         {
-            if (ConquestInfoListBox.Items.Count != Envir.ConquestInfoList.Count)
+            if (ConquestInfoListBox.Items.Count != Env.ConquestInfoList.Count)
             {
                 ConquestInfoListBox.Items.Clear();
 
-                for (int i = 0; i < Envir.ConquestInfoList.Count; i++)
+                for (int i = 0; i < Env.ConquestInfoList.Count; i++)
                 {
-                    ConquestInfoListBox.Items.Add(Envir.ConquestInfoList[i]);
+                    ConquestInfoListBox.Items.Add(Env.ConquestInfoList[i]);
                 }
             }
 
@@ -213,8 +213,8 @@ namespace Server
                 ObLocX_textbox.Text = selectedConquest.KingLocation.X.ToString();
                 ObLocY_textbox.Text = selectedConquest.KingLocation.Y.ToString();
                 ObSize_textbox.Text = selectedConquest.KingSize.ToString();
-                ConquestMap_combo.SelectedItem = Envir.MapInfoList.FirstOrDefault(x => x.Index == selectedConquest.MapIndex);
-                PalaceMap_combo.SelectedItem = Envir.MapInfoList.FirstOrDefault(x => x.Index == selectedConquest.PalaceIndex);
+                ConquestMap_combo.SelectedItem = Env.MapInfoList.FirstOrDefault(x => x.Index == selectedConquest.MapIndex);
+                PalaceMap_combo.SelectedItem = Env.MapInfoList.FirstOrDefault(x => x.Index == selectedConquest.PalaceIndex);
                 WarMode_combo.SelectedItem = selectedConquest.Game;
                 WarType_combo.SelectedItem = selectedConquest.Type;
                 WarLength_num.Value = selectedConquest.WarLength;
@@ -242,7 +242,7 @@ namespace Server
 
                 for (int i = 0; i < selectedConquest.ExtraMaps.Count; i++)
                 {
-                    Maps_listbox.Items.Add(Envir.MapInfoList.FirstOrDefault(x => x.Index == selectedConquest.ExtraMaps[i]));
+                    Maps_listbox.Items.Add(Env.MapInfoList.FirstOrDefault(x => x.Index == selectedConquest.ExtraMaps[i]));
                 }
 
                 for (int i = 0; i < selectedConquest.ConquestGates.Count; i++)
@@ -321,7 +321,7 @@ namespace Server
 
         private void AddConq_button_Click(object sender, EventArgs e)
         {
-            Envir.ConquestInfoList.Add(new ConquestInfo { Index = ++Envir.ConquestIndex, Location = new Point(0, 0), Size = 10, Name = "Conquest Wall", MapIndex = 1, PalaceIndex = 2});
+            Env.ConquestInfoList.Add(new ConquestInfo { Index = ++Env.ConquestIndex, Location = new Point(0, 0), Size = 10, Name = "Conquest Wall", MapIndex = 1, PalaceIndex = 2});
             UpdateInterface();
         }
 
@@ -358,7 +358,7 @@ namespace Server
 
         private void ConquestInfoForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Envir.SaveDB();
+            Env.SaveDB();
         }
 
         private void Name_textbox_TextChanged(object sender, EventArgs e)
@@ -761,9 +761,9 @@ namespace Server
 
             if (MessageBox.Show("Are you sure you want to remove the selected Conquest?", "Remove Items?", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
 
-            Envir.ConquestInfoList.Remove(selectedConquest);
+            Env.ConquestInfoList.Remove(selectedConquest);
 
-            if (Envir.ConquestInfoList.Count == 0) Envir.ConquestIndex = 0;
+            if (Env.ConquestInfoList.Count == 0) Env.ConquestIndex = 0;
 
             UpdateInterface();
         }

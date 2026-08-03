@@ -10,7 +10,7 @@ namespace Server.MirObjects.Monsters
         protected internal Hugger(MonsterInfo info)
             : base(info)
         {
-            ExplosionTime = Envir.Time + 1000 * 60 * 5;
+            ExplosionTime = Env.Time + 1000 * 60 * 5;
         }
 
         protected override void ProcessTarget()
@@ -22,7 +22,7 @@ namespace Server.MirObjects.Monsters
                 Die(); return;
             }
 
-            if (Envir.Time > ExplosionTime)
+            if (Env.Time > ExplosionTime)
             {
                 Die(); return;
             }
@@ -37,7 +37,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -48,7 +48,7 @@ namespace Server.MirObjects.Monsters
 
         public override void Die()
         {
-            ActionList.Add(new DelayedAction(DelayedType.Die, Envir.Time + 500));
+            ActionList.Add(new DelayedAction(DelayedType.Die, Env.Time + 500));
             base.Die();
         }
 

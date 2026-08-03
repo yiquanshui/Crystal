@@ -6,9 +6,9 @@ namespace Server.MirObjects
 {
     public class ConquestObject
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public ConquestGuildInfo GuildInfo;
@@ -273,7 +273,7 @@ namespace Server.MirObjects
                 }
             }
 
-            PalaceMap = Envir.GetMap(Info.PalaceIndex);
+            PalaceMap = Env.GetMap(Info.PalaceIndex);
 
             if (PalaceMap != null)
             {
@@ -290,7 +290,7 @@ namespace Server.MirObjects
             Map temp;
             for (int i = 0; i < Info.ExtraMaps.Count; i++)
             {
-                temp = Envir.GetMap(Info.ExtraMaps[i]);
+                temp = Env.GetMap(Info.ExtraMaps[i]);
                 if (temp == null) continue;
 
                 for (int j = 0; j < temp.NPCs.Count; j++)
@@ -319,7 +319,7 @@ namespace Server.MirObjects
             {
                 if (StartType == ConquestType.Forced)
                 {
-                    WarStartTime = Envir.Now;
+                    WarStartTime = Env.Now;
                     WarEndTime = WarStartTime.AddMinutes(Info.WarLength);
                     GameType = Info.Game;
                 }
@@ -380,7 +380,7 @@ namespace Server.MirObjects
                 ConquestMap.Players[j].CheckConquest();
             }
 
-            PalaceMap = Envir.GetMap(Info.PalaceIndex);
+            PalaceMap = Env.GetMap(Info.PalaceIndex);
             if (PalaceMap != null)
             {
                 if (show)
@@ -401,7 +401,7 @@ namespace Server.MirObjects
             Map temp;
             for (int i = 0; i < Info.ExtraMaps.Count; i++)
             {
-                temp = Envir.GetMap(Info.ExtraMaps[i]);
+                temp = Env.GetMap(Info.ExtraMaps[i]);
 
                 if (temp == null) continue;
 
@@ -441,7 +441,7 @@ namespace Server.MirObjects
 
         public bool CheckDay()
         {
-            switch (Envir.Now.DayOfWeek.ToString())
+            switch (Env.Now.DayOfWeek.ToString())
             {
                 case "Monday":
                     return Info.Monday;
@@ -466,9 +466,9 @@ namespace Server.MirObjects
         {
             int start = ((Info.StartHour * 60));
             int finish = ((Info.StartHour * 60) + Info.WarLength);
-            int now = ((Envir.Now.Hour * 60) + Envir.Now.Minute);
+            int now = ((Env.Now.Hour * 60) + Env.Now.Minute);
 
-            if (WarIsOn && StartType == ConquestType.Forced && WarEndTime <= Envir.Now)
+            if (WarIsOn && StartType == ConquestType.Forced && WarEndTime <= Env.Now)
             {
                 EndWar(Info.Game);
             }
@@ -502,12 +502,12 @@ namespace Server.MirObjects
                 }
             }
 
-            ScheduleTimer = Envir.Time + Settings.Minute;
+            ScheduleTimer = Env.Time + Settings.Minute;
         }
 
         public void Process()
         {
-            if (ScheduleTimer < Envir.Time) AutoSchedule();
+            if (ScheduleTimer < Env.Time) AutoSchedule();
             if (WarIsOn && (GameType == ConquestGame.KingOfHill || GameType == ConquestGame.Classic || GameType == ConquestGame.ControlPoints)) ScorePoints();
         }
 
@@ -772,16 +772,16 @@ namespace Server.MirObjects
                                 int tempInt;
 
                                 //Check Scores
-                                for (int i = 0; i < Envir.Guilds.Count; i++)
+                                for (int i = 0; i < Env.Guilds.Count; i++)
                                 {
-                                    controlFlagPoints.TryGetValue(Envir.Guilds[i], out points);
+                                    controlFlagPoints.TryGetValue(Env.Guilds[i], out points);
                                     if (tempWinning != null)
                                         controlFlagPoints.TryGetValue(tempWinning, out tempInt);
                                     else tempInt = 0;
 
                                     if (points > tempInt)
                                     {
-                                        tempWinning = Envir.Guilds[i];
+                                        tempWinning = Env.Guilds[i];
                                     }
                                 }
 
@@ -845,16 +845,16 @@ namespace Server.MirObjects
                             int tempInt;
 
                             //Check Scores
-                            for (int i = 0; i < Envir.Guilds.Count; i++)
+                            for (int i = 0; i < Env.Guilds.Count; i++)
                             {
-                                KingPoints.TryGetValue(Envir.Guilds[i], out points);
+                                KingPoints.TryGetValue(Env.Guilds[i], out points);
                                 if (tempWinning != null)
                                     KingPoints.TryGetValue(tempWinning, out tempInt);
                                 else tempInt = 0;
 
                                 if (points > tempInt)
                                 {
-                                    tempWinning = Envir.Guilds[i];
+                                    tempWinning = Env.Guilds[i];
                                 }
                             }
 
@@ -908,7 +908,7 @@ namespace Server.MirObjects
         {
             WarIsOn = true;
 
-            foreach (var pl in Envir.Players)
+            foreach (var pl in Env.Players)
                 pl.BroadcastInfo();
         }
 
@@ -962,7 +962,7 @@ namespace Server.MirObjects
                     break;
             }
 
-            foreach (var pl in Envir.Players)
+            foreach (var pl in Env.Players)
                 pl.BroadcastInfo();
         }
     }

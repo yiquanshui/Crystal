@@ -33,25 +33,25 @@ namespace Server.MirObjects.Monsters
 
         protected override void ProcessAI()
         {
-            if (!Dead && Envir.Time > VisibleTime)
+            if (!Dead && Env.Time > VisibleTime)
             {
-                VisibleTime = Envir.Time + 2000;
+                VisibleTime = Env.Time + 2000;
 
                 bool visible = FindNearby(3);
 
                 if (!Visible && visible)
                 {
                     Visible = true;
-                    CellTime = Envir.Time + 500;
+                    CellTime = Env.Time + 500;
                     Broadcast(GetInfo());
                     Broadcast(new S.ObjectShow { ObjectID = ObjectID });
-                    ActionTime = Envir.Time + 1000;
+                    ActionTime = Env.Time + 1000;
                 }
 
                 if (Visible && !visible)
                 {
                     Visible = false;
-                    VisibleTime = Envir.Time + 3000;
+                    VisibleTime = Env.Time + 3000;
 
                     Broadcast(new S.ObjectHide { ObjectID = ObjectID });
 

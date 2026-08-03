@@ -30,14 +30,14 @@ namespace Server.MirObjects.Monsters
             {
                 if (CanAttack)
                 {
-                    if (Envir.Random.Next(5) == 0)
+                    if (Env.Random.Next(5) == 0)
                         RangeAttack();
                 }
 
                 if (CurrentLocation == Target.CurrentLocation)
                 {
-                    MirDirection direction = (MirDirection)Envir.Random.Next(8);
-                    int rotation = Envir.Random.Next(2) == 0 ? 1 : -1;
+                    MirDirection direction = (MirDirection)Env.Random.Next(8);
+                    int rotation = Env.Random.Next(2) == 0 ? 1 : -1;
 
                     for (int d = 0; d < 8; d++)
                     {
@@ -52,7 +52,7 @@ namespace Server.MirObjects.Monsters
 
             if (!CanAttack) return;
 
-            if (Envir.Random.Next(5) > 0)
+            if (Env.Random.Next(5) > 0)
             {
                 if (InAttackRange())
                     Attack();
@@ -140,9 +140,9 @@ namespace Server.MirObjects.Monsters
             }
 
 
-            CellTime = Envir.Time + 500;
-            ActionTime = Envir.Time + 300;
-            MoveTime = Envir.Time + MoveSpeed;
+            CellTime = Env.Time + 500;
+            ActionTime = Env.Time + 300;
+            MoveTime = Env.Time + MoveSpeed;
             if (MoveTime > AttackTime)
                 AttackTime = MoveTime;
 
@@ -177,8 +177,8 @@ namespace Server.MirObjects.Monsters
             }
 
             ShockTime = 0;
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage == 0) return;
@@ -199,8 +199,8 @@ namespace Server.MirObjects.Monsters
             }
 
             ShockTime = 0;
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage == 0) return;
@@ -236,7 +236,7 @@ namespace Server.MirObjects.Monsters
             Master = null;
 
             PoisonList.Clear();
-            Envir.MonsterCount--;
+            Env.MonsterCount--;
 
             if (CurrentMap != null)
                 CurrentMap.MonsterCount--;
@@ -262,10 +262,10 @@ namespace Server.MirObjects.Monsters
                 Name = master != null ? master.Name : Name,
                 NameColour = NameColour,
                 Class = MirClass.Assassin,
-                Gender = master != null ? master.Gender : Envir.Random.Next(2) == 0 ? MirGender.Male : MirGender.Female,
+                Gender = master != null ? master.Gender : Env.Random.Next(2) == 0 ? MirGender.Male : MirGender.Female,
                 Location = CurrentLocation,
                 Direction = Direction,
-                Hair = master != null ? master.Hair : (byte)Envir.Random.Next(0, 5),
+                Hair = master != null ? master.Hair : (byte)Env.Random.Next(0, 5),
                 Weapon = 106,
                 Armour = 22,
                 Light = master != null ? master.Light : Light,

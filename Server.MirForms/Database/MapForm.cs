@@ -5,18 +5,18 @@ namespace Server.MirForms
 {
     public static class ConvertMapInfo
     {
-        public static Envir EditEnvir = null;
+        public static Env EditEnv = null;
 
         public static string Path = string.Empty;
 
         private static List<String> errors = new List<String>();
 
-        public static void Start(Envir envirToUpdate)
+        public static void Start(Env envToUpdate)
         {
             if (Path == string.Empty) return;
-            EditEnvir = envirToUpdate;
+            EditEnv = envToUpdate;
 
-            if (EditEnvir == null) return;
+            if (EditEnv == null) return;
 
             var lines = File.ReadAllLines(Path);
             for (int i = 0; i < lines.Length; i++)
@@ -36,9 +36,9 @@ namespace Server.MirForms
                     string[] b = a[0].Split(' ');
                     string fileName = b[0].TrimStart('[');// Assign MapFile from variable and trim leading '[' char
                     MapInfo newMapInfo = null;
-                    if ((newMapInfo = EditEnvir.MapInfoList.FirstOrDefault(it => it.FileName == fileName)) == null)
+                    if ((newMapInfo = EditEnv.MapInfoList.FirstOrDefault(it => it.FileName == fileName)) == null)
                     {
-                        newMapInfo = new MirDatabase.MapInfo { Index = ++EditEnvir.MapIndex, FileName = fileName };
+                        newMapInfo = new MirDatabase.MapInfo { Index = ++EditEnv.MapIndex, FileName = fileName };
                         isNew=true;
                     }
                     newMapInfo.Title = b[1].Replace("*", " "); // Assign MapName from variable, replacing asterisk with space
@@ -183,21 +183,21 @@ namespace Server.MirForms
                     else if (mapAttributes.Any(s => s.Contains("DARK".ToUpper()))) // DARK = Night
                         newMapInfo.Light = LightSetting.Night;
 
-                    if(isNew) EditEnvir.MapInfoList.Add(newMapInfo); // Add map to list
+                    if(isNew) EditEnv.MapInfoList.Add(newMapInfo); // Add map to list
                 }
                 else if (lines[i].StartsWith(";")) continue;
                 else
                     continue;
             }
 
-            for (int j = 0; j < EditEnvir.MapInfoList.Count; j++)
+            for (int j = 0; j < EditEnv.MapInfoList.Count; j++)
             {
-                EditEnvir.MapInfoList[j].Movements.Clear();
+                EditEnv.MapInfoList[j].Movements.Clear();
                 for (int k = 0; k < lines.Length; k++)
                 {
                     try
                     {
-                        if (lines[k].StartsWith(EditEnvir.MapInfoList[j].FileName + " "))
+                        if (lines[k].StartsWith(EditEnv.MapInfoList[j].FileName + " "))
                         {
                             MirDatabase.MovementInfo newMovement = new MirDatabase.MovementInfo();
 
@@ -280,20 +280,20 @@ namespace Server.MirForms
                             string[] e = c[2].Split(',');
 
 
-                            var toMapIndex = EditEnvir.MapInfoList.FindIndex(a => a.FileName == c[3]); //check existing maps for the connection info
+                            var toMapIndex = EditEnv.MapInfoList.FindIndex(a => a.FileName == c[3]); //check existing maps for the connection info
                             var toMap = -1;
 
                             if (toMapIndex >= 0)
                             {
-                                toMap = EditEnvir.MapInfoList[toMapIndex].Index; //get real index
+                                toMap = EditEnv.MapInfoList[toMapIndex].Index; //get real index
                             }
                             if (toMap < 0)
                             {
-                                toMapIndex = EditEnvir.MapInfoList.FindIndex(a => a.FileName.ToString() == c[3]);
+                                toMapIndex = EditEnv.MapInfoList.FindIndex(a => a.FileName.ToString() == c[3]);
 
                                 if (toMapIndex >= 0)
                                 {
-                                    toMap = EditEnvir.MapInfoList[toMapIndex].Index;
+                                    toMap = EditEnv.MapInfoList[toMapIndex].Index;
                                 }
                             }
 
@@ -310,7 +310,7 @@ namespace Server.MirForms
                             //NeedMove
                             //ConquestIndex
                             
-                            EditEnvir.MapInfoList[j].Movements.Add(newMovement);
+                            EditEnv.MapInfoList[j].Movements.Add(newMovement);
                         }
                     }
                     catch (Exception)
@@ -319,9 +319,9 @@ namespace Server.MirForms
                     }
                 }
             }
-            for (int j = 0; j < EditEnvir.MapInfoList.Count; j++)
+            for (int j = 0; j < EditEnv.MapInfoList.Count; j++)
             {
-                EditEnvir.MapInfoList[j].MineZones.Clear();
+                EditEnv.MapInfoList[j].MineZones.Clear();
                 for (int k = 0; k < lines.Length; k++)
                 {
                     if (!lines[k].StartsWith("MINEZONE")) continue;
@@ -329,7 +329,7 @@ namespace Server.MirForms
 
                     try
                     {
-                        if (line[1] == EditEnvir.MapInfoList[j].FileName)
+                        if (line[1] == EditEnv.MapInfoList[j].FileName)
                         {
                             MineZone newMineInfo = new MineZone
                             {
@@ -337,15 +337,15 @@ namespace Server.MirForms
                                 Location = new Point(Convert.ToInt16(line[4]), Convert.ToInt16(line[5])),
                                 Size = Convert.ToUInt16(line[6])
                             };
-                            EditEnvir.MapInfoList[j].MineZones.Add(newMineInfo);
+                            EditEnv.MapInfoList[j].MineZones.Add(newMineInfo);
                         }
                     }
                     catch (Exception) { continue; }
                 }
             }
-            for (int j = 0; j < EditEnvir.MapInfoList.Count; j++)
+            for (int j = 0; j < EditEnv.MapInfoList.Count; j++)
             {
-                EditEnvir.MapInfoList[j].SafeZones.Clear();
+                EditEnv.MapInfoList[j].SafeZones.Clear();
                 for (int k = 0; k < lines.Length; k++)
                 {
                     //STARTZONE(0,150,150,50) || SAFEZONE(0,150,150,50)
@@ -354,17 +354,17 @@ namespace Server.MirForms
                     var head = line[0].Split('('); // STARTZONE(0 -> STARTZONE || 0
                     try
                     {
-                        if (head[1] == EditEnvir.MapInfoList[j].FileName)
+                        if (head[1] == EditEnv.MapInfoList[j].FileName)
                         {
                             MirDatabase.SafeZoneInfo newSafeZone = new MirDatabase.SafeZoneInfo
                             {
-                                Info = EditEnvir.MapInfoList[j],
+                                Info = EditEnv.MapInfoList[j],
                                 StartPoint = head[0].Equals("STARTZONE"),
                                 Location = new Point(Convert.ToInt16(line[2]), Convert.ToInt16(line[3])),
                                 Size = Convert.ToUInt16(line[1])
                             };
-                            if (!EditEnvir.MapInfoList[j].SafeZones.Exists(sz => sz.StartPoint == newSafeZone.StartPoint && sz.Location.X == newSafeZone.Location.X && sz.Location.Y == newSafeZone.Location.Y))
-                                EditEnvir.MapInfoList[j].SafeZones.Add(newSafeZone);
+                            if (!EditEnv.MapInfoList[j].SafeZones.Exists(sz => sz.StartPoint == newSafeZone.StartPoint && sz.Location.X == newSafeZone.Location.X && sz.Location.Y == newSafeZone.Location.Y))
+                                EditEnv.MapInfoList[j].SafeZones.Add(newSafeZone);
                         }
                     }
                     catch (Exception) { continue; }

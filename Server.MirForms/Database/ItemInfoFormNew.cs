@@ -9,7 +9,7 @@ namespace Server.Database
 {
     public partial class ItemInfoFormNew : Form
     {
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
 
         private readonly Array StatEnums = Enum.GetValues(typeof(Stat));
         private readonly Array BindEnums = Enum.GetValues(typeof(BindMode));
@@ -225,7 +225,7 @@ namespace Server.Database
                 Table.Columns.Add(col.DataPropertyName, col.ValueType);
             }
 
-            foreach (ItemInfo item in Envir.ItemInfoList)
+            foreach (ItemInfo item in Env.ItemInfoList)
             {
                 DataRow row = Table.NewRow();
 
@@ -318,9 +318,9 @@ namespace Server.Database
         private void SaveForm()
         {
             int lastIndex = 0;
-            if (Envir.ItemInfoList.Count > 0)
+            if (Env.ItemInfoList.Count > 0)
             {
-                lastIndex = Envir.ItemInfoList.Max(x => x.Index);
+                lastIndex = Env.ItemInfoList.Max(x => x.Index);
             }
 
             foreach (DataGridViewRow row in itemInfoGridView.Rows)
@@ -336,7 +336,7 @@ namespace Server.Database
 
                 if (string.IsNullOrEmpty((string)row.Cells["ItemIndex"].FormattedValue))
                 {
-                    Envir.ItemInfoList.Add(item = new ItemInfo());
+                    Env.ItemInfoList.Add(item = new ItemInfo());
 
                     item.Index = ++lastIndex;
                 }
@@ -344,7 +344,7 @@ namespace Server.Database
                 {
                     int index = (int)row.Cells["ItemIndex"].Value;
 
-                    item = Envir.ItemInfoList.FirstOrDefault(x => x.Index == index);
+                    item = Env.ItemInfoList.FirstOrDefault(x => x.Index == index);
 
                     if (row.Cells["Modified"].Value != null && (bool)row.Cells["Modified"].Value == false) continue;
                 }
@@ -1033,9 +1033,9 @@ namespace Server.Database
             {
                 int index = (int)row.Cells["ItemIndex"].Value;
 
-                var item = Envir.ItemInfoList.FirstOrDefault(x => x.Index == index);
+                var item = Env.ItemInfoList.FirstOrDefault(x => x.Index == index);
 
-                Envir.ItemInfoList.Remove(item);
+                Env.ItemInfoList.Remove(item);
             }
         }
 
@@ -1051,13 +1051,13 @@ namespace Server.Database
                 {
                     int index = (int)row.Cells["ItemIndex"].Value;
 
-                    var item = Envir.ItemInfoList.FirstOrDefault(x => x.Index == index);
+                    var item = Env.ItemInfoList.FirstOrDefault(x => x.Index == index);
 
-                    Envir.AddToGameShop(item);
+                    Env.AddToGameShop(item);
                 }
             }
 
-            Envir.SaveDB();
+            Env.SaveDB();
         }
 
         private void CellValueChanged(object sender, DataGridViewCellEventArgs e)
@@ -1119,7 +1119,7 @@ namespace Server.Database
             }
 
             SaveForm();
-            Envir.SaveDB();
+            Env.SaveDB();
         }
 
         private void MapHeaderText()

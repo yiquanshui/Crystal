@@ -47,7 +47,7 @@ namespace Server.MirObjects.Monsters
         {
             base.Process();
 
-            if (_currentAttacker != null && _lastAttackTime + 5000 < Envir.Time)
+            if (_currentAttacker != null && _lastAttackTime + 5000 < Env.Time)
             {
                 OutputAverage();
                 ResetStats();
@@ -91,11 +91,11 @@ namespace Server.MirObjects.Monsters
             attacker.GatherElement();
 
             if (_currentAttacker == null)
-                _StartTime = Envir.Time;
+                _StartTime = Env.Time;
             _currentAttacker = attacker;
             _hitCount++;
             _totalDamage += damage;
-            _lastAttackTime = Envir.Time;
+            _lastAttackTime = Env.Time;
             
             ReportDamage(damage, type, false);
             return 1;
@@ -135,7 +135,7 @@ namespace Server.MirObjects.Monsters
             damage -= armour;
 
             if (_currentAttacker == null)
-                _StartTime = Envir.Time;
+                _StartTime = Env.Time;
 
 
             MapObject tmpAttacker = attacker.Master;
@@ -154,7 +154,7 @@ namespace Server.MirObjects.Monsters
 
             _hitCount++;
             _totalDamage += damage;
-            _lastAttackTime = Envir.Time;
+            _lastAttackTime = Env.Time;
 
             ReportDamage(damage, type, true);
             return 1;
@@ -176,13 +176,13 @@ namespace Server.MirObjects.Monsters
             }
             
             if (_currentAttacker == null)
-                _StartTime = Envir.Time;
+                _StartTime = Env.Time;
             _currentAttacker = attacker is MonsterObject ? (PlayerObject)attacker.Master : (PlayerObject)attacker;
             _hitCount++;
             _totalDamage += damage;
-            _lastAttackTime = Envir.Time;
+            _lastAttackTime = Env.Time;
 
-            long timespend = Math.Max(1000, (Envir.Time - _StartTime));//avoid division by 0
+            long timespend = Math.Max(1000, (Env.Time - _StartTime));//avoid division by 0
             if (_StartTime == 0)
                 timespend = 1000;
             double Dps = _totalDamage / (timespend * 0.001);
@@ -198,7 +198,7 @@ namespace Server.MirObjects.Monsters
 
             if (CanRegen)
             {
-                RegenTime = Envir.Time + RegenDelay;
+                RegenTime = Env.Time + RegenDelay;
                 healthRegen += (int)(Stats[Stat.HP] * 0.022F) + 1;
             }
             if (healthRegen > 0) ChangeHP(healthRegen);
@@ -209,7 +209,7 @@ namespace Server.MirObjects.Monsters
             if (!Poisoned) return;
             if (_currentAttacker == null) return;
             _totalDamage += amount;
-            long timespend = Math.Max(1000, (Envir.Time - _StartTime));//avoid division by 0
+            long timespend = Math.Max(1000, (Env.Time - _StartTime));//avoid division by 0
             if (_StartTime == 0)
                 timespend = 1000;
             double Dps = _totalDamage / (timespend * 0.001);
@@ -238,7 +238,7 @@ namespace Server.MirObjects.Monsters
                     output = "Agility";
                     break;
             }
-            long timespend = Math.Max(1000,(Envir.Time - _StartTime));//avoid division by 0
+            long timespend = Math.Max(1000,(Env.Time - _StartTime));//avoid division by 0
             if (_StartTime == 0)
                 timespend = 1000;
             double Dps = _totalDamage / (timespend * 0.001);

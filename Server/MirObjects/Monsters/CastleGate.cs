@@ -73,7 +73,7 @@ namespace Server.MirObjects.Monsters
         {
             base.ProcessAI();
 
-            if(!Closed && CloseTime > 0 && CloseTime < Envir.Time)
+            if(!Closed && CloseTime > 0 && CloseTime < Env.Time)
             {
                 CloseDoor();
                 CloseTime = 0;
@@ -82,9 +82,9 @@ namespace Server.MirObjects.Monsters
 
         protected override void ProcessSearch()
         {
-            if (Envir.Time < SearchTime) return;
+            if (Env.Time < SearchTime) return;
 
-            SearchTime = Envir.Time + SearchDelay;
+            SearchTime = Env.Time + SearchDelay;
 
             if (Closed && AutoOpen)
             {
@@ -98,7 +98,7 @@ namespace Server.MirObjects.Monsters
                     if (player.MyGuild == null || player.MyGuild.Conquest == null || player.MyGuild.Conquest != Conquest || player.WarZone) continue;
 
                     OpenDoor();
-                    CloseTime = Envir.Time + (Settings.Second * 10);
+                    CloseTime = Env.Time + (Settings.Second * 10);
                     break;
                 }
             }

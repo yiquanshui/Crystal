@@ -45,48 +45,48 @@ namespace Server.MirObjects
 
         public override void SetOperateTime()
         {
-            long time = Envir.Time + 2000;
+            long time = Env.Time + 2000;
 
             //if (TickTime < time && TickTime > Envir.Time)
             //    time = TickTime;
 
-            if (OwnerTime < time && OwnerTime > Envir.Time)
+            if (OwnerTime < time && OwnerTime > Env.Time)
                 time = OwnerTime;
 
-            if (ExpireTime < time && ExpireTime > Envir.Time)
+            if (ExpireTime < time && ExpireTime > Env.Time)
                 time = ExpireTime;
 
-            if (PKPointTime < time && PKPointTime > Envir.Time)
+            if (PKPointTime < time && PKPointTime > Env.Time)
                 time = PKPointTime;
 
-            if (LastHitTime < time && LastHitTime > Envir.Time)
+            if (LastHitTime < time && LastHitTime > Env.Time)
                 time = LastHitTime;
 
-            if (EXPOwnerTime < time && EXPOwnerTime > Envir.Time)
+            if (EXPOwnerTime < time && EXPOwnerTime > Env.Time)
                 time = EXPOwnerTime;
 
-            if (BrownTime < time && BrownTime > Envir.Time)
+            if (BrownTime < time && BrownTime > Env.Time)
                 time = BrownTime;
 
             for (int i = 0; i < ActionList.Count; i++)
             {
-                if (ActionList[i].Time >= time && ActionList[i].Time > Envir.Time) continue;
+                if (ActionList[i].Time >= time && ActionList[i].Time > Env.Time) continue;
                 time = ActionList[i].Time;
             }
 
             for (int i = 0; i < PoisonList.Count; i++)
             {
-                if (PoisonList[i].TickTime >= time && PoisonList[i].TickTime > Envir.Time) continue;
+                if (PoisonList[i].TickTime >= time && PoisonList[i].TickTime > Env.Time) continue;
                 time = PoisonList[i].TickTime;
             }
 
             for (int i = 0; i < Buffs.Count; i++)
             {
-                if (Buffs[i].NextTime >= time && Buffs[i].NextTime > Envir.Time) continue;
+                if (Buffs[i].NextTime >= time && Buffs[i].NextTime > Env.Time) continue;
                 time = Buffs[i].NextTime;
             }
 
-            if (OperateTime <= Envir.Time || time < OperateTime)
+            if (OperateTime <= Env.Time || time < OperateTime)
                 OperateTime = time;
         }
 

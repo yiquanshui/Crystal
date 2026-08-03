@@ -6,7 +6,7 @@ namespace Server
     public partial class MagicInfoForm : Form
     {
 
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
 
         private MagicInfo _selectedMagicInfo;
 
@@ -74,7 +74,7 @@ namespace Server
                 if (field != 2)
                     txtDmgMultBoost.Text = _selectedMagicInfo.MultiplierBonus.ToString();
                 txtRange.Text = _selectedMagicInfo.Range.ToString();
-                ItemInfo Book = Envir.GetBook((short)_selectedMagicInfo.Spell);
+                ItemInfo Book = Env.GetBook((short)_selectedMagicInfo.Spell);
                 if (Book != null)
                 {
                     lblBookValid.Text = Book.Name;
@@ -731,7 +731,7 @@ namespace Server
         private void MagicInfoForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             //do something to save it all
-            Envir.SaveDB();
+            Env.SaveDB();
         }
 
         private void MagiclistBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -996,7 +996,7 @@ namespace Server
             if (string.IsNullOrWhiteSpace(MagicSearchBox.Text))
             {
                 MagiclistBox.Items.Clear();
-                foreach (var magic in Envir.MagicInfoList)
+                foreach (var magic in Env.MagicInfoList)
                 {
                     MagiclistBox.Items.Add(magic);
                 }
@@ -1007,7 +1007,7 @@ namespace Server
             MagiclistBox.Items.Clear();
 
             // Add filtered items to the list
-            foreach (var magic in Envir.MagicInfoList)
+            foreach (var magic in Env.MagicInfoList)
             {
                 if (!string.IsNullOrEmpty(magic.Name) && magic.Name.ToLower().Contains(searchText))
                 {

@@ -13,12 +13,12 @@ namespace Server.MirObjects
             get { return MessageQueue.Instance; }
         }
 
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
-        public readonly uint ObjectID = Envir.ObjectID;
+        public readonly uint ObjectID = Env.ObjectID;
 
         public abstract ObjectType Race { get; }
 
@@ -209,25 +209,25 @@ namespace Server.MirObjects
             if (Target != null && (Target.Node == null || Target.Dead)) Target = null;
             if (Owner != null && Owner.Node == null) Owner = null;
 
-            if (PKPoints > 0 && Envir.Time > PKPointTime)
+            if (PKPoints > 0 && Env.Time > PKPointTime)
             {
-                PKPointTime = Envir.Time + Settings.PKDelay * Settings.Second;
+                PKPointTime = Env.Time + Settings.PKDelay * Settings.Second;
                 PKPoints--;
             }
 
-            if (LastHitter != null && Envir.Time > LastHitTime)
+            if (LastHitter != null && Env.Time > LastHitTime)
             {
                 LastHitter = null;
             }
 
-            if (EXPOwner != null && Envir.Time > EXPOwnerTime)
+            if (EXPOwner != null && Env.Time > EXPOwnerTime)
             {
                 EXPOwner = null;
             }
 
             for (int i = 0; i < ActionList.Count; i++)
             {
-                if (Envir.Time < ActionList[i].Time) continue;
+                if (Env.Time < ActionList[i].Time) continue;
                 Process(ActionList[i]);
                 ActionList.RemoveAt(i);
             }
@@ -247,16 +247,16 @@ namespace Server.MirObjects
 
             if (Stats[Stat.Luck] > 0)
             {
-                if (Stats[Stat.Luck] > Envir.Random.Next(Settings.MaxLuck))
+                if (Stats[Stat.Luck] > Env.Random.Next(Settings.MaxLuck))
                     return max;
             }
             else if (Stats[Stat.Luck] < 0)
             {
-                if (Stats[Stat.Luck] < -Envir.Random.Next(Settings.MaxLuck))
+                if (Stats[Stat.Luck] < -Env.Random.Next(Settings.MaxLuck))
                     return min;
             }
 
-            return Envir.Random.Next(min, max + 1);
+            return Env.Random.Next(min, max + 1);
         }
 
         public int GetRangeAttackPower(int min, int max, int range)
@@ -276,7 +276,7 @@ namespace Server.MirObjects
             if (min < 0) min = 0;
             if (min > max) max = min;
 
-            return Envir.Random.Next(min, max + 1);
+            return Env.Random.Next(min, max + 1);
         }
 
         public virtual void Remove(HumanObject player)
@@ -341,14 +341,14 @@ namespace Server.MirObjects
             if (Node != null)
                 throw new InvalidOperationException("Node is not null, Object already spawned");
 
-            Node = Envir.Objects.AddLast(this);
+            Node = Env.Objects.AddLast(this);
             if ((Race == ObjectType.Monster) && Settings.Multithreaded)
             {
                 SpawnThread = CurrentMap.Thread;
-                NodeThreaded = Envir.MobThreads[SpawnThread].ObjectsList.AddLast(this);
+                NodeThreaded = Env.MobThreads[SpawnThread].ObjectsList.AddLast(this);
             }
 
-            OperateTime = Envir.Time + Envir.Random.Next(OperateDelay);
+            OperateTime = Env.Time + Env.Random.Next(OperateDelay);
 
             BroadcastInfo();
             BroadcastHealthChange();
@@ -361,10 +361,10 @@ namespace Server.MirObjects
                 throw new InvalidOperationException("Node is null, Object already Despawned");
             
             Broadcast(new S.ObjectRemove { ObjectID = ObjectID });
-            Envir.Objects.Remove(Node);
+            Env.Objects.Remove(Node);
             if (Settings.Multithreaded && (Race == ObjectType.Monster))
             {
-                Envir.MobThreads[SpawnThread].ObjectsList.Remove(NodeThreaded);
+                Env.MobThreads[SpawnThread].ObjectsList.Remove(NodeThreaded);
             }
 
             ActionList.Clear();
@@ -464,7 +464,7 @@ namespace Server.MirObjects
             switch (type)
             {
                 case DefenceType.ACAgility:
-                    if (Envir.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy])
+                    if (Env.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy])
                     {
                         BroadcastDamageIndicator(DamageType.Miss);
                         hit = false;
@@ -475,12 +475,12 @@ namespace Server.MirObjects
                     armour = GetDefencePower(Stats[Stat.MinAC], Stats[Stat.MaxAC]);
                     break;
                 case DefenceType.MACAgility:
-                    if (Envir.Random.Next(Settings.MagicResistWeight) < Stats[Stat.MagicResist])
+                    if (Env.Random.Next(Settings.MagicResistWeight) < Stats[Stat.MagicResist])
                     {
                         BroadcastDamageIndicator(DamageType.Miss);
                         hit = false;
                     }
-                    if (Envir.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy])
+                    if (Env.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy])
                     {
                         BroadcastDamageIndicator(DamageType.Miss);
                         hit = false;
@@ -488,7 +488,7 @@ namespace Server.MirObjects
                     armour = GetDefencePower(Stats[Stat.MinMAC], Stats[Stat.MaxMAC]);
                     break;
                 case DefenceType.MAC:
-                    if (Envir.Random.Next(Settings.MagicResistWeight) < Stats[Stat.MagicResist])
+                    if (Env.Random.Next(Settings.MagicResistWeight) < Stats[Stat.MagicResist])
                     {
                         BroadcastDamageIndicator(DamageType.Miss);
                         hit = false;
@@ -496,7 +496,7 @@ namespace Server.MirObjects
                     armour = GetDefencePower(Stats[Stat.MinMAC], Stats[Stat.MaxMAC]);
                     break;
                 case DefenceType.Agility:
-                    if (Envir.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy])
+                    if (Env.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy])
                     {
                         BroadcastDamageIndicator(DamageType.Miss);
                         hit = false;
@@ -508,19 +508,19 @@ namespace Server.MirObjects
 
         public virtual void ApplyNegativeEffects(HumanObject attacker, DefenceType type, ushort levelOffset)
         {
-            if (attacker.SpecialMode.HasFlag(SpecialItemMode.Paralize) && type != DefenceType.MAC && type != DefenceType.MACAgility && 1 == Envir.Random.Next(1, 15))
+            if (attacker.SpecialMode.HasFlag(SpecialItemMode.Paralize) && type != DefenceType.MAC && type != DefenceType.MACAgility && 1 == Env.Random.Next(1, 15))
             {
                 ApplyPoison(new Poison { PType = PoisonType.Paralysis, Duration = 5, TickSpeed = 1000 }, attacker);
             }
             if ((attacker.Stats[Stat.Freezing] > 0) && (Settings.PvpCanFreeze || Race != ObjectType.Player) && type != DefenceType.MAC && type != DefenceType.MACAgility)
             {
-                if ((Envir.Random.Next(Settings.FreezingAttackWeight) < attacker.Stats[Stat.Freezing]) && (Envir.Random.Next(levelOffset) == 0))
-                    ApplyPoison(new Poison { PType = PoisonType.Slow, Duration = Math.Min(10, (3 + Envir.Random.Next(attacker.Stats[Stat.Freezing]))), TickSpeed = 1000 }, attacker);
+                if ((Env.Random.Next(Settings.FreezingAttackWeight) < attacker.Stats[Stat.Freezing]) && (Env.Random.Next(levelOffset) == 0))
+                    ApplyPoison(new Poison { PType = PoisonType.Slow, Duration = Math.Min(10, (3 + Env.Random.Next(attacker.Stats[Stat.Freezing]))), TickSpeed = 1000 }, attacker);
             }
             if (attacker.Stats[Stat.PoisonAttack] > 0 && type != DefenceType.MAC && type != DefenceType.MACAgility)
             {
-                if ((Envir.Random.Next(Settings.PoisonAttackWeight) < attacker.Stats[Stat.PoisonAttack]) && (Envir.Random.Next(levelOffset) == 0))
-                    ApplyPoison(new Poison { PType = PoisonType.Green, Duration = 5, TickSpeed = 1000, Value = Math.Min(10, 3 + Envir.Random.Next(attacker.Stats[Stat.PoisonAttack])) }, attacker);
+                if ((Env.Random.Next(Settings.PoisonAttackWeight) < attacker.Stats[Stat.PoisonAttack]) && (Env.Random.Next(levelOffset) == 0))
+                    ApplyPoison(new Poison { PType = PoisonType.Green, Duration = 5, TickSpeed = 1000, Value = Math.Min(10, 3 + Env.Random.Next(attacker.Stats[Stat.PoisonAttack])) }, attacker);
             }
         }
 
@@ -576,7 +576,7 @@ namespace Server.MirObjects
                     Caster = owner,
                     ObjectID = ObjectID,
                     ExpireTime = duration,
-                    LastTime = Envir.Time,
+                    LastTime = Env.Time,
                     Stats = stats
                 };
 
@@ -806,7 +806,7 @@ namespace Server.MirObjects
             if (map.Cells == null) return false;
             if (map.WalkableCells.Count == 0) return false;
 
-            int cellIndex = Envir.Random.Next(map.WalkableCells.Count);
+            int cellIndex = Env.Random.Next(map.WalkableCells.Count);
 
             return Teleport(map, map.WalkableCells[cellIndex]);
         }
@@ -826,10 +826,10 @@ namespace Server.MirObjects
                 Point location;
 
                 if (distance <= 0)
-                    location = new Point(edgeoffset + Envir.Random.Next(map.Width - edgeoffset), edgeoffset + Envir.Random.Next(map.Height - edgeoffset)); //Can adjust Random Range...
+                    location = new Point(edgeoffset + Env.Random.Next(map.Width - edgeoffset), edgeoffset + Env.Random.Next(map.Height - edgeoffset)); //Can adjust Random Range...
                 else
-                    location = new Point(CurrentLocation.X + Envir.Random.Next(-distance, distance + 1),
-                                         CurrentLocation.Y + Envir.Random.Next(-distance, distance + 1));
+                    location = new Point(CurrentLocation.X + Env.Random.Next(-distance, distance + 1),
+                                         CurrentLocation.Y + Env.Random.Next(-distance, distance + 1));
 
 
                 if (map.ValidPoint(location)) return location;
@@ -842,10 +842,10 @@ namespace Server.MirObjects
         {
             if (Race != ObjectType.Player && Race != ObjectType.Monster) return;
 
-            byte time = Math.Min(byte.MaxValue, (byte)Math.Max(5, (RevTime - Envir.Time) / 1000));
+            byte time = Math.Min(byte.MaxValue, (byte)Math.Max(5, (RevTime - Env.Time) / 1000));
             Packet p = new S.ObjectHealth { ObjectID = ObjectID, Percent = PercentHealth, Expire = time };
 
-            if (Envir.Time < RevTime)
+            if (Env.Time < RevTime)
             {
                 CurrentMap.Broadcast(p, CurrentLocation);
                 return;

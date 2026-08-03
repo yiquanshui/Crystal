@@ -8,7 +8,7 @@ namespace Server.Database
 {
     public partial class MonsterInfoFormNew : Form
     {
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
 
         private readonly Array StatEnums = Enum.GetValues(typeof(Stat));
 
@@ -136,7 +136,7 @@ namespace Server.Database
                 Table.Columns.Add(col.DataPropertyName, col.ValueType);
             }
 
-            foreach (MirDatabase.MonsterInfo item in Envir.MonsterInfoList)
+            foreach (MirDatabase.MonsterInfo item in Env.MonsterInfoList)
             {
                 DataRow row = Table.NewRow();
 
@@ -194,9 +194,9 @@ namespace Server.Database
         private void SaveForm()
         {
             int lastIndex = 0;
-            if (Envir.MonsterInfoList.Count > 0)
+            if (Env.MonsterInfoList.Count > 0)
             {
-                lastIndex = Envir.MonsterInfoList.Max(x => x.Index);
+                lastIndex = Env.MonsterInfoList.Max(x => x.Index);
             }
 
             foreach (DataGridViewRow row in monsterInfoGridView.Rows)
@@ -212,7 +212,7 @@ namespace Server.Database
 
                 if (string.IsNullOrEmpty((string)row.Cells["MonsterIndex"].FormattedValue))
                 {
-                    Envir.MonsterInfoList.Add(monster = new MonsterInfo());
+                    Env.MonsterInfoList.Add(monster = new MonsterInfo());
 
                     monster.Index = ++lastIndex;
                 }
@@ -220,7 +220,7 @@ namespace Server.Database
                 {
                     int index = (int)row.Cells["MonsterIndex"].Value;
 
-                    monster = Envir.MonsterInfoList.FirstOrDefault(x => x.Index == index);
+                    monster = Env.MonsterInfoList.FirstOrDefault(x => x.Index == index);
 
                     if (row.Cells["Modified"].Value != null && (bool)row.Cells["Modified"].Value == false) continue;
                 }
@@ -644,16 +644,16 @@ namespace Server.Database
             {
                 int index = (int)row.Cells["MonsterIndex"].Value;
 
-                var item = Envir.MonsterInfoList.FirstOrDefault(x => x.Index == index);
+                var item = Env.MonsterInfoList.FirstOrDefault(x => x.Index == index);
 
-                Envir.MonsterInfoList.Remove(item);
+                Env.MonsterInfoList.Remove(item);
             }
         }
 
         private void monsterInfoFormNew_FormClosed(object sender, FormClosedEventArgs e)
         {
             SaveForm();
-            Envir.SaveDB();
+            Env.SaveDB();
         }
 
         private void monsterInfoGridView_DataError(object sender, DataGridViewDataErrorEventArgs e)

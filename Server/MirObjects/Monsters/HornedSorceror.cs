@@ -52,18 +52,18 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             bool ranged = CurrentLocation == Target.CurrentLocation || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 1);
 
-            AttackTime = Envir.Time + AttackSpeed;
+            AttackTime = Env.Time + AttackSpeed;
 
             //Charged Stomp
-            if (Envir.Time > _ChargedStompTime && HealthPercent < 90 && Envir.Random.Next(4) == 0)
+            if (Env.Time > _ChargedStompTime && HealthPercent < 90 && Env.Random.Next(4) == 0)
             {
-                byte stompLoops = (byte)Envir.Random.Next(5, 10);
+                byte stompLoops = (byte)Env.Random.Next(5, 10);
                 int stompDuration = stompLoops * 500;
 
-                _ChargedStompTime = Envir.Time + 20000;
+                _ChargedStompTime = Env.Time + 20000;
 
-                ActionTime = Envir.Time + (stompDuration) + 500;
-                AttackTime = Envir.Time + (stompDuration) + 500 + AttackSpeed;
+                ActionTime = Env.Time + (stompDuration) + 500;
+                AttackTime = Env.Time + (stompDuration) + 500 + AttackSpeed;
 
                 _Immune = true;
 
@@ -72,15 +72,15 @@ namespace Server.MirObjects.Monsters
                 int damage = GetAttackPower(Stats[Stat.MinSC], Stats[Stat.MaxSC]) * stompLoops;
                 if (damage == 0) return;
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + stompDuration + 500, Target, damage, DefenceType.AC, true);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + stompDuration + 500, Target, damage, DefenceType.AC, true);
                 ActionList.Add(action);
                 return;
             }
 
             //Dust Tornado
-            if (Envir.Time > _TornadoTime && HealthPercent < 90 && Envir.Random.Next(4) == 0)
+            if (Env.Time > _TornadoTime && HealthPercent < 90 && Env.Random.Next(4) == 0)
             {
-                _TornadoTime = Envir.Time + 15000;
+                _TornadoTime = Env.Time + 15000;
 
                 Tornado();
                 return;
@@ -88,9 +88,9 @@ namespace Server.MirObjects.Monsters
 
             if (!ranged)
             {
-                if (Envir.Random.Next(5) > 2) //Thrust hit
+                if (Env.Random.Next(5) > 2) //Thrust hit
                 {
-                    ActionTime = Envir.Time + 300;
+                    ActionTime = Env.Time + 300;
 
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
@@ -99,9 +99,9 @@ namespace Server.MirObjects.Monsters
 
                     LineAttack(damage, 2, 300);
                 }
-                else if (Envir.Random.Next(5) > 2) //Dust hit
+                else if (Env.Random.Next(5) > 2) //Dust hit
                 {
-                    ActionTime = Envir.Time + 300;
+                    ActionTime = Env.Time + 300;
 
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 
@@ -112,16 +112,16 @@ namespace Server.MirObjects.Monsters
                 }
                 else
                 {
-                    ActionTime = Envir.Time + 500;
+                    ActionTime = Env.Time + 500;
 
                     Thrust(Target);
                 }
             }
             else
             {
-                if (Envir.Random.Next(3) == 0)
+                if (Env.Random.Next(3) == 0)
                 {
-                    ActionTime = Envir.Time + 500;
+                    ActionTime = Env.Time + 500;
 
                     Thrust(Target);
                 }
@@ -142,7 +142,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -180,7 +180,7 @@ namespace Server.MirObjects.Monsters
                     {
                         Spell = Spell.HornedSorcererDustTornado,
                         Value = damage,
-                        ExpireTime = Envir.Time + time + start,
+                        ExpireTime = Env.Time + time + start,
                         TickSpeed = 1000,
                         Direction = Direction,
                         CurrentLocation = new Point(x, y),
@@ -191,7 +191,7 @@ namespace Server.MirObjects.Monsters
                         Caster = this
                     };
 
-                    DelayedAction action = new DelayedAction(DelayedType.Spawn, Envir.Time + start, ob);
+                    DelayedAction action = new DelayedAction(DelayedType.Spawn, Env.Time + start, ob);
                     CurrentMap.ActionList.Add(action);
                 }
             }
@@ -223,7 +223,7 @@ namespace Server.MirObjects.Monsters
 
                 if (damage > 0)
                 {
-                    DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 500, location, damage, DefenceType.AC);
+                    DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 500, location, damage, DefenceType.AC);
                     ActionList.Add(action);
                 }
             }

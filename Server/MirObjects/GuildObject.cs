@@ -6,9 +6,9 @@ namespace Server.MirObjects
 {
     public sealed class GuildObject
     {
-        private static Envir Envir
+        private static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public GuildInfo Info;
@@ -104,9 +104,9 @@ namespace Server.MirObjects
         {
             Info = info;
 
-			if (!Envir.Guilds.Any(x => x.Guildindex == info.GuildIndex))
+			if (!Env.Guilds.Any(x => x.Guildindex == info.GuildIndex))
 			{
-				Envir.Guilds.Add(this);
+				Env.Guilds.Add(this);
 			}
 		}
 
@@ -174,7 +174,7 @@ namespace Server.MirObjects
                         }
                         else
                         {
-                            Ranks[i].Members[j].LastLogin = Envir.Now;
+                            Ranks[i].Members[j].LastLogin = Env.Now;
                             Ranks[i].Members[j].Player = null;
                             Ranks[i].Members[j].Online = false;
                             NeedSave = true;
@@ -227,7 +227,7 @@ namespace Server.MirObjects
             }
 
             GuildRank lowestRank = Ranks[Ranks.Count - 1];
-            GuildMember member = new GuildMember() { Name = newMember.Info.Name, Player = newMember, Id = newMember.Info.Index, LastLogin = Envir.Now, Online = true };
+            GuildMember member = new GuildMember() { Name = newMember.Info.Name, Player = newMember, Id = newMember.Info.Index, LastLogin = Env.Now, Online = true };
             lowestRank.Members.Add(member);
 
             PlayerLogged(newMember, true, true);
@@ -253,7 +253,7 @@ namespace Server.MirObjects
             Found:
             if (Member == null) return false;
 
-            MirDatabase.CharacterInfo Character = Envir.GetCharacterInfo(memberName);
+            MirDatabase.CharacterInfo Character = Env.GetCharacterInfo(memberName);
             if (Character == null) return false;
             if ((rankIndex == 0) && (Character.Level < Settings.Guild_RequiredLevel))
             {
@@ -293,7 +293,7 @@ namespace Server.MirObjects
             if (HasGT)
             {
                 GTMap GTmap = null;
-                foreach (var gt in Envir.GTMapList)
+                foreach (var gt in Env.GTMapList)
                 {
                     if (gt.Index == GTIndex)
                     {
@@ -502,7 +502,7 @@ namespace Server.MirObjects
 
             MemberRank.Members.Remove(Member);
 
-            Envir.DeleteGuild(this);
+            Env.DeleteGuild(this);
             Kicker.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.YouHaveDisbandedGuild), ChatType.System);
 
             return true;
@@ -680,7 +680,7 @@ namespace Server.MirObjects
                     Info.MemberCap = Settings.Guild_MembercapList[Info.Level];
                 }
 
-                NextExpUpdate = Envir.Time + 10000;
+                NextExpUpdate = Env.Time + 10000;
 
                 for (int i = 0; i < Ranks.Count; i++)
                 {
@@ -695,9 +695,9 @@ namespace Server.MirObjects
             }
             else
             {
-                if (NextExpUpdate < Envir.Time)
+                if (NextExpUpdate < Env.Time)
                 {
-                    NextExpUpdate = Envir.Time + 10000;
+                    NextExpUpdate = Env.Time + 10000;
                     SendServerPacket(new ServerPackets.GuildExpGain() { Amount = expAmount });
                 }
             }
@@ -713,12 +713,12 @@ namespace Server.MirObjects
                 return false;
             }
 
-            if (Envir.GuildsAtWar.Where(e => e.GuildA == this && e.GuildB == enemyGuild).Any() || Envir.GuildsAtWar.Where(e => e.GuildA == enemyGuild && e.GuildB == this).Any())
+            if (Env.GuildsAtWar.Where(e => e.GuildA == this && e.GuildB == enemyGuild).Any() || Env.GuildsAtWar.Where(e => e.GuildA == enemyGuild && e.GuildB == this).Any())
             {
                 return false;
             }
 
-            Envir.GuildsAtWar.Add(new GuildAtWar(this, enemyGuild));
+            Env.GuildsAtWar.Add(new GuildAtWar(this, enemyGuild));
             UpdatePlayersColours();
             enemyGuild.UpdatePlayersColours();
             return true;
@@ -826,14 +826,14 @@ namespace Server.MirObjects
 
             if (GTIndex > -1)
             {
-                GTMap gt = Envir.GTMapList.First(x => x.Index == GTIndex);
-                if (GTBegin > Envir.Now)
-                    gt.Begin = (GTBegin - Envir.Now).Seconds;
+                GTMap gt = Env.GTMapList.First(x => x.Index == GTIndex);
+                if (GTBegin > Env.Now)
+                    gt.Begin = (GTBegin - Env.Now).Seconds;
                 else
                     gt.Begin = 0;
 
 
-                if (Envir.Now > GTRent)
+                if (Env.Now > GTRent)
                 {
                     EndGT();
                     SendOutputMessage(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.GuildTerritoryExpired));
@@ -842,7 +842,7 @@ namespace Server.MirObjects
         }
         public void EndGT()
         {
-            GTMap gt = Envir.GTMapList.First(x => x.Index == GTIndex);
+            GTMap gt = Env.GTMapList.First(x => x.Index == GTIndex);
             gt.Owner = "None";
             gt.Price = Settings.BuyGTGold;
             gt.Leader = "None";
@@ -858,7 +858,7 @@ namespace Server.MirObjects
                     PlayerObject player = map.Players[j];
                     if (player == null) continue;
 
-                    player.Teleport(Envir.GetMap(player.BindMapIndex), player.BindLocation);
+                    player.Teleport(Env.GetMap(player.BindMapIndex), player.BindLocation);
                 }
             }
 
@@ -869,7 +869,7 @@ namespace Server.MirObjects
 
         public bool GTForSale(PlayerObject player, int price)
         {
-            GTMap gt = Envir.GTMapList.First(x => x.Index == GTIndex);
+            GTMap gt = Env.GTMapList.First(x => x.Index == GTIndex);
 
             if (gt.Price > 0)
             {
@@ -884,7 +884,7 @@ namespace Server.MirObjects
 
         public bool EndGTSale(PlayerObject player)
         {
-            GTMap gt = Envir.GTMapList.First(x => x.Index == GTIndex);
+            GTMap gt = Env.GTMapList.First(x => x.Index == GTIndex);
 
             if (gt.Price <= 0)
             {
@@ -911,7 +911,7 @@ namespace Server.MirObjects
 
         public bool NewBuff(int Id, bool charge = true)
         {
-            GuildBuffInfo info = Envir.FindGuildBuffInfo(Id);
+            GuildBuffInfo info = Env.FindGuildBuffInfo(Id);
 
             if (info == null)
             {

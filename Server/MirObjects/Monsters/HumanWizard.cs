@@ -34,13 +34,13 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             Broadcast(new S.ObjectMagic { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Spell = Spell.ThunderBolt, TargetID = Target.ObjectID, Target = Target.CurrentLocation, Cast = true, Level = 3 });
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC]);
             if (damage == 0) return;
 
-            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.MAC);
+            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.MAC);
             ActionList.Add(action);
         }
 
@@ -48,9 +48,9 @@ namespace Server.MirObjects.Monsters
         {
             base.ProcessAI();
 
-            if (Master != null && Master is PlayerObject && Envir.Time > DecreaseMPTime)
+            if (Master != null && Master is PlayerObject && Env.Time > DecreaseMPTime)
             {
-                DecreaseMPTime = Envir.Time + 1000;
+                DecreaseMPTime = Env.Time + 1000;
                 if (!Master.Dead) ((PlayerObject)Master).ChangeMP(-10);
 
                 if (((PlayerObject)Master).MP <= 0) Die();
@@ -64,15 +64,15 @@ namespace Server.MirObjects.Monsters
             if (Master != null)
                 MoveTo(Master.CurrentLocation);
 
-            if (InAttackRange() && (Master != null || Envir.Time < FearTime))
+            if (InAttackRange() && (Master != null || Env.Time < FearTime))
             {
                 Attack();
                 return;
             }
 
-            FearTime = Envir.Time + 5000;
+            FearTime = Env.Time + 5000;
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -86,7 +86,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Envir.Random.Next(2)) //No favour
+                switch (Env.Random.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)
@@ -149,7 +149,7 @@ namespace Server.MirObjects.Monsters
             Master = null;
 
             PoisonList.Clear();
-            Envir.MonsterCount--;
+            Env.MonsterCount--;
 
             if (CurrentMap != null)
                 CurrentMap.MonsterCount--;

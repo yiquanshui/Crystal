@@ -23,10 +23,10 @@ namespace Server.MirObjects.Monsters
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
-            switch (Envir.Random.Next(0, 6))
+            switch (Env.Random.Next(0, 6))
             {
                 case 0:
                     {
@@ -49,7 +49,7 @@ namespace Server.MirObjects.Monsters
                         int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]) * 2;
                         if (damage == 0) return;
 
-                        DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 400, Target, damage, DefenceType.ACAgility);
+                        DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 400, Target, damage, DefenceType.ACAgility);
                         ActionList.Add(action);
                     }
                     break;

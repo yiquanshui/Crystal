@@ -12,9 +12,9 @@ namespace Server
 {
     public partial class SMain : Form
     {
-        public static Envir Envir => Envir.Main;
+        public static Env Env => Env.Main;
 
-        public static Envir EditEnvir => Envir.Edit;
+        public static Env EditEnv => Env.Edit;
 
         protected static MessageQueue MessageQueue => MessageQueue.Instance;
 
@@ -107,25 +107,25 @@ namespace Server
         {
             try
             {
-                Text = $"Total: {Envir.LastCount}, Real: {Envir.LastRealCount}";
-                PlayersLabel.Text = $"Players: {Envir.Players.Count}";
-                MonsterLabel.Text = $"Monsters: {Envir.MonsterCount}";
-                ConnectionsLabel.Text = $"Connections: {Envir.Connections.Count}";
-                BlockedIPsLabel.Text = $"Blocked IPs: {Envir.IPBlocks.Count(x => x.Value > Envir.Now)}";
-                UpTimeLabel.Text = $"Uptime: {Envir.Stopwatch.ElapsedMilliseconds / 1000 / 60 / 60 / 24}d:{Envir.Stopwatch.ElapsedMilliseconds / 1000 / 60 / 60 % 24}h:{Envir.Stopwatch.ElapsedMilliseconds / 1000 / 60 % 60}m:{Envir.Stopwatch.ElapsedMilliseconds / 1000 % 60}s";
+                Text = $"Total: {Env.LastCount}, Real: {Env.LastRealCount}";
+                PlayersLabel.Text = $"Players: {Env.Players.Count}";
+                MonsterLabel.Text = $"Monsters: {Env.MonsterCount}";
+                ConnectionsLabel.Text = $"Connections: {Env.Connections.Count}";
+                BlockedIPsLabel.Text = $"Blocked IPs: {Env.IPBlocks.Count(x => x.Value > Env.Now)}";
+                UpTimeLabel.Text = $"Uptime: {Env.Stopwatch.ElapsedMilliseconds / 1000 / 60 / 60 / 24}d:{Env.Stopwatch.ElapsedMilliseconds / 1000 / 60 / 60 % 24}h:{Env.Stopwatch.ElapsedMilliseconds / 1000 / 60 % 60}m:{Env.Stopwatch.ElapsedMilliseconds / 1000 % 60}s";
 
-                if (Settings.Multithreaded && (Envir.MobThreads != null))
+                if (Settings.Multithreaded && (Env.MobThreads != null))
                 {
-                    CycleDelayLabel.Text = $"CycleDelays: {Envir.LastRunTime:0000}";
-                    for (int i = 0; i < Envir.MobThreads.Length; i++)
+                    CycleDelayLabel.Text = $"CycleDelays: {Env.LastRunTime:0000}";
+                    for (int i = 0; i < Env.MobThreads.Length; i++)
                     {
-                        if (Envir.MobThreads[i] == null) break;
-                        CycleDelayLabel.Text = CycleDelayLabel.Text + $"|{Envir.MobThreads[i].LastRunTime:0000}";
+                        if (Env.MobThreads[i] == null) break;
+                        CycleDelayLabel.Text = CycleDelayLabel.Text + $"|{Env.MobThreads[i].LastRunTime:0000}";
 
                     }
                 }
                 else
-                    CycleDelayLabel.Text = $"CycleDelay: {Envir.LastRunTime}";
+                    CycleDelayLabel.Text = $"CycleDelay: {Env.LastRunTime}";
 
                 while (!MessageQueue.MessageLog.IsEmpty)
                 {
@@ -180,13 +180,13 @@ namespace Server
 
         private void ProcessPlayersOnlineTab(bool forced = false)
         {
-            if (PlayersOnlineListView.Items.Count != Envir.Players.Count || forced == true)
+            if (PlayersOnlineListView.Items.Count != Env.Players.Count || forced == true)
             {
                 PlayersOnlineListView.Items.Clear();
 
-                for (int i = PlayersOnlineListView.Items.Count; i < Envir.Players.Count; i++)
+                for (int i = PlayersOnlineListView.Items.Count; i < Env.Players.Count; i++)
                 {
-                    CharacterInfo character = Envir.Players[i].Info;
+                    CharacterInfo character = Env.Players[i].Info;
 
                     ListViewItem tempItem = CreateListView(character);
 
@@ -197,18 +197,18 @@ namespace Server
 
         private void startServerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Envir.Start();
+            Env.Start();
         }
 
         private void stopServerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Envir.Stop();
-            Envir.MonsterCount = 0;
+            Env.Stop();
+            Env.MonsterCount = 0;
         }
 
         private void SMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Envir.Stop();
+            Env.Stop();
         }
 
         private void closeServerToolStripMenuItem_Click(object sender, EventArgs e)
@@ -339,7 +339,7 @@ namespace Server
         {
             if (GlobalMessageTextBox.Text.Length < 1) return;
 
-            foreach (var player in Envir.Players)
+            foreach (var player in Env.Players)
             {
                 player.ReceiveChat(GlobalMessageTextBox.Text, ChatType.Announcement);
             }
@@ -412,11 +412,11 @@ namespace Server
 
         private void SMain_Load(object sender, EventArgs e)
         {
-            var loaded = EditEnvir.LoadDB();
+            var loaded = EditEnv.LoadDB();
 
             if (loaded)
             {
-                Envir.Start();
+                Env.Start();
             }
 
             AutoResize();
@@ -438,7 +438,7 @@ namespace Server
 
         private void rebootServerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Envir.Reboot();
+            Env.Reboot();
         }
 
         private void respawnsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -450,7 +450,7 @@ namespace Server
 
         private void monsterTunerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!SMain.Envir.Running)
+            if (!SMain.Env.Running)
             {
                 MessageBox.Show("Server must be running to tune monsters", "Notice",
                 MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
@@ -491,32 +491,32 @@ namespace Server
 
         private void clearBlockedIPsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Envir.IPBlocks.Clear();
+            Env.IPBlocks.Clear();
         }
 
         private void nPCsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Envir.ReloadNPCs();
+            Env.ReloadNPCs();
         }
 
         private void dropsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Envir.ReloadDrops();
+            Env.ReloadDrops();
         }
 
         private void lineMessageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Envir.ReloadLineMessages();
+            Env.ReloadLineMessages();
         }
 
         #region Guild View Tab
         public void ProcessGuildViewTab(bool forced = false)
         {
-            if (GuildListView.Items.Count != Envir.GuildList.Count || forced == true)
+            if (GuildListView.Items.Count != Env.GuildList.Count || forced == true)
             {
                 GuildListView.Items.Clear();
 
-                foreach (GuildInfo guild in Envir.GuildList)
+                foreach (GuildInfo guild in Env.GuildList)
                 {
                     ListViewItem tempItem = new ListViewItem(guild.GuildIndex.ToString()) { Tag = this };
 
@@ -551,7 +551,7 @@ namespace Server
             ListViewItem item = list.SelectedItems[0];
             int index = Int32.Parse(item.Text);
 
-            GuildObject Guild = Envir.GetGuild(index);
+            GuildObject Guild = Env.GetGuild(index);
             GuildItemForm form = new GuildItemForm
             {
                 GuildName = Guild.Name,
@@ -572,7 +572,7 @@ namespace Server
                 if (i == null) continue;
                 ListViewItem tempItem = new ListViewItem(i.Item.UniqueID.ToString()) { Tag = this };
 
-                CharacterInfo character = Envir.GetCharacterInfo((int)i.UserId);
+                CharacterInfo character = Env.GetCharacterInfo((int)i.UserId);
                 if (character != null)
                     tempItem.SubItems.Add(character.Name);
                 else if (i.UserId == -1)

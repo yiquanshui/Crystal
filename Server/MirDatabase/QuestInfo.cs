@@ -6,14 +6,14 @@ namespace Server.MirDatabase
 {
     public class QuestInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
-        protected static Envir EditEnvir
+        protected static Env EditEnv
         {
-            get { return Envir.Edit; }
+            get { return Env.Edit; }
         }
 
         protected static MessageQueue MessageQueue
@@ -38,7 +38,7 @@ namespace Server.MirDatabase
         {
             get
             {
-                return Envir.NPCs.Single(x => x.ObjectID == FinishNpcIndex);
+                return Env.NPCs.Single(x => x.ObjectID == FinishNpcIndex);
             }
         }
 
@@ -101,7 +101,7 @@ namespace Server.MirDatabase
             ItemMessage = reader.ReadString();
             FlagMessage = reader.ReadString();
 
-            if (Envir.LoadVersion > 90)
+            if (Env.LoadVersion > 90)
             {
                 TimeLimitInSeconds = reader.ReadInt32();
             }
@@ -265,14 +265,14 @@ namespace Server.MirDatabase
 
             if (split.Length > 1) ushort.TryParse(split[1], out count);
 
-            ItemInfo mInfo = Envir.GetItemInfo(split[0]);
+            ItemInfo mInfo = Env.GetItemInfo(split[0]);
 
             if (mInfo == null)
             {
-                mInfo = Envir.GetItemInfo(split[0] + "(M)");
+                mInfo = Env.GetItemInfo(split[0] + "(M)");
                 if (mInfo != null) list.Add(new QuestItemReward() { Item = mInfo, Count = count });
 
-                mInfo = Envir.GetItemInfo(split[0] + "(F)");
+                mInfo = Env.GetItemInfo(split[0] + "(F)");
                 if (mInfo != null) list.Add(new QuestItemReward() { Item = mInfo, Count = count });
             }
             else
@@ -289,7 +289,7 @@ namespace Server.MirDatabase
             int count = 1;
             string message = "";
 
-            MonsterInfo mInfo = Envir.GetMonsterInfo(split[0]);
+            MonsterInfo mInfo = Env.GetMonsterInfo(split[0]);
             if (split.Length > 1) int.TryParse(split[1], out count);
 
             var match = _regexMessage.Match(line);
@@ -309,7 +309,7 @@ namespace Server.MirDatabase
             ushort count = 1;
             string message = "";
 
-            ItemInfo mInfo = Envir.GetItemInfo(split[0]);
+            ItemInfo mInfo = Env.GetItemInfo(split[0]);
             if (split.Length > 1) ushort.TryParse(split[1], out count);
 
             var match = _regexMessage.Match(line);
@@ -421,7 +421,7 @@ namespace Server.MirDatabase
             switch (linkType)
             {
                 case "ITEM":
-                    var itemInfo = Envir.GetItemInfo(index);
+                    var itemInfo = Env.GetItemInfo(index);
                     if (itemInfo != null)
                         viewer.Connection.CheckItemInfo(itemInfo);
                     break;
@@ -445,9 +445,9 @@ namespace Server.MirDatabase
             {
                 index = -1;
             }
-            if (index == -1 || (info = EditEnvir.QuestInfoList.FirstOrDefault(it => it.Index == index)) == null)
+            if (index == -1 || (info = EditEnv.QuestInfoList.FirstOrDefault(it => it.Index == index)) == null)
             {
-                info = new QuestInfo() { Index = ++EditEnvir.QuestIndex };
+                info = new QuestInfo() { Index = ++EditEnv.QuestIndex };
                 isNew = true;
 
             }
@@ -474,7 +474,7 @@ namespace Server.MirDatabase
 
             info.RequiredClass = (RequiredClass)temp;
 
-            if (isNew) EditEnvir.QuestInfoList.Add(info);
+            if (isNew) EditEnv.QuestInfoList.Add(info);
         }
 
         public string ToText()

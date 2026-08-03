@@ -4,9 +4,9 @@ namespace Server.MirEnvir
 {
     public class MailInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public ulong MailID;
@@ -45,7 +45,7 @@ namespace Server.MirEnvir
 
         public MailInfo(int recipientIndex, bool canReply = false)
         {
-            MailID = ++Envir.NextMailID;
+            MailID = ++Env.NextMailID;
             RecipientIndex = recipientIndex;
 
             CanReply = canReply;
@@ -64,7 +64,7 @@ namespace Server.MirEnvir
             for (int i = 0; i < count; i++)
             {
                 UserItem item = new UserItem(reader, version, customversion);
-                if (Envir.BindItem(item))
+                if (Env.BindItem(item))
                     Items.Add(item);
             }
 
@@ -129,7 +129,7 @@ namespace Server.MirEnvir
 
             if (RecipientInfo == null)
             {
-                RecipientInfo = Envir.GetCharacterInfo(RecipientIndex);
+                RecipientInfo = Env.GetCharacterInfo(RecipientIndex);
             }
 
             RecipientInfo.Mail.Add(this); //add to players inbox
@@ -139,7 +139,7 @@ namespace Server.MirEnvir
                 RecipientInfo.Player.NewMail = true; //notify player of new mail  --check in player process
             }
 
-            DateSent = Envir.Now;
+            DateSent = Env.Now;
         }
 
         public ClientMail CreateClientMail()

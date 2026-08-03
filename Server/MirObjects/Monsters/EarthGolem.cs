@@ -29,7 +29,7 @@ namespace Server.MirObjects.Monsters
 
         protected override void ProcessAI()
         {
-            if (!Dead && Envir.Time > ActionTime)
+            if (!Dead && Env.Time > ActionTime)
             {
                 bool stoned = !FindNearby(4);
 
@@ -37,9 +37,9 @@ namespace Server.MirObjects.Monsters
                 {
                     Wake();
 
-                    AttackTime = Envir.Time + 1500;
-                    ActionTime = Envir.Time + 1500;
-                    MoveTime = Envir.Time + 1500;
+                    AttackTime = Env.Time + 1500;
+                    ActionTime = Env.Time + 1500;
+                    MoveTime = Env.Time + 1500;
                 }
             }
 
@@ -59,17 +59,17 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             bool ranged = CurrentLocation == Target.CurrentLocation || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 1);
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
-            if (!ranged && Envir.Random.Next(3) > 0)
+            if (!ranged && Env.Random.Next(3) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                 if (damage == 0) return;
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.MAC);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.MAC);
                 ActionList.Add(action);
             }
             else
@@ -102,7 +102,7 @@ namespace Server.MirObjects.Monsters
                         {
                             Spell = Spell.EarthGolemPile,
                             Value = damage,
-                            ExpireTime = Envir.Time + 1200 + start,
+                            ExpireTime = Env.Time + 1200 + start,
                             TickSpeed = 1000,
                             CurrentLocation = new Point(x, y),
                             CastLocation = location,
@@ -111,7 +111,7 @@ namespace Server.MirObjects.Monsters
                             Caster = this
                         };
 
-                        DelayedAction action = new DelayedAction(DelayedType.Spawn, Envir.Time + start, ob);
+                        DelayedAction action = new DelayedAction(DelayedType.Spawn, Env.Time + start, ob);
                         CurrentMap.ActionList.Add(action);
                     }
                 }
@@ -122,15 +122,15 @@ namespace Server.MirObjects.Monsters
         {
             if (Target == null || !CanAttack) return;
 
-            if (InAttackRange() && Envir.Time < FearTime)
+            if (InAttackRange() && Env.Time < FearTime)
             {
                 Attack();
                 return;
             }
 
-            FearTime = Envir.Time + 2000;
+            FearTime = Env.Time + 2000;
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -146,7 +146,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Envir.Random.Next(2)) //No favour
+                switch (Env.Random.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)

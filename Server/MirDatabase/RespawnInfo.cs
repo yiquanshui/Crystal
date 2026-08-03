@@ -5,9 +5,9 @@ namespace Server.MirDatabase
 {
     public class RespawnInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public int MonsterIndex;
@@ -47,7 +47,7 @@ namespace Server.MirDatabase
             }
             else
             {
-                RespawnIndex = ++Envir.RespawnIndex;
+                RespawnIndex = ++Env.RespawnIndex;
             }
         }
 
@@ -101,7 +101,7 @@ namespace Server.MirDatabase
 
         public override string ToString()
         {
-            var monsterName = Envir.MonsterInfoList.Find(o => o.Index == MonsterIndex)?.Name ?? "Unknown";
+            var monsterName = Env.MonsterInfoList.Find(o => o.Index == MonsterIndex)?.Name ?? "Unknown";
             return string.Format("Monster: {0} - {1} - {2} - {3} - {4} - {5} - {6} - {7} - {8} - {9} - {10}",
                 MonsterIndex,
                 monsterName,

@@ -21,8 +21,8 @@ namespace Server.MirObjects.Monsters
         protected internal DarkOmaKing(MonsterInfo info) 
             : base(info)
         {
-            _MassThunderTime = Envir.Time + 10000;
-            _OrbTime = Envir.Time + 20000;
+            _MassThunderTime = Env.Time + 10000;
+            _OrbTime = Env.Time + 20000;
         }
 
         protected override bool InAttackRange()
@@ -41,13 +41,13 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             bool ranged = CurrentLocation == Target.CurrentLocation || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 3);
 
-            if (Envir.Time > _OrbTime)
+            if (Env.Time > _OrbTime)
             {
-                _OrbTime = Envir.Time + 20000;
+                _OrbTime = Env.Time + 20000;
 
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 2 });
 
-                ActionTime = Envir.Time + AttackSpeed + 300;
+                ActionTime = Env.Time + AttackSpeed + 300;
 
                 var attempts = 4;
                 var distance = 8;
@@ -57,8 +57,8 @@ namespace Server.MirObjects.Monsters
                 {
                     for (int i = 0; i < attempts; i++)
                     {
-                        var location = new Point(CurrentLocation.X + Envir.Random.Next(-distance, distance + 1),
-                                             CurrentLocation.Y + Envir.Random.Next(-distance, distance + 1));
+                        var location = new Point(CurrentLocation.X + Env.Random.Next(-distance, distance + 1),
+                                             CurrentLocation.Y + Env.Random.Next(-distance, distance + 1));
 
                         if (location == CurrentLocation || location == Target.CurrentLocation) continue;
 
@@ -67,18 +67,18 @@ namespace Server.MirObjects.Monsters
                 }    
             }
 
-            if (Envir.Time > _MassThunderTime)
+            if (Env.Time > _MassThunderTime)
             {
-                _MassThunderTime = Envir.Time + 10000 + Envir.Random.Next(0, 5000);
+                _MassThunderTime = Env.Time + 10000 + Env.Random.Next(0, 5000);
 
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 3 });
 
-                ActionTime = Envir.Time + AttackSpeed + 300;
+                ActionTime = Env.Time + AttackSpeed + 300;
 
                 int damage = GetAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC]);
                 if (damage == 0) return;
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility, true);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility, true);
                 ActionList.Add(action);
 
                 return;
@@ -86,23 +86,23 @@ namespace Server.MirObjects.Monsters
 
             if (!ranged)
             {
-                if (Envir.Random.Next(4) > 0)
+                if (Env.Random.Next(4) > 0)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
-                    ActionTime = Envir.Time + AttackSpeed + 300;
+                    ActionTime = Env.Time + AttackSpeed + 300;
 
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                     if (damage == 0) return;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility);
                     ActionList.Add(action);
                 }
                 else
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 
-                    ActionTime = Envir.Time + AttackSpeed + 3400;
+                    ActionTime = Env.Time + AttackSpeed + 3400;
 
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                     if (damage == 0) return;
@@ -117,7 +117,7 @@ namespace Server.MirObjects.Monsters
                     {
                         Spell = Spell.DarkOmaKingNuke,
                         Value = Stats[Stat.MaxDC],
-                        ExpireTime = Envir.Time + 900 + start,
+                        ExpireTime = Env.Time + 900 + start,
                         TickSpeed = 1000,
                         Direction = Direction,
                         CurrentLocation = Functions.PointMove(CurrentLocation, Direction, 3),
@@ -127,28 +127,28 @@ namespace Server.MirObjects.Monsters
                         Caster = this
                     };
 
-                    DelayedAction action2 = new DelayedAction(DelayedType.Spawn, Envir.Time + start, ob);
+                    DelayedAction action2 = new DelayedAction(DelayedType.Spawn, Env.Time + start, ob);
                     CurrentMap.ActionList.Add(action2);
                 }
             }
             else
             {
-                if (Envir.Random.Next(3) == 0)
+                if (Env.Random.Next(3) == 0)
                 {
                     Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID, Type = 0 });
 
-                    ActionTime = Envir.Time + AttackSpeed + 300;
+                    ActionTime = Env.Time + AttackSpeed + 300;
 
                     int damage = GetAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC]);
                     if (damage == 0) return;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.MAC);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.MAC);
                     ActionList.Add(action);
                 }
             }
 
             ShockTime = 0;
-            AttackTime = Envir.Time + AttackSpeed;
+            AttackTime = Env.Time + AttackSpeed;
         }
 
         protected override void CompleteAttack(IList<object> data)

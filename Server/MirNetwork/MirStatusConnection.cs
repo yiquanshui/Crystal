@@ -7,9 +7,9 @@ namespace Server.MirNetwork
 {
     public class MirStatusConnection
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
         protected static MessageQueue MessageQueue
         {
@@ -30,7 +30,7 @@ namespace Server.MirNetwork
             {
                 if (_disconnecting == value) return;
                 _disconnecting = value;
-                TimeOutTime = Envir.Time + 500;
+                TimeOutTime = Env.Time + 500;
             }
         }
         public readonly long TimeConnected;
@@ -46,7 +46,7 @@ namespace Server.MirNetwork
                 _client = client;
                 _client.NoDelay = true;
 
-                TimeConnected = Envir.Time;
+                TimeConnected = Env.Time;
                 TimeOutTime = TimeConnected + Settings.TimeOut;
                 Connected = true;
             }
@@ -89,17 +89,17 @@ namespace Server.MirNetwork
                     return;
                 }
 
-                if (Envir.Time > TimeOutTime || Disconnecting)
+                if (Env.Time > TimeOutTime || Disconnecting)
                 {
                     Disconnect();
                     return;
                 }
 
 
-                if (Envir.Time > NextSendTime)
+                if (Env.Time > NextSendTime)
                 {
-                    NextSendTime = Envir.Time + 10000;
-                    string output = string.Format("c;/NoName/{0}/CrystalM2/{1}//;", Envir.PlayerCount,
+                    NextSendTime = Env.Time + 10000;
+                    string output = string.Format("c;/NoName/{0}/CrystalM2/{1}//;", Env.PlayerCount,
                                                   Assembly.GetCallingAssembly().GetName().Version);
 
                     BeginSend(Encoding.ASCII.GetBytes(output));
@@ -118,8 +118,8 @@ namespace Server.MirNetwork
 
                 Connected = false;
 
-                lock (Envir.StatusConnections)
-                    Envir.StatusConnections.Remove(this);
+                lock (Env.StatusConnections)
+                    Env.StatusConnections.Remove(this);
 
                 if (_client != null) _client.Client.Dispose();
                 _client = null;

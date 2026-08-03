@@ -5,9 +5,9 @@ namespace Server.MirDatabase
 {
     public class NPCInfo
     {
-        protected static Envir EditEnvir
+        protected static Env EditEnv
         {
-            get { return Envir.Edit; }
+            get { return Env.Edit; }
         }
 
         public int Index;
@@ -59,7 +59,7 @@ namespace Server.MirDatabase
 
             Location = new Point(reader.ReadInt32(), reader.ReadInt32());
 
-            if (Envir.LoadVersion >= 72)
+            if (Env.LoadVersion >= 72)
             {
                 Image = reader.ReadUInt16();
             }
@@ -70,7 +70,7 @@ namespace Server.MirDatabase
 
             Rate = reader.ReadUInt16();
 
-            if (Envir.LoadVersion >= 64)
+            if (Env.LoadVersion >= 64)
             {
                 TimeVisible = reader.ReadBoolean();
                 HourStart = reader.ReadByte();
@@ -81,22 +81,22 @@ namespace Server.MirDatabase
                 MaxLev = reader.ReadInt16();
                 DayofWeek = reader.ReadString();
                 ClassRequired = reader.ReadString();
-                if (Envir.LoadVersion >= 66)
+                if (Env.LoadVersion >= 66)
                     Conquest = reader.ReadInt32();
                 else
                     Sabuk = reader.ReadBoolean();
                 FlagNeeded = reader.ReadInt32();
             }
 
-            if (Envir.LoadVersion > 95)
+            if (Env.LoadVersion > 95)
             {
                 ShowOnBigMap = reader.ReadBoolean();
                 BigMapIcon = reader.ReadInt32();
             }
-            if (Envir.LoadVersion > 96)
+            if (Env.LoadVersion > 96)
                 CanTeleportTo = reader.ReadBoolean();
 
-            if (Envir.LoadVersion >= 107)
+            if (Env.LoadVersion >= 107)
             {
                 ConquestVisible = reader.ReadBoolean();
             }
@@ -152,14 +152,14 @@ namespace Server.MirDatabase
             {
                 index = -1;
             }
-            if (index == -1 || (info = EditEnvir.NPCInfoList.FirstOrDefault(d => d.Index == index)) == null)
+            if (index == -1 || (info = EditEnv.NPCInfoList.FirstOrDefault(d => d.Index == index)) == null)
             {
-                info = new NPCInfo() { Index = ++EditEnvir.NPCIndex };
+                info = new NPCInfo() { Index = ++EditEnv.NPCIndex };
                 isNew = true;
             }
             info.FileName = data[1];
 
-            info.MapIndex = EditEnvir.MapInfoList.Where(d => d.FileName == data[2]).FirstOrDefault().Index;
+            info.MapIndex = EditEnv.MapInfoList.Where(d => d.FileName == data[2]).FirstOrDefault().Index;
 
             if (!int.TryParse(data[3], out int x)) return;
             if (!int.TryParse(data[4], out int y)) return;
@@ -183,12 +183,12 @@ namespace Server.MirDatabase
             if (!byte.TryParse(data[17], out info.HourEnd)) return;
             if (!byte.TryParse(data[18], out info.MinuteEnd)) return;
 
-            if (isNew) EditEnvir.NPCInfoList.Add(info);
+            if (isNew) EditEnv.NPCInfoList.Add(info);
         }
         public string ToText()
         {
             return string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18}", Index,
-                FileName, EditEnvir.MapInfoList.Where(d => d.Index == MapIndex).FirstOrDefault().FileName, Location.X, Location.Y, Name, Image, Rate, ShowOnBigMap, BigMapIcon, CanTeleportTo, ConquestVisible,
+                FileName, EditEnv.MapInfoList.Where(d => d.Index == MapIndex).FirstOrDefault().FileName, Location.X, Location.Y, Name, Image, Rate, ShowOnBigMap, BigMapIcon, CanTeleportTo, ConquestVisible,
                 MinLev, MaxLev, TimeVisible, HourStart, MinuteStart, HourEnd, MinuteEnd);
         }
 

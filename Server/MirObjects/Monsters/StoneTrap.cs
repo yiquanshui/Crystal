@@ -60,7 +60,7 @@ namespace Server.MirObjects.Monsters
                                 case ObjectType.Monster:
                                 case ObjectType.Hero:
 
-                                    MonsterInfo mInfo = Envir.GetMonsterInfo(ob.Name);
+                                    MonsterInfo mInfo = Env.GetMonsterInfo(ob.Name);
                                     if (mInfo == null)
                                     {
                                         continue;
@@ -110,7 +110,7 @@ namespace Server.MirObjects.Monsters
                 Master != null)
             {
                 if (Master.CurrentMap != CurrentMap ||
-                    Envir.Time > DieTime ||
+                    Env.Time > DieTime ||
                     !Functions.InRange(Master.CurrentLocation, CurrentLocation, 15))
                 {
                     Die();

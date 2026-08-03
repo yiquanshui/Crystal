@@ -38,17 +38,17 @@ namespace Server.MirObjects.Monsters
 
             if (_areaTime == long.MaxValue)
             {
-                _areaTime = Envir.Time + 10000;
+                _areaTime = Env.Time + 10000;
             }
 
             ShockTime = 0;
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            if (Envir.Time < _areaTime)
+            if (Env.Time < _areaTime)
             {
-                ActionTime = Envir.Time + 300;
-                AttackTime = Envir.Time + AttackSpeed;
+                ActionTime = Env.Time + 300;
+                AttackTime = Env.Time + AttackSpeed;
 
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
@@ -59,17 +59,17 @@ namespace Server.MirObjects.Monsters
             }
             else
             {
-                _areaTime = Envir.Time + 5000 + Envir.Random.Next(10) * 1000;
+                _areaTime = Env.Time + 5000 + Env.Random.Next(10) * 1000;
 
-                ActionTime = Envir.Time + 500;
-                AttackTime = Envir.Time + (AttackSpeed * 2);
+                ActionTime = Env.Time + 500;
+                AttackTime = Env.Time + (AttackSpeed * 2);
 
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 
                 var damage = GetAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC]);
                 if (damage == 0) return;
 
-                ActionList.Add(new DelayedAction(DelayedType.Damage, Envir.Time + 1600, Target, 0, DefenceType.MACAgility, true));
+                ActionList.Add(new DelayedAction(DelayedType.Damage, Env.Time + 1600, Target, 0, DefenceType.MACAgility, true));
             }
         }
 
@@ -95,7 +95,7 @@ namespace Server.MirObjects.Monsters
                 {
                     targets[i].Attacked(this, Stats[Stat.MaxMC], defence);
 
-                    PoisonTarget(targets[i], 2, Envir.Random.Next(5, 10), PoisonType.Dazed, 1000);
+                    PoisonTarget(targets[i], 2, Env.Random.Next(5, 10), PoisonType.Dazed, 1000);
                 }
             }
         }

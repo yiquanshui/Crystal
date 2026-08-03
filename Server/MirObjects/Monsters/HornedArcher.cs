@@ -14,13 +14,13 @@ namespace Server.MirObjects.Monsters
 
         protected override void ProcessTarget()
         {
-            if (Envir.Time > BuffTime)
+            if (Env.Time > BuffTime)
             {
                 var friends = FindAllFriends(Info.ViewRange, CurrentLocation);
 
                 if (friends.Count > 0)
                 {
-                    var friend = friends[Envir.Random.Next(friends.Count)];
+                    var friend = friends[Env.Random.Next(friends.Count)];
 
                     int delay = Functions.MaxDistance(CurrentLocation, friend.CurrentLocation) * 50 + 500;
 
@@ -28,18 +28,18 @@ namespace Server.MirObjects.Monsters
 
                     Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = friend.ObjectID, Type = 1 });
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + delay, friend, 0, DefenceType.MACAgility);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + delay, friend, 0, DefenceType.MACAgility);
 
                     ActionList.Add(action);
 
-                    BuffTime = Envir.Time + 20000;
-                    ActionTime = Envir.Time + 300;
-                    AttackTime = Envir.Time + AttackSpeed;
+                    BuffTime = Env.Time + 20000;
+                    ActionTime = Env.Time + 300;
+                    AttackTime = Env.Time + AttackSpeed;
                     ShockTime = 0;
                     return;
                 }
 
-                BuffTime = Envir.Time + 10000;
+                BuffTime = Env.Time + 10000;
             }
 
             base.ProcessTarget();
@@ -57,8 +57,8 @@ namespace Server.MirObjects.Monsters
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID, Type = 0 });
 
@@ -67,7 +67,7 @@ namespace Server.MirObjects.Monsters
 
             int delay = Functions.MaxDistance(CurrentLocation, Target.CurrentLocation) * 50 + 500;
 
-            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + delay, Target, damage, DefenceType.ACAgility);
+            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + delay, Target, damage, DefenceType.ACAgility);
             ActionList.Add(action);
         }
 

@@ -33,13 +33,13 @@ namespace Server.MirObjects.Monsters
             {
                 if (CanAttack)
                 {
-                    if (Envir.Random.Next(3) == 0)
+                    if (Env.Random.Next(3) == 0)
                         LineAttack(4);
                 }
                 if (CurrentLocation == Target.CurrentLocation)
                 {
-                    MirDirection direction = (MirDirection)Envir.Random.Next(8);
-                    int rotation = Envir.Random.Next(2) == 0 ? 1 : -1;
+                    MirDirection direction = (MirDirection)Env.Random.Next(8);
+                    int rotation = Env.Random.Next(2) == 0 ? 1 : -1;
 
                     for (int d = 0; d < 8; d++)
                     {
@@ -54,14 +54,14 @@ namespace Server.MirObjects.Monsters
 
             if (!CanAttack) return;
 
-            if (Envir.Random.Next(3) > 0)
+            if (Env.Random.Next(3) > 0)
             {
                 if (InAttackRange())
                     Attack();
             }
             else LineAttack(4);
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -84,12 +84,12 @@ namespace Server.MirObjects.Monsters
 
             List<MapObject> targets = FindAllTargets(1, CurrentLocation);
 
-            if (targets.Count > 1 && Envir.Random.Next(2) > 0)
+            if (targets.Count > 1 && Env.Random.Next(2) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
                 for (int i = 0; i < targets.Count; i++)
                 {
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 600, targets[i], damage, DefenceType.AC);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 600, targets[i], damage, DefenceType.AC);
                     ActionList.Add(action);
                 }
             }
@@ -99,8 +99,8 @@ namespace Server.MirObjects.Monsters
             }
 
 
-            ActionTime = Envir.Time + 500;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 500;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
 
 
@@ -114,14 +114,14 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (LineAttackTime > Envir.Time) return;
+            if (LineAttackTime > Env.Time) return;
             ShockTime = 0;
-            ActionTime = Envir.Time + 500;
-            AttackTime = Envir.Time + AttackSpeed + 500;
+            ActionTime = Env.Time + 500;
+            AttackTime = Env.Time + AttackSpeed + 500;
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]) * 3;
             if (damage == 0) return;
 
-            LineAttackTime = Envir.Time + 3000 + Envir.Random.Next(5) * 1000;
+            LineAttackTime = Env.Time + 3000 + Env.Random.Next(5) * 1000;
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 2 });
 

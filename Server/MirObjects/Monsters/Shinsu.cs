@@ -20,26 +20,26 @@ namespace Server.MirObjects.Monsters
 
         protected internal Shinsu(MonsterInfo info) : base(info)
         {
-            ActionTime = Envir.Time + 1000;
+            ActionTime = Env.Time + 1000;
         }
 
         protected override void ProcessAI()
         {
-            if (!Dead && Envir.Time > ActionTime)
+            if (!Dead && Env.Time > ActionTime)
             {
-                if (Target != null) ModeTime = Envir.Time + 30000;
+                if (Target != null) ModeTime = Env.Time + 30000;
 
-                if (!Mode && Envir.Time < ModeTime)
+                if (!Mode && Env.Time < ModeTime)
                 {
                     Mode = true;
                     Broadcast(new S.ObjectShow { ObjectID = ObjectID });
-                    ActionTime = Envir.Time + 1000;
+                    ActionTime = Env.Time + 1000;
                 }
-                else if (Mode && Envir.Time > ModeTime)
+                else if (Mode && Env.Time > ModeTime)
                 {
                     Mode = false;
                     Broadcast(new S.ObjectHide { ObjectID = ObjectID });
-                    ActionTime = Envir.Time + 1000;
+                    ActionTime = Env.Time + 1000;
                 }
             }
 
@@ -68,8 +68,8 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);

@@ -17,7 +17,7 @@ namespace Server.MirObjects.Monsters
             if (Target.CurrentMap != CurrentMap) return false;
             if (Target.CurrentLocation == CurrentLocation) return false;
 
-            return Functions.InRange(CurrentLocation, Target.CurrentLocation, Envir.Time > _areaTime ? 3 : 1);
+            return Functions.InRange(CurrentLocation, Target.CurrentLocation, Env.Time > _areaTime ? 3 : 1);
         }
 
         protected override void Attack()
@@ -28,20 +28,20 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < _areaTime)
+            if (Env.Time < _areaTime)
             {
                 base.Attack();
                 return;
             }
 
-            _areaTime = Envir.Time + 2000 + Envir.Random.Next(3)*1000;
+            _areaTime = Env.Time + 2000 + Env.Random.Next(3)*1000;
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
-            ActionList.Add(new DelayedAction(DelayedType.RangeDamage, Envir.Time + 500));
+            ActionList.Add(new DelayedAction(DelayedType.RangeDamage, Env.Time + 500));
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
         }
 

@@ -17,19 +17,19 @@ namespace Server.MirObjects.Monsters
             : base(info)
         {
             RevivalCount = 0;
-            LifeCount = Envir.Random.Next(3);
+            LifeCount = Env.Random.Next(3);
         }
 
         public override void Die()
         {
-            DieTime = Envir.Time;
-            RevivalTime = (4 + Envir.Random.Next(20)) * 1000;
+            DieTime = Env.Time;
+            RevivalTime = (4 + Env.Random.Next(20)) * 1000;
             base.Die();
         }
 
         protected override void ProcessAI()
         {
-            if (Dead && Envir.Time > DieTime + RevivalTime && RevivalCount < LifeCount)
+            if (Dead && Env.Time > DieTime + RevivalTime && RevivalCount < LifeCount)
             {
                 RevivalCount++;
 

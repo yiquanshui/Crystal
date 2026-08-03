@@ -6,7 +6,7 @@ namespace Server
     {
         public string ItemListPath = Path.Combine(Settings.ExportPath, "ItemList.txt");
 
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
         private List<ItemInfo> _selectedItemInfos;
 
         public class ComboBoxItem
@@ -90,12 +90,12 @@ namespace Server
             {
                 ItemInfoListBox.Items.Clear();
 
-                for (int i = 0; i < Envir.ItemInfoList.Count; i++)
+                for (int i = 0; i < Env.ItemInfoList.Count; i++)
                 {
                     if (ITypeFilterComboBox.SelectedItem == null ||
                         ITypeFilterComboBox.SelectedIndex == ITypeFilterComboBox.Items.Count - 1 ||
-                        Envir.ItemInfoList[i].Type == (ItemType)ITypeFilterComboBox.SelectedItem)
-                        ItemInfoListBox.Items.Add(Envir.ItemInfoList[i]);
+                        Env.ItemInfoList[i].Type == (ItemType)ITypeFilterComboBox.SelectedItem)
+                        ItemInfoListBox.Items.Add(Env.ItemInfoList[i]);
                 }
             }
 
@@ -454,12 +454,12 @@ namespace Server
 
             for (int i = 0; i < ItemInfoListBox.Items.Count; i++) selected.Add(ItemInfoListBox.GetSelected(i));
             ItemInfoListBox.Items.Clear();
-            for (int i = 0; i < Envir.ItemInfoList.Count; i++)
+            for (int i = 0; i < Env.ItemInfoList.Count; i++)
             {
                 if (ITypeFilterComboBox.SelectedItem == null ||
                     ITypeFilterComboBox.SelectedIndex == ITypeFilterComboBox.Items.Count - 1 ||
-                    Envir.ItemInfoList[i].Type == (ItemType)ITypeFilterComboBox.SelectedItem)
-                    ItemInfoListBox.Items.Add(Envir.ItemInfoList[i]);
+                    Env.ItemInfoList[i].Type == (ItemType)ITypeFilterComboBox.SelectedItem)
+                    ItemInfoListBox.Items.Add(Env.ItemInfoList[i]);
             };
             for (int i = 0; i < selected.Count; i++) ItemInfoListBox.SetSelected(i, selected[i]);
 
@@ -470,12 +470,12 @@ namespace Server
         {
             if (ITypeFilterComboBox.SelectedIndex == ITypeFilterComboBox.Items.Count - 1)
             {
-                Envir.CreateItemInfo();
+                Env.CreateItemInfo();
                 ITypeFilterComboBox.SelectedIndex = ITypeFilterComboBox.Items.Count - 1;
             }
             else
             {
-                Envir.CreateItemInfo((ItemType)ITypeFilterComboBox.SelectedItem);
+                Env.CreateItemInfo((ItemType)ITypeFilterComboBox.SelectedItem);
             }
 
             UpdateInterface(true);
@@ -497,9 +497,9 @@ namespace Server
 
             if (MessageBox.Show("Are you sure you want to remove the selected Items?", "Remove Items?", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
 
-            for (int i = 0; i < _selectedItemInfos.Count; i++) Envir.Remove(_selectedItemInfos[i]);
+            for (int i = 0; i < _selectedItemInfos.Count; i++) Env.Remove(_selectedItemInfos[i]);
 
-            if (Envir.ItemInfoList.Count == 0) Envir.ItemIndex = 0;
+            if (Env.ItemInfoList.Count == 0) Env.ItemIndex = 0;
 
             UpdateInterface(true);
         }
@@ -1046,7 +1046,7 @@ namespace Server
 
         private void ItemInfoForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Envir.SaveDB();
+            Env.SaveDB();
         }
 
         private void PasteButton_Click(object sender, EventArgs e)
@@ -1891,8 +1891,8 @@ namespace Server
         private void Gameshop_button_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < _selectedItemInfos.Count; i++)
-                Envir.AddToGameShop(_selectedItemInfos[i]);
-            Envir.SaveDB();
+                Env.AddToGameShop(_selectedItemInfos[i]);
+            Env.SaveDB();
         }
 
         private void NoWeddingRingcheckbox_CheckedChanged(object sender, EventArgs e)

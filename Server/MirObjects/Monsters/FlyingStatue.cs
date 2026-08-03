@@ -38,18 +38,18 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             bool ranged = CurrentLocation == Target.CurrentLocation || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 1);
 
-            ActionTime = Envir.Time + 600;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 600;
+            AttackTime = Env.Time + AttackSpeed;
 
             if (!ranged)
             {
-                if (Envir.Random.Next(6) != 0)
+                if (Env.Random.Next(6) != 0)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                     if (damage == 0) return;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 1100, Target, damage, DefenceType.MACAgility);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 1100, Target, damage, DefenceType.MACAgility);
                     ActionList.Add(action);
                 }
                 else
@@ -58,7 +58,7 @@ namespace Server.MirObjects.Monsters
                     int damage = GetAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC]);
                     if (damage == 0) return;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 1100, Target, damage, DefenceType.MACAgility);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 1100, Target, damage, DefenceType.MACAgility);
                     ActionList.Add(action);
                 }
             }
@@ -78,7 +78,7 @@ namespace Server.MirObjects.Monsters
 
             if (count == 0) return;
 
-            var target = targets[Envir.Random.Next(count)];
+            var target = targets[Env.Random.Next(count)];
 
             var location = target.CurrentLocation;
 
@@ -106,7 +106,7 @@ namespace Server.MirObjects.Monsters
                     {
                         Spell = Spell.FlyingStatueIceTornado,
                         Value = damage,
-                        ExpireTime = Envir.Time + 1500 + start,
+                        ExpireTime = Env.Time + 1500 + start,
                         TickSpeed = 3000,
                         CurrentLocation = new Point(x, y),
                         CastLocation = location,
@@ -115,7 +115,7 @@ namespace Server.MirObjects.Monsters
                         Caster = this
                     };
 
-                    DelayedAction action = new DelayedAction(DelayedType.Spawn, Envir.Time + start, ob);
+                    DelayedAction action = new DelayedAction(DelayedType.Spawn, Env.Time + start, ob);
                     CurrentMap.ActionList.Add(action);
                 }
             }
@@ -136,7 +136,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -155,7 +155,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Envir.Random.Next(2)) //No favour
+                switch (Env.Random.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)

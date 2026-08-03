@@ -32,7 +32,7 @@ namespace Server.MirObjects.Monsters
 
             if (!ranged)
             {
-                switch (Envir.Random.Next(5))
+                switch (Env.Random.Next(5))
                 {
                     case 0:
                     case 1:
@@ -46,7 +46,7 @@ namespace Server.MirObjects.Monsters
                             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                             if (damage == 0) return;
 
-                            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility, true);
+                            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility, true);
                             ActionList.Add(action);
                         }
                         break;
@@ -54,7 +54,7 @@ namespace Server.MirObjects.Monsters
                         {
                             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 2 });
 
-                            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, 0, DefenceType.ACAgility, false);
+                            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, 0, DefenceType.ACAgility, false);
                             ActionList.Add(action);
                         }
                         break;
@@ -64,13 +64,13 @@ namespace Server.MirObjects.Monsters
             }
             else
             {
-                if (Envir.Random.Next(2) == 0)
+                if (Env.Random.Next(2) == 0)
                 {
                     MoveTo(Target.CurrentLocation);
                 }
                 else
                 {
-                    switch (Envir.Random.Next(2))
+                    switch (Env.Random.Next(2))
                     {
                         case 0:
                             Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
@@ -84,7 +84,7 @@ namespace Server.MirObjects.Monsters
                                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]) * 3;
                                 if (damage == 0) return;
 
-                                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 500, Target, damage, DefenceType.ACAgility);
+                                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 500, Target, damage, DefenceType.ACAgility);
                                 ActionList.Add(action);
 
 
@@ -94,8 +94,8 @@ namespace Server.MirObjects.Monsters
                 }
 
                 ShockTime = 0;
-                ActionTime = Envir.Time + 300;
-                AttackTime = Envir.Time + AttackSpeed;
+                ActionTime = Env.Time + 300;
+                AttackTime = Env.Time + AttackSpeed;
             }
         }
 
@@ -171,22 +171,22 @@ namespace Server.MirObjects.Monsters
 
             int count = Math.Min(8, (targets.Count * 5) - SlaveList.Count);
             
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             for (int i = 0; i < count; i++)
             {
                 MonsterObject mob = null;
-                switch (Envir.Random.Next(4))
+                switch (Env.Random.Next(4))
                 {
                     case 0:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.BehemothMonster1));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.BehemothMonster1));
                         break;
                     case 1:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.BehemothMonster2));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.BehemothMonster2));
                         break;
                     case 2:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.BehemothMonster3));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.BehemothMonster3));
                         break;
                 }
 
@@ -195,8 +195,8 @@ namespace Server.MirObjects.Monsters
                 if (!mob.Spawn(CurrentMap, Front))
                     mob.Spawn(CurrentMap, CurrentLocation);
                 
-                mob.Target = targets[Envir.Random.Next(targets.Count)];
-                mob.ActionTime = Envir.Time + 2000;
+                mob.Target = targets[Env.Random.Next(targets.Count)];
+                mob.ActionTime = Env.Time + 2000;
                 SlaveList.Add(mob);
             }
         }

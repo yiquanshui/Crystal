@@ -41,11 +41,11 @@ namespace Server.MirEnvir
             RandomWrapper.Value.Next(minValue, maxValue);
     }
 
-    public class Envir
+    public class Env
     {
-        public static Envir Main { get; } = new Envir();
+        public static Env Main { get; } = new Env();
 
-        public static Envir Edit { get; } = new Envir();
+        public static Env Edit { get; } = new Env();
 
         protected static MessageQueue MessageQueue => MessageQueue.Instance;
 
@@ -178,7 +178,7 @@ namespace Server.MirEnvir
 
         static HttpServer http;
 
-        static Envir()
+        static Env()
         {
             AccountIDReg = new Regex(@"^[A-Za-z0-9]{" + Globals.MinAccountIDLength + "," + Globals.MaxAccountIDLength + "}$");
             PasswordReg = new Regex(@"^[A-Za-z0-9]{" + Globals.MinPasswordLength + "," + Globals.MaxPasswordLength + "}$");
@@ -4186,7 +4186,7 @@ namespace Server.MirEnvir
             return list;
         }
 
-        private AccountInfo? GetAccount(string accountId)
+        public AccountInfo? GetAccount(string accountId)
         {
             return AccountList.FirstOrDefault(t => string.Compare(t.AccountID, accountId, StringComparison.OrdinalIgnoreCase) == 0);
         }
@@ -4464,7 +4464,7 @@ namespace Server.MirEnvir
             }
         }
 
-        private int RandomRange(int count, int rate)
+        public int RandomRange(int count, int rate)
         {
             var x = 0;
             for (var i = 0; i < count; i++) if (Random.Next(rate) == 0) x++;

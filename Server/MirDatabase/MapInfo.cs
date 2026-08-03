@@ -5,14 +5,14 @@ namespace Server.MirDatabase
 {
     public class MapInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
-        protected static Envir EditEnvir
+        protected static Env EditEnv
         {
-            get { return Envir.Edit; }
+            get { return Env.Edit; }
         }
 
         public int Index;
@@ -60,7 +60,7 @@ namespace Server.MirDatabase
 
             count = reader.ReadInt32();
             for (int i = 0; i < count; i++)
-                Respawns.Add(new RespawnInfo(reader, Envir.LoadVersion, Envir.LoadCustomVersion));
+                Respawns.Add(new RespawnInfo(reader, Env.LoadVersion, Env.LoadCustomVersion));
 
             count = reader.ReadInt32();
             for (int i = 0; i < count; i++)
@@ -94,22 +94,22 @@ namespace Server.MirDatabase
             NoFight = reader.ReadBoolean();
             Music = reader.ReadUInt16();
 
-            if (Envir.LoadVersion < 78) return;
+            if (Env.LoadVersion < 78) return;
             NoTownTeleport = reader.ReadBoolean();
-            if (Envir.LoadVersion < 79) return;
+            if (Env.LoadVersion < 79) return;
             NoReincarnation = reader.ReadBoolean();
 
-            if (Envir.LoadVersion >= 110)
+            if (Env.LoadVersion >= 110)
             {
                 WeatherParticles = (WeatherSetting)reader.ReadUInt16();
             }
 
-            if (Envir.LoadVersion >= 111)
+            if (Env.LoadVersion >= 111)
             {
                 GT = reader.ReadBoolean();
                 GTIndex = reader.ReadByte();
             }
-            if (Envir.LoadVersion >= 114)
+            if (Env.LoadVersion >= 114)
             {
                 NoExperience = reader.ReadBoolean();
                 NoGroup = reader.ReadBoolean();
@@ -196,22 +196,22 @@ namespace Server.MirDatabase
 
         public void CreateMap()
         {
-            for (int j = 0; j < Envir.NPCInfoList.Count; j++)
+            for (int j = 0; j < Env.NPCInfoList.Count; j++)
             {
-                if (Envir.NPCInfoList[j].MapIndex != Index) continue;
+                if (Env.NPCInfoList[j].MapIndex != Index) continue;
 
-                NPCs.Add(Envir.NPCInfoList[j]);
+                NPCs.Add(Env.NPCInfoList[j]);
             }
 
             Map map = new Map(this);
 
             if (!map.Load()) return;
 
-            Envir.MapList.Add(map);
+            Env.MapList.Add(map);
 
             for (int i = 0; i < SafeZones.Count; i++)
                 if (SafeZones[i].StartPoint)
-                    Envir.StartPoints.Add(SafeZones[i]);
+                    Env.StartPoints.Add(SafeZones[i]);
         }
 
         public void CreateSafeZone()
@@ -221,7 +221,7 @@ namespace Server.MirDatabase
 
         public void CreateRespawnInfo()
         {
-            Respawns.Add(new RespawnInfo { RespawnIndex = ++EditEnvir.RespawnIndex });
+            Respawns.Add(new RespawnInfo { RespawnIndex = ++EditEnv.RespawnIndex });
         }
 
         public override string ToString()
@@ -340,12 +340,12 @@ namespace Server.MirDatabase
 
 
 
-            info.Index = ++EditEnvir.MapIndex;
-            EditEnvir.MapInfoList.Add(info);
+            info.Index = ++EditEnv.MapIndex;
+            EditEnv.MapInfoList.Add(info);
         }
         public static string GetMapTitleByIndex(int index) // For Players Online tab
         {
-            var mapInfo = Envir.MapInfoList.FirstOrDefault(m => m.Index == index);
+            var mapInfo = Env.MapInfoList.FirstOrDefault(m => m.Index == index);
             return mapInfo != null ? mapInfo.Title : $"UnknownMap({index})";
         }
     }

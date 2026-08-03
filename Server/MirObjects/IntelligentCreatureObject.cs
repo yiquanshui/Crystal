@@ -64,7 +64,7 @@ namespace Server.MirObjects
         {
             get
             {
-                return Envir.Time > MoveTime && Envir.Time > ActionTime;
+                return Env.Time > MoveTime && Env.Time > ActionTime;
             }
         }
 
@@ -77,7 +77,7 @@ namespace Server.MirObjects
         {
             get
             {
-                return !Dead && Envir.Time > AttackTime && Envir.Time > ActionTime;
+                return !Dead && Env.Time > AttackTime && Env.Time > ActionTime;
             }
         }
 
@@ -91,7 +91,7 @@ namespace Server.MirObjects
 
         public IntelligentCreatureObject(MonsterInfo info) : base(info)
         {
-            ActionTime = Envir.Time + 1000;
+            ActionTime = Env.Time + 1000;
             PetType = (IntelligentCreatureType)info.Effect;
         }
 
@@ -101,10 +101,10 @@ namespace Server.MirObjects
 
             var time = OperateTime;
 
-            if (CreatureTime < time && CreatureTime > Envir.Time)
+            if (CreatureTime < time && CreatureTime > Env.Time)
                 time = RoamTime;
 
-            if (OperateTime <= Envir.Time || time < OperateTime)
+            if (OperateTime <= Env.Time || time < OperateTime)
                 OperateTime = time;
         }
 
@@ -115,7 +115,7 @@ namespace Server.MirObjects
             if (Target != null && (Target.CurrentMap != CurrentMap || !Functions.InRange(CurrentLocation, Target.CurrentLocation, Globals.DataRange)))
                 Target = null;
 
-            if (Dead && Envir.Time >= DeadTime)
+            if (Dead && Env.Time >= DeadTime)
             {
                 CurrentMap.RemoveObject(this);
                 if (Master != null)
@@ -128,9 +128,9 @@ namespace Server.MirObjects
                 return;
             }
 
-            if (Envir.Time > CreatureTime)
+            if (Env.Time > CreatureTime)
             {
-                CreatureTime = Envir.Time + Settings.Second;
+                CreatureTime = Env.Time + Settings.Second;
 
                 ProcessBlackStoneProduction();
                 ProcessMaintainFoodBuff();
@@ -146,7 +146,7 @@ namespace Server.MirObjects
 
             if (DoDelayedPickup && Target != null && DoTargetList)//delayed pickup
             {
-                if (Envir.Time > DelayedpickupTicker)
+                if (Env.Time > DelayedpickupTicker)
                 {
                     PickupAllItems(Target.CurrentLocation);
                     Target = null;
@@ -188,17 +188,17 @@ namespace Server.MirObjects
         public void ProcessAnimVariant()
         {
             
-            if (Envir.Time > AnimvariantTicker)
+            if (Env.Time > AnimvariantTicker)
             {
-                AnimvariantTicker = Envir.Time + AnimvariantDelay;
-                ActionTime = Envir.Time + 300;
-                AttackTime = Envir.Time + AttackSpeed;
+                AnimvariantTicker = Env.Time + AnimvariantDelay;
+                ActionTime = Env.Time + 300;
+                AttackTime = Env.Time + AttackSpeed;
 
                 switch (PetType)
                 {
                     case IntelligentCreatureType.BabyDragon:
                     case IntelligentCreatureType.OlympicFlame:
-                        if (Envir.Random.Next(10) > 5)
+                        if (Env.Random.Next(10) > 5)
                             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
                         else
                             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 2 });
@@ -207,7 +207,7 @@ namespace Server.MirObjects
                         Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
                         break;
                     default:
-                        switch(Envir.Random.Next(10))
+                        switch(Env.Random.Next(10))
                         {
                             case 0:
                                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
@@ -276,26 +276,26 @@ namespace Server.MirObjects
                 FindTarget();
             }
             if (Target != null) return;
-            if (Envir.Time < SearchTime) return;
+            if (Env.Time < SearchTime) return;
 
-            SearchTime = Envir.Time + SearchDelay;
+            SearchTime = Env.Time + SearchDelay;
 
-            if (Target == null || Envir.Random.Next(3) == 0) FindTarget();
+            if (Target == null || Env.Random.Next(3) == 0) FindTarget();
         }
         protected override void ProcessRoam()
         {
             if (Target == null) FindTarget();
-            if (Target != null || Envir.Time < RoamTime) return;
+            if (Target != null || Env.Time < RoamTime) return;
 
             //if (ProcessRoute()) return;
-            RoamTime = Envir.Time + 500;
+            RoamTime = Env.Time + 500;
 
             if (Master != null)
             {
                 if (!Functions.InRange(CurrentLocation, Master.CurrentLocation, 2))
                     MoveTo(Functions.PointMove(Master.CurrentLocation,Master.Direction, -2));
                 else
-                    if (Envir.Random.Next(100) >= 60) ProcessAnimVariant();//random anims
+                    if (Env.Random.Next(100) >= 60) ProcessAnimVariant();//random anims
             }
         }
         
@@ -520,7 +520,7 @@ namespace Server.MirObjects
 
             if (Walk(dir)) return true;
 
-            switch (Envir.Random.Next(2)) //No favour
+            switch (Env.Random.Next(2)) //No favour
             {
                 case 0:
                     for (int i = 0; i < 7; i++)
@@ -553,8 +553,8 @@ namespace Server.MirObjects
 
             Target = null;
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             DecreaseFullness(1);//use some food for operation
             IncreasePearlProduction();
@@ -568,8 +568,8 @@ namespace Server.MirObjects
                 Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             DecreaseFullness(1);//use some food for operation
             IncreasePearlProduction();
@@ -578,7 +578,7 @@ namespace Server.MirObjects
 
         public void DelayedPickup(long delay)
         {
-            DelayedpickupTicker = Envir.Time + delay;
+            DelayedpickupTicker = Env.Time + delay;
             DoDelayedPickup = true;
         }
 
@@ -697,7 +697,7 @@ namespace Server.MirObjects
         public void IncreaseFullness(int amount)
         {
             if (Fullness >= 10000) return;
-            FullnessTicker = Envir.Time + FullnessDelay;
+            FullnessTicker = Env.Time + FullnessDelay;
             Fullness += amount;
             if (Fullness < CreatureRules.MinimalFullness) CreatureSay(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.PetHmmm));
             else CreatureSay(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.PetBurp));
@@ -708,9 +708,9 @@ namespace Server.MirObjects
         {
             if (Fullness <= 0 || MaintainfoodTime > 0) return;
 
-            if (Envir.Time > FullnessTicker)
+            if (Env.Time > FullnessTicker)
             {
-                FullnessTicker = Envir.Time + FullnessDelay;
+                FullnessTicker = Env.Time + FullnessDelay;
                 Fullness -= amount;
                 if (Fullness < 0) Fullness = 0;
                 if (Fullness < CreatureRules.MinimalFullness) CreatureTimedSay(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.PetHungry));
@@ -764,10 +764,10 @@ namespace Server.MirObjects
 
         public void CreatureTimedSay(string message)
         {
-            if (Envir.Time > TimedSayTicker)
+            if (Env.Time > TimedSayTicker)
             {
                 CreatureSay(message);
-                TimedSayTicker = Envir.Time + TimedSayDelay;
+                TimedSayTicker = Env.Time + TimedSayDelay;
             }
         }
 
@@ -831,8 +831,8 @@ namespace Server.MirObjects
         {
             base.Spawned();
             Summoned = true;
-            FullnessTicker = Envir.Time + FullnessDelay;
-            AnimvariantTicker = Envir.Time + AnimvariantDelay;
+            FullnessTicker = Env.Time + FullnessDelay;
+            AnimvariantTicker = Env.Time + AnimvariantDelay;
         }
 
         public override void Die()

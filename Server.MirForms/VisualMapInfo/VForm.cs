@@ -10,7 +10,7 @@ namespace Server.MirForms.VisualMapInfo
     {
         ShapeContainer Canvas = new ShapeContainer();
 
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
 
         public Point MouseDownLocation;
 
@@ -115,8 +115,8 @@ namespace Server.MirForms.VisualMapInfo
 
         private void InitializeRespawnInfo()
         {
-            for (int i = 0; i < Envir.MonsterInfoList.Count; i++)
-                RespawnsFilter.Items.Add(Envir.MonsterInfoList[i]);
+            for (int i = 0; i < Env.MonsterInfoList.Count; i++)
+                RespawnsFilter.Items.Add(Env.MonsterInfoList[i]);
 
             RespawnsFilter.Items.Add("No Filter");
             RespawnsFilter.Text = "No Filter";

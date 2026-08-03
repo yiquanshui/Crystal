@@ -19,29 +19,29 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage == 0) return;
 
-            if (Envir.Random.Next(5) != 0)
+            if (Env.Random.Next(5) != 0)
             {
                 Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility);
                 ActionList.Add(action);
             }
             else
             {
                 Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
-                DelayedAction action1 = new DelayedAction(DelayedType.Damage, Envir.Time + 350, Target, damage, DefenceType.ACAgility);
+                DelayedAction action1 = new DelayedAction(DelayedType.Damage, Env.Time + 350, Target, damage, DefenceType.ACAgility);
                 ActionList.Add(action1);
-                DelayedAction action2 = new DelayedAction(DelayedType.Damage, Envir.Time + 550, Target, damage, DefenceType.ACAgility);
+                DelayedAction action2 = new DelayedAction(DelayedType.Damage, Env.Time + 550, Target, damage, DefenceType.ACAgility);
                 ActionList.Add(action2);
-                DelayedAction action3 = new DelayedAction(DelayedType.Damage, Envir.Time + 750, Target, damage, DefenceType.ACAgility);
+                DelayedAction action3 = new DelayedAction(DelayedType.Damage, Env.Time + 750, Target, damage, DefenceType.ACAgility);
                 ActionList.Add(action3);
             }
         }        

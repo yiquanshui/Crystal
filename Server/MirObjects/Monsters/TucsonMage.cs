@@ -33,20 +33,20 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
             bool range = !Functions.InRange(CurrentLocation, Target.CurrentLocation, 1);
 
-            if (!range && Envir.Random.Next(3) > 0)
+            if (!range && Env.Random.Next(3) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                 if (damage == 0) return;
  
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility);
                 ActionList.Add(action);
             }
             else
@@ -75,7 +75,7 @@ namespace Server.MirObjects.Monsters
                     {
                         if (!ob.IsAttackTarget(this)) continue;
 
-                        DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, ob, damage, DefenceType.ACAgility);
+                        DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, ob, damage, DefenceType.ACAgility);
                         ActionList.Add(action);
                     }
                     else continue;
@@ -105,7 +105,7 @@ namespace Server.MirObjects.Monsters
                             if (!ob.IsAttackTarget(this)) continue;
 
                             int delay = Functions.MaxDistance(CurrentLocation, ob.CurrentLocation) * 50 + 500; //50 MS per Step
-                            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + delay, ob, damage, DefenceType.ACAgility);
+                            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + delay, ob, damage, DefenceType.ACAgility);
                             ActionList.Add(action);
                         }
                         else continue;

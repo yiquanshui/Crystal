@@ -5,7 +5,7 @@ namespace Server
 {
     public partial class BalanceConfigForm : Form
     {
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
         public byte SelectedClassID = 0;
         public byte HeroSelectedClassID = 0;
 
@@ -65,13 +65,13 @@ namespace Server
             if (BaseStatsChanged)
             {
                 Settings.SaveBaseStats();
-                SMain.Envir.RequiresBaseStatUpdate();
+                SMain.Env.RequiresBaseStatUpdate();
             }
 
             if (HeroBaseStatsChanged)
             {
                 Settings.SaveHeroBaseStats();
-                SMain.Envir.RequiresHeroBaseStatUpdate();
+                SMain.Env.RequiresHeroBaseStatUpdate();
             }
 
             if (RandomItemStatsChanged) Settings.SaveRandomItemStats();

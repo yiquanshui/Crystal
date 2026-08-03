@@ -30,7 +30,7 @@ namespace Server.MirObjects.Monsters
 
         protected override void ProcessSearch()
         {
-            if (Envir.Time < SearchTime) return;
+            if (Env.Time < SearchTime) return;
 
             base.ProcessSearch();
 
@@ -50,21 +50,21 @@ namespace Server.MirObjects.Monsters
 
             ShockTime = 0;
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damageMultiplier = (Pack.Count > _MaxPackSize ? _MaxPackSize : Pack.Count) + 1;
 
             if (Info.Effect == 1)
             {
-                if (!ranged && Envir.Random.Next(4) > 0)
+                if (!ranged && Env.Random.Next(4) > 0)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC] * damageMultiplier);
                     if (damage == 0) return;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.MACAgility);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.MACAgility);
                     ActionList.Add(action);
                 }
                 else
@@ -86,7 +86,7 @@ namespace Server.MirObjects.Monsters
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC] * damageMultiplier);
                 if (damage == 0) return;
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.MACAgility);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.MACAgility);
                 ActionList.Add(action);
             }
         }

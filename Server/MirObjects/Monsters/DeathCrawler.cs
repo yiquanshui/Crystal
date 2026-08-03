@@ -15,14 +15,14 @@ namespace Server.MirObjects.Monsters
         {
             base.Die();
 
-            ActionList.Add(new DelayedAction(DelayedType.Die, Envir.Time + 500));
+            ActionList.Add(new DelayedAction(DelayedType.Die, Env.Time + 500));
         }
 
         public override void ApplyNegativeEffects(HumanObject attacker, DefenceType type, ushort levelOffset)
         {
             base.ApplyNegativeEffects(attacker, type, levelOffset);
 
-            if (Envir.Random.Next(3) == 0)
+            if (Env.Random.Next(3) == 0)
             {
                 Broadcast(new S.ObjectEffect { ObjectID = ObjectID, Effect = SpellEffect.DeathCrawlerBreath });
 

@@ -12,7 +12,7 @@ namespace Server.MirObjects.Monsters
         protected internal PoisonHugger(MonsterInfo info)
             : base(info)
         {
-            ExplosionTime = Envir.Time + 1000 * 60 * 5;
+            ExplosionTime = Env.Time + 1000 * 60 * 5;
         }
 
         protected override bool InAttackRange()
@@ -24,7 +24,7 @@ namespace Server.MirObjects.Monsters
         {
             if (!CanAttack) return;
 
-            if (Target == null || Envir.Time > ExplosionTime || !Target.IsAttackTarget(this))
+            if (Target == null || Env.Time > ExplosionTime || !Target.IsAttackTarget(this))
             {
                 Die(); return;
             }
@@ -35,20 +35,20 @@ namespace Server.MirObjects.Monsters
             {
                 if (ranged)
                 {
-                    if(Envir.Random.Next(5) == 0)
+                    if(Env.Random.Next(5) == 0)
                     {
                         Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
                         Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID });
 
-                        ActionTime = Envir.Time + 300;
-                        AttackTime = Envir.Time + AttackSpeed;
+                        ActionTime = Env.Time + 300;
+                        AttackTime = Env.Time + AttackSpeed;
 
                         int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                         if (damage == 0) return;
 
                         int delay = Functions.MaxDistance(CurrentLocation, Target.CurrentLocation) * 50 + 500; //50 MS per Step
 
-                        DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + delay, Target, damage, DefenceType.ACAgility);
+                        DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + delay, Target, damage, DefenceType.ACAgility);
                         ActionList.Add(action);
 
                         return;
@@ -64,7 +64,7 @@ namespace Server.MirObjects.Monsters
                 }
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -79,7 +79,7 @@ namespace Server.MirObjects.Monsters
 
             for (int i = 0; i < targets.Count; i++)
             {
-                ActionList.Add(new DelayedAction(DelayedType.Die, Envir.Time + 500, targets[i], GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]), DefenceType.ACAgility));
+                ActionList.Add(new DelayedAction(DelayedType.Die, Env.Time + 500, targets[i], GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]), DefenceType.ACAgility));
             }
 
             base.Die();

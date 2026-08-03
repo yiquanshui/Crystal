@@ -32,16 +32,16 @@ namespace Server.MirObjects.Monsters
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            byte spelltype = Envir.Random.Next(2) == 0 ? (byte)0 : (byte)1;
+            byte spelltype = Env.Random.Next(2) == 0 ? (byte)0 : (byte)1;
             Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID, Type = spelltype });
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage == 0) return;
 
-            DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 500, Target, damage, DefenceType.MAC);
+            DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 500, Target, damage, DefenceType.MAC);
             ActionList.Add(action);
         }
 
@@ -49,11 +49,11 @@ namespace Server.MirObjects.Monsters
         {
             if (Target == null || !CanAttack) return;
 
-            if (InAttackRange() && (Envir.Time < FearTime))
+            if (InAttackRange() && (Env.Time < FearTime))
             {
-                if (Functions.InRange(CurrentLocation, Target.CurrentLocation, 1) && Envir.Time > TeleportTime && Envir.Random.Next(1) == 0)
+                if (Functions.InRange(CurrentLocation, Target.CurrentLocation, 1) && Env.Time > TeleportTime && Env.Random.Next(1) == 0)
                 {
-                    TeleportTime = Envir.Time + 10000;
+                    TeleportTime = Env.Time + 10000;
                     TeleportRandom(40, 14);
                     return;
                 }
@@ -64,9 +64,9 @@ namespace Server.MirObjects.Monsters
                 }
             }
 
-            FearTime = Envir.Time + 5000;
+            FearTime = Env.Time + 5000;
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -82,7 +82,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Envir.Random.Next(2)) //No favour
+                switch (Env.Random.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)
@@ -113,10 +113,10 @@ namespace Server.MirObjects.Monsters
                 Point location;
 
                 if (distance <= 0)
-                    location = new Point(Envir.Random.Next(CurrentMap.Width), Envir.Random.Next(CurrentMap.Height));
+                    location = new Point(Env.Random.Next(CurrentMap.Width), Env.Random.Next(CurrentMap.Height));
                 else
-                    location = new Point(CurrentLocation.X + Envir.Random.Next(-distance, distance + 1),
-                                         CurrentLocation.Y + Envir.Random.Next(-distance, distance + 1));
+                    location = new Point(CurrentLocation.X + Env.Random.Next(-distance, distance + 1),
+                                         CurrentLocation.Y + Env.Random.Next(-distance, distance + 1));
 
                 if (Teleport(CurrentMap, location, true, 2)) return true;
             }

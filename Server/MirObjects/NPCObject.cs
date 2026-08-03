@@ -16,7 +16,7 @@ namespace Server.MirObjects
         {
             if (objectID == 0) return null;
 
-            var obj = Envir.NPCs.SingleOrDefault(x => x.ObjectID == objectID);
+            var obj = Env.NPCs.SingleOrDefault(x => x.ObjectID == objectID);
 
             if (obj != null && obj is NPCObject)
             {
@@ -49,10 +49,10 @@ namespace Server.MirObjects
             Info = info;
             NameColour = Color.Lime;
 
-            Direction = (MirDirection)Envir.Random.Next(3);
-            TurnTime = Envir.Time + Envir.Random.Next(100);
+            Direction = (MirDirection)Env.Random.Next(3);
+            TurnTime = Env.Time + Env.Random.Next(100);
 
-            Envir.NPCs.Add(this);
+            Env.NPCs.Add(this);
 
             Spawned();
             LoadScript();
@@ -83,7 +83,7 @@ namespace Server.MirObjects
                 {
                     UserItem item = items[i];
 
-                    if (DateTime.Compare(item.BuybackExpiryDate.AddMinutes(Settings.GoodsBuyBackTime), Envir.Now) <= 0 || clear)
+                    if (DateTime.Compare(item.BuybackExpiryDate.AddMinutes(Settings.GoodsBuyBackTime), Env.Now) <= 0 || clear)
                     {
                         deleteList.Add(item);
 
@@ -213,23 +213,23 @@ namespace Server.MirObjects
         {
             base.Process();
 
-            if (Envir.Time > TurnTime)
+            if (Env.Time > TurnTime)
             {
-                TurnTime = Envir.Time + TurnDelay;
-                Turn((MirDirection)Envir.Random.Next(3));
+                TurnTime = Env.Time + TurnDelay;
+                Turn((MirDirection)Env.Random.Next(3));
             }
 
-            if (Envir.Time > UsedGoodsTime)
+            if (Env.Time > UsedGoodsTime)
             {
-                UsedGoodsTime = Envir.Time + (Settings.Minute * Settings.GoodsBuyBackTime);
+                UsedGoodsTime = Env.Time + (Settings.Minute * Settings.GoodsBuyBackTime);
                 ProcessGoods();
             }
 
-            if (Envir.Time > VisTime)
+            if (Env.Time > VisTime)
             {
-                VisTime = Envir.Time + (Settings.Minute);
+                VisTime = Env.Time + (Settings.Minute);
 
-                if (Info.DayofWeek != "" && Info.DayofWeek != Envir.Now.DayOfWeek.ToString())
+                if (Info.DayofWeek != "" && Info.DayofWeek != Env.Now.DayOfWeek.ToString())
                 {
                     if (Visible) Hide();
                 }
@@ -237,7 +237,7 @@ namespace Server.MirObjects
                 {
                     int StartTime = ((Info.HourStart * 60) + Info.MinuteStart);
                     int FinishTime = ((Info.HourEnd * 60) + Info.MinuteEnd);
-                    int CurrentTime = ((Envir.Now.Hour * 60) + Envir.Now.Minute);
+                    int CurrentTime = ((Env.Now.Hour * 60) + Env.Now.Minute);
 
                     if (Info.TimeVisible)
                     {
@@ -253,17 +253,17 @@ namespace Server.MirObjects
                 }
             }
 
-            if (Speech.Count > 0 && Envir.Time > SpeechTime)
+            if (Speech.Count > 0 && Env.Time > SpeechTime)
             {
                 var nearby = FindNearby(4);
 
-                SpeechTime = Envir.Time + (SpeechDelay * (nearby ? Envir.Random.Next(1, 13) : 1));
+                SpeechTime = Env.Time + (SpeechDelay * (nearby ? Env.Random.Next(1, 13) : 1));
 
                 if (nearby)
                 {
                     var maxWeight = Speech.Max(x => x.Weight);
 
-                    var speech = Speech.OrderBy(x => x.GetWeight(Envir.Random, maxWeight)).Last();
+                    var speech = Speech.OrderBy(x => x.GetWeight(Env.Random, maxWeight)).Last();
 
                     Broadcast(new S.ObjectChat { ObjectID = this.ObjectID, Text = $"{Info.Name.Split('_')[0]}:{speech.Message}", Type = ChatType.Normal });
                 }
@@ -272,48 +272,48 @@ namespace Server.MirObjects
 
         public override void SetOperateTime()
         {
-            long time = Envir.Time + 2000;
+            long time = Env.Time + 2000;
 
-            if (TurnTime < time && TurnTime > Envir.Time)
+            if (TurnTime < time && TurnTime > Env.Time)
                 time = TurnTime;
 
-            if (OwnerTime < time && OwnerTime > Envir.Time)
+            if (OwnerTime < time && OwnerTime > Env.Time)
                 time = OwnerTime;
 
-            if (ExpireTime < time && ExpireTime > Envir.Time)
+            if (ExpireTime < time && ExpireTime > Env.Time)
                 time = ExpireTime;
 
-            if (PKPointTime < time && PKPointTime > Envir.Time)
+            if (PKPointTime < time && PKPointTime > Env.Time)
                 time = PKPointTime;
 
-            if (LastHitTime < time && LastHitTime > Envir.Time)
+            if (LastHitTime < time && LastHitTime > Env.Time)
                 time = LastHitTime;
 
-            if (EXPOwnerTime < time && EXPOwnerTime > Envir.Time)
+            if (EXPOwnerTime < time && EXPOwnerTime > Env.Time)
                 time = EXPOwnerTime;
 
-            if (BrownTime < time && BrownTime > Envir.Time)
+            if (BrownTime < time && BrownTime > Env.Time)
                 time = BrownTime;
 
             for (int i = 0; i < ActionList.Count; i++)
             {
-                if (ActionList[i].Time >= time && ActionList[i].Time > Envir.Time) continue;
+                if (ActionList[i].Time >= time && ActionList[i].Time > Env.Time) continue;
                 time = ActionList[i].Time;
             }
 
             for (int i = 0; i < PoisonList.Count; i++)
             {
-                if (PoisonList[i].TickTime >= time && PoisonList[i].TickTime > Envir.Time) continue;
+                if (PoisonList[i].TickTime >= time && PoisonList[i].TickTime > Env.Time) continue;
                 time = PoisonList[i].TickTime;
             }
 
             for (int i = 0; i < Buffs.Count; i++)
             {
-                if (Buffs[i].NextTime >= time && Buffs[i].NextTime > Envir.Time) continue;
+                if (Buffs[i].NextTime >= time && Buffs[i].NextTime > Env.Time) continue;
                 time = Buffs[i].NextTime;
             }
 
-            if (OperateTime <= Envir.Time || time < OperateTime)
+            if (OperateTime <= Env.Time || time < OperateTime)
                 OperateTime = time;
         }
 
@@ -335,7 +335,7 @@ namespace Server.MirObjects
                     CheckVisible(player, true);
                     if (player.CheckStacked())
                     {
-                        player.StackingTime = Envir.Time + 1000;
+                        player.StackingTime = Env.Time + 1000;
                         player.Stacking = true;
                     }
                 }

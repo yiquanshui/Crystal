@@ -36,9 +36,9 @@ namespace Server.MirDatabase
         public int GTIndex = -1;
         public int GTKey = 0;
         public int GTPrice;
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
         public bool HasGT
         {
@@ -52,7 +52,7 @@ namespace Server.MirDatabase
             Name = name;
 
             var ownerRank = new GuildRank { Name = "Leader", Options = (GuildRankOptions)255, Index = 0 };
-            var leader = new GuildMember { Name = owner.Info.Name, Player = owner, Id = owner.Info.Index, LastLogin = Envir.Now, Online = true };
+            var leader = new GuildMember { Name = owner.Info.Name, Player = owner, Id = owner.Info.Index, LastLogin = Env.Now, Online = true };
 
             ownerRank.Members.Add(leader);
             Ranks.Add(ownerRank);
@@ -75,12 +75,12 @@ namespace Server.MirDatabase
                 MemberCap = Settings.Guild_MembercapList[Level];
             }
 
-            FlagColour = Color.FromArgb(255, Envir.Random.Next(255), Envir.Random.Next(255), Envir.Random.Next(255));
+            FlagColour = Color.FromArgb(255, Env.Random.Next(255), Env.Random.Next(255), Env.Random.Next(255));
         }
 
         public GuildInfo(BinaryReader reader)
         {
-            int customversion = Envir.LoadCustomVersion;
+            int customversion = Env.LoadCustomVersion;
             int version = reader.ReadInt32();
             GuildIndex = version;
 
@@ -92,7 +92,7 @@ namespace Server.MirDatabase
             }
             else
             {
-                version = Envir.LoadVersion;
+                version = Env.LoadVersion;
                 NeedSave = true;
             }
 
@@ -126,7 +126,7 @@ namespace Server.MirDatabase
                     UserId = reader.ReadInt64()
                 };
 
-                if (Envir.BindItem(Guilditem.Item) && j < StoredItems.Length)
+                if (Env.BindItem(Guilditem.Item) && j < StoredItems.Length)
                     StoredItems[j] = Guilditem;
             }
 
@@ -147,7 +147,7 @@ namespace Server.MirDatabase
 
             for (int j = 0; j < BuffList.Count; j++)
             {
-                BuffList[j].Info = Envir.FindGuildBuffInfo(BuffList[j].Id);
+                BuffList[j].Info = Env.FindGuildBuffInfo(BuffList[j].Id);
             }
 
             int noticeCount = reader.ReadInt32();
@@ -190,8 +190,8 @@ namespace Server.MirDatabase
         {
             int temp = int.MaxValue;
             writer.Write(temp);
-            writer.Write(Envir.Version);
-            writer.Write(Envir.CustomVersion);
+            writer.Write(Env.Version);
+            writer.Write(Env.CustomVersion);
 
             int rankCount = 0;
             for (int i = Ranks.Count - 1; i >= 0; i--)

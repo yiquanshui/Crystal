@@ -6,7 +6,7 @@ namespace Server
 {
     public partial class MapInfoForm : Form
     {
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
 
         private List<MapInfo> _selectedMapInfos;
         private List<SafeZoneInfo> _selectedSafeZoneInfos;
@@ -28,11 +28,11 @@ namespace Server
             LightsComboBox.Items.AddRange(Enum.GetValues(typeof(LightSetting)).Cast<object>().ToArray());
 
             List<MonsterInfo> monsterInfoItems = new();
-            Envir.MonsterInfoList.ForEach(x => monsterInfoItems.Add(x));
+            Env.MonsterInfoList.ForEach(x => monsterInfoItems.Add(x));
             MonsterInfoComboBox.DataSource = monsterInfoItems;
 
             List<String> conquestItems = new() { { "None" } };
-            Envir.ConquestInfoList.ForEach(x => conquestItems.Add(x.Name));
+            Env.ConquestInfoList.ForEach(x => conquestItems.Add(x.Name));
             ConquestComboBox.DataSource = conquestItems;
 
             lstParticles.Items.AddRange(Enum.GetValues(typeof(WeatherSetting)).Cast<object>().ToArray());
@@ -41,7 +41,7 @@ namespace Server
         }
         private void MapInfoForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Envir.SaveDB();
+            Env.SaveDB();
         }
 
 
@@ -49,7 +49,7 @@ namespace Server
         {
             MapInfoListBox.SelectedIndexChanged -= MapInfoListBox_SelectedIndexChanged;
 
-            if (refresh || MapInfoListBox.Items.Count != Envir.MapInfoList.Count)
+            if (refresh || MapInfoListBox.Items.Count != Env.MapInfoList.Count)
             {
                 MapInfo selectedMap = MapInfoListBox.SelectedItem as MapInfo;
 
@@ -57,14 +57,14 @@ namespace Server
                 DestMapComboBox.Items.Clear();
                 lstParticles.SelectedItems.Clear();
 
-                for (int i = 0; i < Envir.MapInfoList.Count; i++)
+                for (int i = 0; i < Env.MapInfoList.Count; i++)
                 {
                     if (!string.IsNullOrEmpty(MapSearchTextBox.Text) &&
-                        !Envir.MapInfoList[i].Title.Contains(MapSearchTextBox.Text, StringComparison.OrdinalIgnoreCase))
+                        !Env.MapInfoList[i].Title.Contains(MapSearchTextBox.Text, StringComparison.OrdinalIgnoreCase))
                         continue;
 
-                    MapInfoListBox.Items.Add(Envir.MapInfoList[i]);
-                    DestMapComboBox.Items.Add(Envir.MapInfoList[i]);
+                    MapInfoListBox.Items.Add(Env.MapInfoList[i]);
+                    DestMapComboBox.Items.Add(Env.MapInfoList[i]);
                 }
                 // Restore the selection if possible
                 if (selectedMap != null && MapInfoListBox.Items.Contains(selectedMap))
@@ -371,7 +371,7 @@ namespace Server
             RespawnInfo info = _selectedRespawnInfos[0];
             RespawnInfoPanel.Enabled = true;
 
-            MonsterInfoComboBox.SelectedItem = Envir.MonsterInfoList.FirstOrDefault(x => x.Index == info.MonsterIndex);
+            MonsterInfoComboBox.SelectedItem = Env.MonsterInfoList.FirstOrDefault(x => x.Index == info.MonsterIndex);
             RXTextBox.Text = info.Location.X.ToString();
             RYTextBox.Text = info.Location.Y.ToString();
             CountTextBox.Text = info.Count.ToString();
@@ -389,7 +389,7 @@ namespace Server
             {
                 info = _selectedRespawnInfos[i];
 
-                if (MonsterInfoComboBox.SelectedItem != Envir.MonsterInfoList.FirstOrDefault(x => x.Index == info.MonsterIndex)) MonsterInfoComboBox.SelectedItem = null;
+                if (MonsterInfoComboBox.SelectedItem != Env.MonsterInfoList.FirstOrDefault(x => x.Index == info.MonsterIndex)) MonsterInfoComboBox.SelectedItem = null;
                 if (RXTextBox.Text != info.Location.X.ToString()) RXTextBox.Text = string.Empty;
                 if (RYTextBox.Text != info.Location.Y.ToString()) RYTextBox.Text = string.Empty;
                 if (CountTextBox.Text != info.Count.ToString()) CountTextBox.Text = string.Empty;
@@ -485,12 +485,12 @@ namespace Server
             NeedHoleMCheckBox.Checked = info.NeedHole;
             NeedMoveMCheckBox.Checked = info.NeedMove;
             ShowBigMapCheckBox.Checked = info.ShowOnBigMap;
-            DestMapComboBox.SelectedItem = Envir.MapInfoList.FirstOrDefault(x => x.Index == info.MapIndex);
+            DestMapComboBox.SelectedItem = Env.MapInfoList.FirstOrDefault(x => x.Index == info.MapIndex);
             DestXTextBox.Text = info.Destination.X.ToString();
             DestYTextBox.Text = info.Destination.Y.ToString();
             BigMapIconTextBox.Text = info.Icon.ToString();
 
-            ConquestComboBox.SelectedItem = Envir.ConquestInfoList.FirstOrDefault(x => x.Index == info.ConquestIndex)?.Name;
+            ConquestComboBox.SelectedItem = Env.ConquestInfoList.FirstOrDefault(x => x.Index == info.ConquestIndex)?.Name;
             if (ConquestComboBox.SelectedItem == null) ConquestComboBox.SelectedIndex = 0;
 
             for (int i = 1; i < _selectedMovementInfos.Count; i++)
@@ -499,22 +499,22 @@ namespace Server
 
                 SourceXTextBox.Text = info.Source.X.ToString();
                 SourceYTextBox.Text = info.Source.Y.ToString();
-                DestMapComboBox.SelectedItem = Envir.MapInfoList.FirstOrDefault(x => x.Index == info.MapIndex);
+                DestMapComboBox.SelectedItem = Env.MapInfoList.FirstOrDefault(x => x.Index == info.MapIndex);
                 DestXTextBox.Text = info.Destination.X.ToString();
                 DestYTextBox.Text = info.Destination.Y.ToString();
-                ConquestComboBox.SelectedItem = Envir.ConquestInfoList.FirstOrDefault(x => x.Index == info.ConquestIndex)?.Name;
+                ConquestComboBox.SelectedItem = Env.ConquestInfoList.FirstOrDefault(x => x.Index == info.ConquestIndex)?.Name;
                 BigMapIconTextBox.Text = info.Icon.ToString();
 
                 if (SourceXTextBox.Text != info.Source.X.ToString()) SourceXTextBox.Text = string.Empty;
                 if (SourceYTextBox.Text != info.Source.Y.ToString()) SourceYTextBox.Text = string.Empty;
 
-                if (DestMapComboBox.SelectedItem != Envir.MapInfoList.FirstOrDefault(x => x.Index == info.MapIndex)) DestMapComboBox.SelectedItem = null;
+                if (DestMapComboBox.SelectedItem != Env.MapInfoList.FirstOrDefault(x => x.Index == info.MapIndex)) DestMapComboBox.SelectedItem = null;
 
                 if (DestXTextBox.Text != info.Destination.X.ToString()) DestXTextBox.Text = string.Empty;
                 if (DestYTextBox.Text != info.Destination.Y.ToString()) DestYTextBox.Text = string.Empty;
 
                 if (BigMapIconTextBox.Text != info.Icon.ToString()) BigMapIconTextBox.Text = string.Empty;
-                if (ConquestComboBox.SelectedItem != Envir.ConquestInfoList.FirstOrDefault(x => x.Index == info.ConquestIndex)) ConquestComboBox.SelectedItem = null;
+                if (ConquestComboBox.SelectedItem != Env.ConquestInfoList.FirstOrDefault(x => x.Index == info.ConquestIndex)) ConquestComboBox.SelectedItem = null;
             }
 
         }
@@ -584,7 +584,7 @@ namespace Server
 
             for (int i = 0; i < MapInfoListBox.Items.Count; i++) selected.Add(MapInfoListBox.GetSelected(i));
             MapInfoListBox.Items.Clear();
-            for (int i = 0; i < Envir.MapInfoList.Count; i++) MapInfoListBox.Items.Add(Envir.MapInfoList[i]);
+            for (int i = 0; i < Env.MapInfoList.Count; i++) MapInfoListBox.Items.Add(Env.MapInfoList[i]);
             for (int i = 0; i < selected.Count; i++) MapInfoListBox.SetSelected(i, selected[i]);
 
             MapInfoListBox.SelectedIndexChanged += MapInfoListBox_SelectedIndexChanged;
@@ -651,7 +651,7 @@ namespace Server
 
         private void AddButton_Click(object sender, EventArgs e)
         {
-            Envir.CreateMapInfo();
+            Env.CreateMapInfo();
             UpdateInterface(true);
         }
         private void RemoveButton_Click(object sender, EventArgs e)
@@ -660,9 +660,9 @@ namespace Server
 
             if (MessageBox.Show("Are you sure you want to remove the selected maps?", "Remove Maps?", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
 
-            for (int i = 0; i < _selectedMapInfos.Count; i++) Envir.Remove(_selectedMapInfos[i]);
+            for (int i = 0; i < _selectedMapInfos.Count; i++) Env.Remove(_selectedMapInfos[i]);
 
-            if (Envir.MapInfoList.Count == 0) Envir.MapIndex = 0;
+            if (Env.MapInfoList.Count == 0) Env.MapIndex = 0;
 
             MapTabs.SelectTab(0);
 
@@ -1461,7 +1461,7 @@ namespace Server
             if (ofd.FileName == string.Empty) return;
 
             MirForms.ConvertMapInfo.Path = ofd.FileName;
-            MirForms.ConvertMapInfo.Start(Envir);
+            MirForms.ConvertMapInfo.Start(Env);
 
             MirForms.ConvertMapInfo.End();
             UpdateInterface(true);
@@ -1508,7 +1508,7 @@ namespace Server
                         try
                         {
                             string movement =
-                                $"{_selectedMapInfos[i].FileName} {_selectedMapInfos[i].Movements[j].Source.X + "," + _selectedMapInfos[i].Movements[j].Source.Y} {"->"} {Envir.MapInfoList.First(it=>it.Index== _selectedMapInfos[i].Movements[j].MapIndex).FileName} {_selectedMapInfos[i].Movements[j].Destination.X + "," + _selectedMapInfos[i].Movements[j].Destination.Y} {(_selectedMapInfos[i].Movements[j].NeedHole ? "NEEDHOLE " : "") + (_selectedMapInfos[i].Movements[j].NeedMove ? "NEEDMOVE " : "") + (_selectedMapInfos[i].Movements[j].ConquestIndex > 0 ? "NEEDCONQUEST(" + _selectedMapInfos[i].Movements[j].ConquestIndex + ")" : "") + (_selectedMapInfos[i].Movements[j].ShowOnBigMap ? "SHOWONBIGMAP " : "") + (_selectedMapInfos[i].Movements[j].Icon > 0 ? "BIGMAPICON(" + _selectedMapInfos[i].Movements[j].Icon + ")" : "")}";
+                                $"{_selectedMapInfos[i].FileName} {_selectedMapInfos[i].Movements[j].Source.X + "," + _selectedMapInfos[i].Movements[j].Source.Y} {"->"} {Env.MapInfoList.First(it=>it.Index== _selectedMapInfos[i].Movements[j].MapIndex).FileName} {_selectedMapInfos[i].Movements[j].Destination.X + "," + _selectedMapInfos[i].Movements[j].Destination.Y} {(_selectedMapInfos[i].Movements[j].NeedHole ? "NEEDHOLE " : "") + (_selectedMapInfos[i].Movements[j].NeedMove ? "NEEDMOVE " : "") + (_selectedMapInfos[i].Movements[j].ConquestIndex > 0 ? "NEEDCONQUEST(" + _selectedMapInfos[i].Movements[j].ConquestIndex + ")" : "") + (_selectedMapInfos[i].Movements[j].ShowOnBigMap ? "SHOWONBIGMAP " : "") + (_selectedMapInfos[i].Movements[j].Icon > 0 ? "BIGMAPICON(" + _selectedMapInfos[i].Movements[j].Icon + ")" : "")}";
 
                             sw.WriteLine(movement);
                         }
@@ -1569,7 +1569,7 @@ namespace Server
         {
             bool hasImported = false;
 
-            if (Envir.MapInfoList.Count == 0) return;
+            if (Env.MapInfoList.Count == 0) return;
 
             MirForms.ConvertMonGenInfo.Start();
 
@@ -1577,7 +1577,7 @@ namespace Server
             {
                 try
                 {
-                    int monsterIndex = Envir.MonsterInfoList.Find(a => a.Name == MirForms.ConvertMonGenInfo.monGenList[i].Name).Index;
+                    int monsterIndex = Env.MonsterInfoList.Find(a => a.Name == MirForms.ConvertMonGenInfo.monGenList[i].Name).Index;
                     if (monsterIndex == -1) continue;
 
                     RespawnInfo respawnInfo = new RespawnInfo
@@ -1589,13 +1589,13 @@ namespace Server
                         Delay = (ushort)MirForms.ConvertMonGenInfo.monGenList[i].Delay,
                         Direction = (byte)MirForms.ConvertMonGenInfo.monGenList[i].Direction,
                         RoutePath = MirForms.ConvertMonGenInfo.monGenList[i].RoutePath,
-                        RespawnIndex = ++Envir.RespawnIndex
+                        RespawnIndex = ++Env.RespawnIndex
                     };
 
-                    int index = Envir.MapInfoList.FindIndex(a => a.FileName == MirForms.ConvertMonGenInfo.monGenList[i].Map);
+                    int index = Env.MapInfoList.FindIndex(a => a.FileName == MirForms.ConvertMonGenInfo.monGenList[i].Map);
                     if (index == -1) continue;
 
-                    Envir.MapInfoList[index].Respawns.Add(respawnInfo);
+                    Env.MapInfoList[index].Respawns.Add(respawnInfo);
                     hasImported = true;
                 }
                 catch (Exception)
@@ -1627,7 +1627,7 @@ namespace Server
                 {
                     for (int j = 0; j < _selectedMapInfos[i].Respawns.Count; j++)
                     {
-                        MonsterInfo mob = Envir.GetMonsterInfo(_selectedMapInfos[i].Respawns[j].MonsterIndex);
+                        MonsterInfo mob = Env.GetMonsterInfo(_selectedMapInfos[i].Respawns[j].MonsterIndex);
 
                         if (mob == null) continue;
 
@@ -1798,7 +1798,7 @@ namespace Server
 
                 if (cmb.SelectedIndex >= 0)
                 {
-                    ConquestInfo info = Envir.ConquestInfoList.FirstOrDefault(x => x.Name == ConquestComboBox.SelectedItem.ToString());
+                    ConquestInfo info = Env.ConquestInfoList.FirstOrDefault(x => x.Name == ConquestComboBox.SelectedItem.ToString());
 
                     if (info != null)
                     {

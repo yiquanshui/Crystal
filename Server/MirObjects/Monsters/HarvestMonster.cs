@@ -64,7 +64,7 @@ namespace Server.MirObjects.Monsters
                 {
                     foreach (var dropItem in reward.Items)
                     {
-                        UserItem item = Envir.CreateDropItem(dropItem);
+                        UserItem item = Env.CreateDropItem(dropItem);
                         if (item == null) continue;
 
                         if (drop.QuestRequired)

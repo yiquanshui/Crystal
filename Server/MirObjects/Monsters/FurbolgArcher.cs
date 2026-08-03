@@ -34,8 +34,8 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
@@ -45,13 +45,13 @@ namespace Server.MirObjects.Monsters
 
             Point location = Functions.PointMove(CurrentLocation, Functions.ReverseDirection(Direction), 2);
 
-            if (dist <= 2 && CurrentMap.ValidPoint(location) && Envir.Random.Next(5) == 0)
+            if (dist <= 2 && CurrentMap.ValidPoint(location) && Env.Random.Next(5) == 0)
             {
                 JumpBack(2);
                 return;
             }
 
-            if (Envir.Random.Next(5) > 0)
+            if (Env.Random.Next(5) > 0)
             {
                 Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID });
@@ -69,15 +69,15 @@ namespace Server.MirObjects.Monsters
         {
             if (Target == null || !CanAttack) return;
 
-            if (InAttackRange() && Envir.Time < FearTime)
+            if (InAttackRange() && Env.Time < FearTime)
             {
                 Attack();
                 return;
             }
 
-            FearTime = Envir.Time + 5000;
+            FearTime = Env.Time + 5000;
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -93,7 +93,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Envir.Random.Next(2)) //No favour
+                switch (Env.Random.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)

@@ -42,12 +42,12 @@ namespace Server.MirObjects.Monsters
 
             if (!ranged)
             {
-                ActionTime = Envir.Time + 300;
-                AttackTime = Envir.Time + AttackSpeed;
+                ActionTime = Env.Time + 300;
+                AttackTime = Env.Time + AttackSpeed;
 
                 var hpPercent = (HP * 100) / Stats[Stat.HP];
 
-                switch (Envir.Random.Next(3))
+                switch (Env.Random.Next(3))
                 {
                     case 0: //Spin
                     case 1:
@@ -57,7 +57,7 @@ namespace Server.MirObjects.Monsters
                             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                             if (damage == 0) return;
 
-                            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.MACAgility, (int)0);
+                            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.MACAgility, (int)0);
                             ActionList.Add(action);
                         }
                         break;
@@ -70,7 +70,7 @@ namespace Server.MirObjects.Monsters
                                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                                 if (damage == 0) return;
 
-                                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.MACAgility, (int)1);
+                                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.MACAgility, (int)1);
                                 ActionList.Add(action);
                             }
                             else //Stomp
@@ -80,7 +80,7 @@ namespace Server.MirObjects.Monsters
                                 int damage = Stats[Stat.MaxDC];
                                 if (damage == 0) return;
 
-                                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.MACAgility, (int)2);
+                                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.MACAgility, (int)2);
                                 ActionList.Add(action);
                             }
                         }
@@ -89,8 +89,8 @@ namespace Server.MirObjects.Monsters
             }
             else
             {
-                ActionTime = Envir.Time + 300;
-                AttackTime = Envir.Time + (AttackSpeed * 2);
+                ActionTime = Env.Time + 300;
+                AttackTime = Env.Time + (AttackSpeed * 2);
 
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID, Type = 0 });
 

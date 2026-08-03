@@ -30,11 +30,11 @@ namespace Server.MirObjects.Monsters
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            if ((HP * 100 / Stats[Stat.HP]) < 20 && MassAttackTime < Envir.Time)
+            if ((HP * 100 / Stats[Stat.HP]) < 20 && MassAttackTime < Env.Time)
             {
                 ShockTime = 0;
-                ActionTime = Envir.Time + 500;
-                AttackTime = Envir.Time + (AttackSpeed);
+                ActionTime = Env.Time + 500;
+                AttackTime = Env.Time + (AttackSpeed);
 
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
@@ -48,23 +48,23 @@ namespace Server.MirObjects.Monsters
                 {
                     int delay = Functions.MaxDistance(CurrentLocation, targets[i].CurrentLocation) * 50 + 750; //50 MS per Step
 
-                    DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + delay, Target, damage, DefenceType.ACAgility);
+                    DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + delay, Target, damage, DefenceType.ACAgility);
                     ActionList.Add(action);
                 }
 
-                MassAttackTime = Envir.Time + 2000 + (Envir.Random.Next(5) * 1000);
-                ActionTime = Envir.Time + 800;
-                AttackTime = Envir.Time + (AttackSpeed);
+                MassAttackTime = Env.Time + 2000 + (Env.Random.Next(5) * 1000);
+                ActionTime = Env.Time + 800;
+                AttackTime = Env.Time + (AttackSpeed);
                 return;
             }
 
-            if (!Functions.InRange(CurrentLocation, Target.CurrentLocation, 1) || Envir.Random.Next(3) == 0)
+            if (!Functions.InRange(CurrentLocation, Target.CurrentLocation, 1) || Env.Random.Next(3) == 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility);
                 ActionList.Add(action);
             }
             else
@@ -73,13 +73,13 @@ namespace Server.MirObjects.Monsters
 
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
 
-                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 300, Target, damage, DefenceType.ACAgility);
+                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 300, Target, damage, DefenceType.ACAgility);
                 ActionList.Add(action);
             }
 
             ShockTime = 0;
-            ActionTime = Envir.Time + 500;
-            AttackTime = Envir.Time + (AttackSpeed);
+            ActionTime = Env.Time + 500;
+            AttackTime = Env.Time + (AttackSpeed);
         }
        
     }

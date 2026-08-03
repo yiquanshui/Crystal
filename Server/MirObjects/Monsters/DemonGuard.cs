@@ -19,7 +19,7 @@ namespace Server.MirObjects.Monsters
             : base(info)
         {
             RevivalCount = 0;
-            LifeCount = Envir.Random.Next(3);
+            LifeCount = Env.Random.Next(3);
         }
 
         protected override void Attack()
@@ -32,18 +32,18 @@ namespace Server.MirObjects.Monsters
 
             ShockTime = 0;
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            if (Envir.Random.Next(3) > 0)
+            if (Env.Random.Next(3) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                 if (damage == 0) return;
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility);
                 ActionList.Add(action);
             }
             else
@@ -52,7 +52,7 @@ namespace Server.MirObjects.Monsters
                 int damage = GetAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC]);
                 if (damage == 0) return;
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility);
                 ActionList.Add(action);
 
             }
@@ -61,14 +61,14 @@ namespace Server.MirObjects.Monsters
 
         public override void Die()
         {
-            DieTime = Envir.Time;
-            RevivalTime = (4 + Envir.Random.Next(20)) * 1000;
+            DieTime = Env.Time;
+            RevivalTime = (4 + Env.Random.Next(20)) * 1000;
             base.Die();
         }
 
         protected override void ProcessAI()
         {
-            if (Dead && Envir.Time > DieTime + RevivalTime && RevivalCount < LifeCount)
+            if (Dead && Env.Time > DieTime + RevivalTime && RevivalCount < LifeCount)
             {
                 RevivalCount++;
 

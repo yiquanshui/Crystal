@@ -32,7 +32,7 @@ namespace Server.MirObjects.Monsters
 
             if (Functions.InRange(CurrentLocation, Target.CurrentLocation, 3))
             {
-                if (Envir.Random.Next(2) == 0 || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 2))
+                if (Env.Random.Next(2) == 0 || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 2))
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
@@ -45,7 +45,7 @@ namespace Server.MirObjects.Monsters
 
                     for (int i = 0; i < targets.Count; i++)
                     {
-                        DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, targets[i], damage, DefenceType.MACAgility);
+                        DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, targets[i], damage, DefenceType.MACAgility);
                         ActionList.Add(action);
                     }
                 }
@@ -69,13 +69,13 @@ namespace Server.MirObjects.Monsters
 
                     int delay = Functions.MaxDistance(CurrentLocation, targets[i].CurrentLocation) * 50 + 500; //50 MS per Step
 
-                    DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + delay, targets[i], damage, DefenceType.ACAgility);
+                    DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + delay, targets[i], damage, DefenceType.ACAgility);
                     ActionList.Add(action);
                 }
             }
 
-            ActionTime = Envir.Time + 500;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 500;
+            AttackTime = Env.Time + AttackSpeed;
         }
 
         protected override void CompleteAttack(IList<object> data)
@@ -101,22 +101,22 @@ namespace Server.MirObjects.Monsters
 
             if (target.Attacked(this, damage, DefenceType.MACAgility) <= 0) return;
 
-            PoisonTarget(target, 1, Envir.Random.Next(Stats[Stat.MaxMC]), PoisonType.Dazed, 1000);
+            PoisonTarget(target, 1, Env.Random.Next(Stats[Stat.MaxMC]), PoisonType.Dazed, 1000);
         }
 
         protected override void ProcessTarget()
         {
             if (Target == null || !CanAttack) return;
 
-            if (InAttackRange() && Envir.Time < FearTime)
+            if (InAttackRange() && Env.Time < FearTime)
             {
                 Attack();
                 return;
             }
 
-            FearTime = Envir.Time + 5000;
+            FearTime = Env.Time + 5000;
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -140,7 +140,7 @@ namespace Server.MirObjects.Monsters
 
             if (Walk(dir)) return;
 
-            switch (Envir.Random.Next(2)) //No favour
+            switch (Env.Random.Next(2)) //No favour
             {
                 case 0:
                     for (int i = 0; i < 7; i++)

@@ -39,8 +39,8 @@ namespace Server.MirObjects.Monsters
             if (!ranged) base.Attack();
             else
             {
-                ActionTime = Envir.Time + 300;
-                AttackTime = Envir.Time + AttackSpeed;
+                ActionTime = Env.Time + 300;
+                AttackTime = Env.Time + AttackSpeed;
                 ShockTime = 0;
 
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
@@ -84,10 +84,10 @@ namespace Server.MirObjects.Monsters
                     {
                         if (!ob.IsAttackTarget(this)) continue;
 
-                        if (Envir.Random.Next(Settings.MagicResistWeight) >= ob.Stats[Stat.MagicResist])
+                        if (Env.Random.Next(Settings.MagicResistWeight) >= ob.Stats[Stat.MagicResist])
                         {
                             int delay = Functions.MaxDistance(CurrentLocation, ob.CurrentLocation) * 50 + additionalDelay; //50 MS per Step
-                            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + delay, ob, damage, defenceType, true);
+                            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + delay, ob, damage, defenceType, true);
                             ActionList.Add(action);
                         }
                     }

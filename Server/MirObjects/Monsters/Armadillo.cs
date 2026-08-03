@@ -16,13 +16,13 @@ namespace Server.MirObjects.Monsters
 
         protected override void SpawnDigOutEffect()
         {
-            if (Visible && Envir.Time > DigOutTime + 500 && !DoneDigOut)
+            if (Visible && Env.Time > DigOutTime + 500 && !DoneDigOut)
             {
                 SpellObject ob = new SpellObject
                 {
                     Spell = Spell.DigOutArmadillo,
                     Value = 1,
-                    ExpireTime = Envir.Time + (5 * 60 * 1000),
+                    ExpireTime = Env.Time + (5 * 60 * 1000),
                     TickSpeed = 2000,
                     Caster = null,
                     CurrentLocation = DigOutLocation,
@@ -37,7 +37,7 @@ namespace Server.MirObjects.Monsters
 
         public override int Attacked(HumanObject attacker, int damage, DefenceType type = DefenceType.ACAgility, bool damageWeapon = true)
         {
-            if (_runAway && Envir.Random.Next(4) == 0)
+            if (_runAway && Env.Random.Next(4) == 0)
             {
                 _runAway = false;
             }
@@ -47,7 +47,7 @@ namespace Server.MirObjects.Monsters
 
         public override int Attacked(MonsterObject attacker, int damage, DefenceType type = DefenceType.ACAgility)
         {
-            if (_runAway && Envir.Random.Next(4) == 0)
+            if (_runAway && Env.Random.Next(4) == 0)
             {
                 _runAway = false;
             }
@@ -67,10 +67,10 @@ namespace Server.MirObjects.Monsters
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
-            switch (Envir.Random.Next(0, 6))
+            switch (Env.Random.Next(0, 6))
             {
                 case 0:
                     {
@@ -83,19 +83,19 @@ namespace Server.MirObjects.Monsters
                         int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                         if (damage == 0) return;
 
-                        DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 400, Target, damage / 2, DefenceType.ACAgility);
+                        DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 400, Target, damage / 2, DefenceType.ACAgility);
                         ActionList.Add(action);
 
                         damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                         if (damage == 0) return;
 
-                        action = new DelayedAction(DelayedType.Damage, Envir.Time + 600, Target, damage / 2, DefenceType.ACAgility);
+                        action = new DelayedAction(DelayedType.Damage, Env.Time + 600, Target, damage / 2, DefenceType.ACAgility);
                         ActionList.Add(action);
 
                         damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                         if (damage == 0) return;
 
-                        action = new DelayedAction(DelayedType.Damage, Envir.Time + 800, Target, damage / 2, DefenceType.ACAgility);
+                        action = new DelayedAction(DelayedType.Damage, Env.Time + 800, Target, damage / 2, DefenceType.ACAgility);
                         ActionList.Add(action);
                     }
                     break;
@@ -105,7 +105,7 @@ namespace Server.MirObjects.Monsters
                         int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                         if (damage == 0) return;
 
-                        DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 400, Target, damage, DefenceType.ACAgility);
+                        DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 400, Target, damage, DefenceType.ACAgility);
                         ActionList.Add(action);
                     }
                     break;
@@ -140,7 +140,7 @@ namespace Server.MirObjects.Monsters
             int damage = Stats[Stat.MaxDC];
             if (damage == 0) return;
 
-            DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 900, Target, damage, DefenceType.AC);
+            DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 900, Target, damage, DefenceType.AC);
             ActionList.Add(action);
         }
 
@@ -173,7 +173,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Envir.Random.Next(2)) //No favour
+                switch (Env.Random.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)

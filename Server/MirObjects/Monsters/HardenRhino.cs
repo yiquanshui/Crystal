@@ -21,25 +21,25 @@ namespace Server.MirObjects.Monsters
 
         protected override void ProcessSearch()
         {
-            if (Envir.Time < SearchTime) return;
+            if (Env.Time < SearchTime) return;
             if (Master != null && (Master.PMode == PetMode.MoveOnly || Master.PMode == PetMode.None || Master.PMode == PetMode.FocusMasterTarget)) return;
 
-            SearchTime = Envir.Time + SearchDelay;
+            SearchTime = Env.Time + SearchDelay;
 
-            if (Target == null || Envir.Random.Next(3) == 0)
+            if (Target == null || Env.Random.Next(3) == 0)
                 FindTarget();
 
-            if (Target != null && !Functions.InRange(CurrentLocation, Target.CurrentLocation, 3) && Envir.Random.Next(3) == 0)
+            if (Target != null && !Functions.InRange(CurrentLocation, Target.CurrentLocation, 3) && Env.Random.Next(3) == 0)
             {
                 Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 
-                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 1500, Target);
+                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 1500, Target);
                 ActionList.Add(action);
 
-                ActionTime = Envir.Time + 1500;
-                MoveTime = Envir.Time + 1500;
+                ActionTime = Env.Time + 1500;
+                MoveTime = Env.Time + 1500;
             }
         }
 
@@ -56,15 +56,15 @@ namespace Server.MirObjects.Monsters
 
             ShockTime = 0;
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage == 0) return;
 
-            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.ACAgility);
+            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.ACAgility);
             ActionList.Add(action);
         }
 
@@ -77,7 +77,7 @@ namespace Server.MirObjects.Monsters
             Dash(target);
 
             MoveTo(target.CurrentLocation);
-            ActionTime = Envir.Time + 300;
+            ActionTime = Env.Time + 300;
         }
 
         private void Dash(MapObject target)

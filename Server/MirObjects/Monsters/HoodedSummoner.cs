@@ -30,12 +30,12 @@ namespace Server.MirObjects.Monsters
             }
 
             ShockTime = 0;
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            switch (Envir.Random.Next(6))
+            switch (Env.Random.Next(6))
             {
                 case 0:
                 case 1:
@@ -47,14 +47,14 @@ namespace Server.MirObjects.Monsters
                     break;
                 case 4:
                     {
-                        if (Envir.Time > SlaveSpawnTime)
+                        if (Env.Time > SlaveSpawnTime)
                         {
                             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
                             slaves1 = true;
                             SpawnSlaves();
 
                             // Timer added so if many of these mobs are around it doesn't overwhelm players too quickly with scrolls.
-                            SlaveSpawnTime = Envir.Time + (Settings.Second * 15);
+                            SlaveSpawnTime = Env.Time + (Settings.Second * 15);
                         }
                         else
                         {
@@ -64,14 +64,14 @@ namespace Server.MirObjects.Monsters
                     break;
                 case 5:
                     {
-                        if (Envir.Time > SlaveSpawnTime)
+                        if (Env.Time > SlaveSpawnTime)
                         {
                             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
                             slaves2 = true;
                             SpawnSlaves();
 
                             // Timer added so if many of these mobs are around it doesn't overwhelm players too quickly with scrolls.
-                            SlaveSpawnTime = Envir.Time + (Settings.Second * 15);
+                            SlaveSpawnTime = Env.Time + (Settings.Second * 15);
                         }
                         else
                         {
@@ -96,7 +96,7 @@ namespace Server.MirObjects.Monsters
 
             int damage = GetAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC]);
             if (damage == 0) return;
-            DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 500, Target, damage, DefenceType.MAC);
+            DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 500, Target, damage, DefenceType.MAC);
             ActionList.Add(action);
         }
 
@@ -110,26 +110,26 @@ namespace Server.MirObjects.Monsters
 
                 if (slaves1 == true)
                 {
-                    switch (Envir.Random.Next(2))
+                    switch (Env.Random.Next(2))
                     {
                         case 0:
-                            mob = GetMonster(Envir.GetMonsterInfo(Settings.ScrollMob1));
+                            mob = GetMonster(Env.GetMonsterInfo(Settings.ScrollMob1));
                             break;
                         case 1:
-                            mob = GetMonster(Envir.GetMonsterInfo(Settings.ScrollMob2));
+                            mob = GetMonster(Env.GetMonsterInfo(Settings.ScrollMob2));
                             break;
                     }
                 }
 
                 if (slaves2 == true)
                 {
-                    switch (Envir.Random.Next(2))
+                    switch (Env.Random.Next(2))
                     {
                         case 0:
-                            mob = GetMonster(Envir.GetMonsterInfo(Settings.ScrollMob3));
+                            mob = GetMonster(Env.GetMonsterInfo(Settings.ScrollMob3));
                             break;
                         case 1:
-                            mob = GetMonster(Envir.GetMonsterInfo(Settings.ScrollMob4));
+                            mob = GetMonster(Env.GetMonsterInfo(Settings.ScrollMob4));
                             break;
                     }
                 }
@@ -139,7 +139,7 @@ namespace Server.MirObjects.Monsters
                 if (!mob.Spawn(CurrentMap, Front))
                     mob.Spawn(CurrentMap, Target.CurrentLocation);
 
-                mob.ActionTime = Envir.Time + 2000;
+                mob.ActionTime = Env.Time + 2000;
                 SlaveList.Add(mob);
             }
         }
@@ -148,15 +148,15 @@ namespace Server.MirObjects.Monsters
         {
             if (Target == null || !CanAttack) return;
 
-            if (InAttackRange() && Envir.Time < FearTime)
+            if (InAttackRange() && Env.Time < FearTime)
             {
                 Attack();
                 return;
             }
 
-            FearTime = Envir.Time + 5000;
+            FearTime = Env.Time + 5000;
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -172,7 +172,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Envir.Random.Next(2)) //No favour
+                switch (Env.Random.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)

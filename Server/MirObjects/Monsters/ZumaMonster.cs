@@ -58,7 +58,7 @@ namespace Server.MirObjects.Monsters
 
         protected override void ProcessAI()
         {
-            if (!Dead && Envir.Time > ActionTime)
+            if (!Dead && Env.Time > ActionTime)
             {
                 bool stoned = !FindNearby(2);
                 
@@ -78,7 +78,7 @@ namespace Server.MirObjects.Monsters
 
             Stoned = false;
             Broadcast(new S.ObjectShow { ObjectID = ObjectID });
-            ActionTime = Envir.Time + 1000;
+            ActionTime = Env.Time + 1000;
         }
 
         public void WakeAll(int dist)
@@ -152,9 +152,9 @@ namespace Server.MirObjects.Monsters
                 RemoveBuff(BuffType.Hiding);
             }
 
-            CellTime = Envir.Time + 500;
-            ActionTime = Envir.Time + 300;
-            MoveTime = Envir.Time + MoveSpeed;
+            CellTime = Env.Time + 500;
+            ActionTime = Env.Time + 300;
+            MoveTime = Env.Time + MoveSpeed;
 
             if (MoveTime > AttackTime)
                 AttackTime = MoveTime;

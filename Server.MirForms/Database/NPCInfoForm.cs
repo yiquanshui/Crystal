@@ -9,7 +9,7 @@ namespace Server
     {
         public string NPCListPath = Path.Combine(Settings.ExportPath, "NPCList.csv");
 
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
 
         private List<NPCInfo> _selectedNPCInfos;
 
@@ -17,16 +17,16 @@ namespace Server
         {
             InitializeComponent();
 
-            for (int i = 0; i < Envir.MapInfoList.Count; i++) MapComboBox.Items.Add(Envir.MapInfoList[i]);
+            for (int i = 0; i < Env.MapInfoList.Count; i++) MapComboBox.Items.Add(Env.MapInfoList[i]);
 
-            if (ConquestHidden_combo.Items.Count != Envir.ConquestInfoList.Count)
+            if (ConquestHidden_combo.Items.Count != Env.ConquestInfoList.Count)
             {
                 ConquestHidden_combo.Items.Clear();
 
                 ConquestHidden_combo.Items.Add("");
-                for (int i = 0; i < Envir.ConquestInfoList.Count; i++)
+                for (int i = 0; i < Env.ConquestInfoList.Count; i++)
                 {
-                    ConquestHidden_combo.Items.Add(Envir.ConquestInfoList[i]);
+                    ConquestHidden_combo.Items.Add(Env.ConquestInfoList[i]);
                 }
             }
 
@@ -37,7 +37,7 @@ namespace Server
 
         private void AddButton_Click(object sender, EventArgs e)
         {
-            Envir.CreateNPCInfo();
+            Env.CreateNPCInfo();
             UpdateInterface();
             RefreshNPCList(); // Without this, the newly created NPC wont show on the NPCInfoListBox, not sure why?
         }
@@ -47,9 +47,9 @@ namespace Server
 
             if (MessageBox.Show("Are you sure you want to remove the selected NPCs?", "Remove NPCs?", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
 
-            for (int i = 0; i < _selectedNPCInfos.Count; i++) Envir.Remove(_selectedNPCInfos[i]);
+            for (int i = 0; i < _selectedNPCInfos.Count; i++) Env.Remove(_selectedNPCInfos[i]);
 
-            if (Envir.NPCInfoList.Count == 0) Envir.NPCIndex = 0;
+            if (Env.NPCInfoList.Count == 0) Env.NPCIndex = 0;
 
             UpdateInterface();
         }
@@ -76,11 +76,11 @@ namespace Server
             NYTextBox.Text = info.Location.Y.ToString();
             NImageTextBox.Text = info.Image.ToString();
             NRateTextBox.Text = info.Rate.ToString();
-            MapComboBox.SelectedItem = Envir.MapInfoList.FirstOrDefault(x => x.Index == info.MapIndex);
+            MapComboBox.SelectedItem = Env.MapInfoList.FirstOrDefault(x => x.Index == info.MapIndex);
             MinLev_textbox.Text = info.MinLev.ToString();
             MaxLev_textbox.Text = info.MaxLev.ToString();
             Class_combo.Text = info.ClassRequired;
-            ConquestHidden_combo.SelectedItem = Envir.ConquestInfoList.FirstOrDefault(x => x.Index == info.Conquest);
+            ConquestHidden_combo.SelectedItem = Env.ConquestInfoList.FirstOrDefault(x => x.Index == info.Conquest);
             Day_combo.Text = info.DayofWeek;
             TimeVisible_checkbox.Checked = info.TimeVisible;
             StartHour_combo.Text = info.HourStart.ToString();
@@ -134,7 +134,7 @@ namespace Server
             for (int i = 0; i < NPCInfoListBox.Items.Count; i++) selected.Add(NPCInfoListBox.GetSelected(i));
             NPCInfoListBox.Items.Clear();
 
-            for (int i = 0; i < Envir.NPCInfoList.Count; i++) NPCInfoListBox.Items.Add(Envir.NPCInfoList[i]);
+            for (int i = 0; i < Env.NPCInfoList.Count; i++) NPCInfoListBox.Items.Add(Env.NPCInfoList[i]);
             for (int i = 0; i < selected.Count; i++) NPCInfoListBox.SetSelected(i, selected[i]);
 
             NPCInfoListBox.SelectedIndexChanged += NPCInfoListBox_SelectedIndexChanged;
@@ -277,7 +277,7 @@ namespace Server
 
         private void NPCInfoForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Envir.SaveDB();
+            Env.SaveDB();
         }
 
 
@@ -305,7 +305,7 @@ namespace Server
 
         private void ExportAllButton_Click(object sender, EventArgs e)
         {
-            ExportNPCs(Envir.NPCInfoList);
+            ExportNPCs(Env.NPCInfoList);
         }
 
         private void ExportSelected_Click(object sender, EventArgs e)
@@ -447,7 +447,7 @@ namespace Server
 
         private void CopyMButton_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(Envir.Now.DayOfWeek.ToString());
+            MessageBox.Show(Env.Now.DayOfWeek.ToString());
         }
 
         private void MaxLev_textbox_TextChanged(object sender, EventArgs e)
@@ -559,7 +559,7 @@ namespace Server
 
         private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
         {
-            MessageBox.Show(Envir.Now.TimeOfDay.ToString());
+            MessageBox.Show(Env.Now.TimeOfDay.ToString());
         }
 
         private void NPCInfoForm_Load(object sender, EventArgs e)
@@ -639,7 +639,7 @@ namespace Server
             NPCInfoListBox.Items.Clear();
 
             // Filter NPCs based on search text
-            foreach (var npc in Envir.NPCInfoList)
+            foreach (var npc in Env.NPCInfoList)
             {
                 if (!string.IsNullOrEmpty(npc.Name) && npc.Name.ToLower().Contains(searchText) ||
                     !string.IsNullOrEmpty(npc.FileName) && npc.FileName.ToLower().Contains(searchText))

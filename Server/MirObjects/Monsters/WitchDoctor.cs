@@ -30,7 +30,7 @@ namespace Server.MirObjects.Monsters
 
             ShockTime = 0;
 
-            if (Envir.Random.Next(5) == 0)
+            if (Env.Random.Next(5) == 0)
             {
                 TeleportRandom(10, AttackRange);
             }
@@ -38,12 +38,12 @@ namespace Server.MirObjects.Monsters
             {
                 var hpPercent = (HP * 100) / Stats[Stat.HP];
 
-                if (Envir.Random.Next(3) == 0 && hpPercent < 50)
+                if (Env.Random.Next(3) == 0 && hpPercent < 50)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
-                    ActionTime = Envir.Time + 300;
-                    AttackTime = Envir.Time + AttackSpeed;
+                    ActionTime = Env.Time + 300;
+                    AttackTime = Env.Time + AttackSpeed;
 
                     ChangeHP(Stats[Stat.HP] / 4);
                 }
@@ -52,15 +52,15 @@ namespace Server.MirObjects.Monsters
                     Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
                     Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID });
 
-                    ActionTime = Envir.Time + 300;
-                    AttackTime = Envir.Time + AttackSpeed;
+                    ActionTime = Env.Time + 300;
+                    AttackTime = Env.Time + AttackSpeed;
 
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                     if (damage == 0) return;
 
                     int delay = Functions.MaxDistance(CurrentLocation, Target.CurrentLocation) * 50 + 500; //50 MS per Step
 
-                    DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + delay, Target, damage, DefenceType.MACAgility);
+                    DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + delay, Target, damage, DefenceType.MACAgility);
                     ActionList.Add(action);
                 }
             }
@@ -70,15 +70,15 @@ namespace Server.MirObjects.Monsters
         {
             if (Target == null || !CanAttack) return;
 
-            if (InAttackRange() && Envir.Time < FearTime)
+            if (InAttackRange() && Env.Time < FearTime)
             {
                 Attack();
                 return;
             }
 
-            FearTime = Envir.Time + 5000;
+            FearTime = Env.Time + 5000;
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -94,7 +94,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Envir.Random.Next(2)) //No favour
+                switch (Env.Random.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)
@@ -127,8 +127,8 @@ namespace Server.MirObjects.Monsters
             {
                 Point location;
 
-                location = new Point(Target.CurrentLocation.X + Envir.Random.Next(-distance, distance + 1),
-                                          Target.CurrentLocation.Y + Envir.Random.Next(-distance, distance + 1));
+                location = new Point(Target.CurrentLocation.X + Env.Random.Next(-distance, distance + 1),
+                                          Target.CurrentLocation.Y + Env.Random.Next(-distance, distance + 1));
 
                 if (Teleport(CurrentMap, location, true, 5)) return true;
             }

@@ -41,13 +41,13 @@ namespace Server.MirObjects.Monsters
             {
                 if (CanAttack)
                 {
-                    if (Envir.Random.Next(5) == 0)
+                    if (Env.Random.Next(5) == 0)
                         RangeAttack();
                 }
                 if (CurrentLocation == Target.CurrentLocation)
                 {
-                    MirDirection direction = (MirDirection)Envir.Random.Next(8);
-                    int rotation = Envir.Random.Next(2) == 0 ? 1 : -1;
+                    MirDirection direction = (MirDirection)Env.Random.Next(8);
+                    int rotation = Env.Random.Next(2) == 0 ? 1 : -1;
 
                     for (int d = 0; d < 8; d++)
                     {
@@ -62,14 +62,14 @@ namespace Server.MirObjects.Monsters
 
             if (!CanAttack) return;
 
-            if (Envir.Random.Next(5) > 0)
+            if (Env.Random.Next(5) > 0)
             {
                 if (InAttackRange())
                     Attack();
             }
             else RangeAttack();
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -89,16 +89,16 @@ namespace Server.MirObjects.Monsters
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             ShockTime = 0;
-            ActionTime = Envir.Time + 500;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 500;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage == 0) return;
 
-            if (Envir.Random.Next(5) == 0)
+            if (Env.Random.Next(5) == 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.AC);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.AC);
                 ActionList.Add(action);
             }
             else
@@ -115,8 +115,8 @@ namespace Server.MirObjects.Monsters
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             ShockTime = 0;
-            ActionTime = Envir.Time + 500;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 500;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC]);
             if (damage == 0) return;
@@ -166,14 +166,14 @@ namespace Server.MirObjects.Monsters
                                 {
                                     if (target.Attacked(this, Damage, DefenceType.MAC) > 0)
                                     {
-                                        if (Envir.Random.Next(Settings.PoisonResistWeight) >= target.Stats[Stat.PoisonResist])
+                                        if (Env.Random.Next(Settings.PoisonResistWeight) >= target.Stats[Stat.PoisonResist])
                                         {
-                                            if (Envir.Random.Next(5) == 0)
+                                            if (Env.Random.Next(5) == 0)
                                             {
                                                 target.ApplyPoison(new Poison
                                                 {
                                                     Owner = this,
-                                                    Duration = target.Race == ObjectType.Player ? 4 : 5 + Envir.Random.Next(5),
+                                                    Duration = target.Race == ObjectType.Player ? 4 : 5 + Env.Random.Next(5),
                                                     PType = PoisonType.Slow,
                                                     TickSpeed = 1000,
                                                 }, this);

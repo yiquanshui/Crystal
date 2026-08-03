@@ -18,7 +18,7 @@ namespace Server.MirObjects.Monsters
 
             int ownDamage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
 
-            if (attackerDamage > ownDamage && Envir.Random.Next(2) == 0)
+            if (attackerDamage > ownDamage && Env.Random.Next(2) == 0)
             {
                 FindWeakerTarget();
             }
@@ -32,7 +32,7 @@ namespace Server.MirObjects.Monsters
 
             int ownDamage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
 
-            if (attackerDamage > ownDamage && Envir.Random.Next(2) == 0)
+            if (attackerDamage > ownDamage && Env.Random.Next(2) == 0)
             {
                 FindWeakerTarget();
             }

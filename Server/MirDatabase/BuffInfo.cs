@@ -89,9 +89,9 @@ namespace Server.MirDatabase
 
     public class Buff
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         private Dictionary<string, object> Data { get; set; } = new Dictionary<string, object>();
@@ -127,7 +127,7 @@ namespace Server.MirDatabase
 
         public Buff(BuffType type)
         {
-            Info = Envir.GetBuffInfo(type);
+            Info = Env.GetBuffInfo(type);
             Stats = new Stats();
             Data = new Dictionary<string, object>();
         }
@@ -136,7 +136,7 @@ namespace Server.MirDatabase
         {
             var type = (BuffType)reader.ReadByte();
 
-            Info = Envir.GetBuffInfo(type);
+            Info = Env.GetBuffInfo(type);
 
             Caster = null;
 

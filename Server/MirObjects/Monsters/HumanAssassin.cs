@@ -15,7 +15,7 @@ namespace Server.MirObjects.Monsters
         protected internal HumanAssassin(MonsterInfo info)
             : base(info)
         {
-            ExplosionTime = Envir.Time + 1000 * 10;
+            ExplosionTime = Env.Time + 1000 * 10;
             Summoned = true;
         }
 
@@ -102,9 +102,9 @@ namespace Server.MirObjects.Monsters
                 RemoveBuff(BuffType.Hiding);
             }
 
-            CellTime = Envir.Time + 500;
-            ActionTime = Envir.Time + 300;
-            MoveTime = Envir.Time + MoveSpeed;
+            CellTime = Env.Time + 500;
+            ActionTime = Env.Time + 300;
+            MoveTime = Env.Time + MoveSpeed;
             if (MoveTime > AttackTime)
                 AttackTime = MoveTime;
 
@@ -144,15 +144,15 @@ namespace Server.MirObjects.Monsters
 
             if (Master != null && Master is PlayerObject)
             {
-                if (Envir.Time > ExplosionTime) Die();
+                if (Env.Time > ExplosionTime) Die();
             }
         }
 
         protected override void ProcessSearch()
         {
-            if (Envir.Time < SearchTime) return;
+            if (Env.Time < SearchTime) return;
 
-            SearchTime = Envir.Time + SearchDelay;
+            SearchTime = Env.Time + SearchDelay;
 
             //Stacking or Infront of master - Move
             bool stacking = false;
@@ -175,7 +175,7 @@ namespace Server.MirObjects.Monsters
                 {
                     MirDirection dir = Direction;
 
-                    switch (Envir.Random.Next(3)) // favour Clockwise
+                    switch (Env.Random.Next(3)) // favour Clockwise
                     {
                         case 0:
                             for (int i = 0; i < 7; i++)
@@ -199,7 +199,7 @@ namespace Server.MirObjects.Monsters
                 }
             }
 
-            if (Target == null || Envir.Random.Next(3) == 0)
+            if (Target == null || Env.Random.Next(3) == 0)
                 FindTarget();
         }
 
@@ -213,7 +213,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -246,15 +246,15 @@ namespace Server.MirObjects.Monsters
             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             AttackDamage += damage;
 
             if (damage == 0) return;
 
-            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility);
+            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility);
             ActionList.Add(action);
         }
 
@@ -287,7 +287,7 @@ namespace Server.MirObjects.Monsters
             Master = null;
 
             PoisonList.Clear();
-            Envir.MonsterCount--;
+            Env.MonsterCount--;
 
             if (CurrentMap != null)
                 CurrentMap.MonsterCount--;
@@ -295,7 +295,7 @@ namespace Server.MirObjects.Monsters
 
         private void ExplosionDie()
         {
-            int criticalDamage = Envir.Random.Next(0, 100) <= Stats[Stat.Accuracy] ? Stats[Stat.MaxDC] * 2 : Stats[Stat.MinDC] * 2;
+            int criticalDamage = Env.Random.Next(0, 100) <= Stats[Stat.Accuracy] ? Stats[Stat.MaxDC] * 2 : Stats[Stat.MinDC] * 2;
             int damage = (Stats[Stat.MinDC] / 5 + 4 * (Level / 20)) * criticalDamage / 20 + Stats[Stat.MaxDC];
 
             for (int i = 0; i < 16; i++)

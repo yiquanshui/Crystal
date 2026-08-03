@@ -43,7 +43,7 @@ namespace Server
             SaveDelayTextBox.Text = Settings.SaveDelay.ToString();
 
             ServerVersionLabel.Text = Application.ProductVersion;
-            DBVersionLabel.Text = MirEnvir.Envir.LoadVersion.ToString() + ((MirEnvir.Envir.LoadVersion < MirEnvir.Envir.Version) ? " (Update needed)" : "");
+            DBVersionLabel.Text = MirEnvir.Env.LoadVersion.ToString() + ((MirEnvir.Env.LoadVersion < MirEnvir.Env.Version) ? " (Update needed)" : "");
             maxConnectionsPerIP.Text = Settings.MaxIP.ToString();
             expRateInput.Value = Math.Round((decimal)Settings.ExpRate, 2);
             dropRateInput.Value = Math.Round((decimal)Settings.DropRate, 2);
@@ -259,7 +259,7 @@ namespace Server
         }
 
         #region Drop Adjuster
-        private Envir Envir => SMain.EditEnvir;
+        private Env Env => SMain.EditEnv;
         private void ProcessFiles(RequiredClass targetClass, bool comment)
         {
             string dropPath = Path.Combine(Application.StartupPath, "Envir", "Drops");
@@ -272,7 +272,7 @@ namespace Server
 
             try
             {
-                var itemLookup = Envir.ItemInfoList.ToLookup(
+                var itemLookup = Env.ItemInfoList.ToLookup(
                     i => i.Name.Trim(),
                     StringComparer.OrdinalIgnoreCase
                 );

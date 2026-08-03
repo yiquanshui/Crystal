@@ -9,7 +9,7 @@ namespace Server.MirObjects.Monsters
         protected internal RootSpider(MonsterInfo info) 
             : base(info)
         {
-            byte randomdirection = (byte)Envir.Random.Next(3);
+            byte randomdirection = (byte)Env.Random.Next(3);
             Direction = (MirDirection)randomdirection;
         }
 
@@ -25,17 +25,17 @@ namespace Server.MirObjects.Monsters
 
             if (SlaveList.Count >= 20) return;
 
-            MonsterObject spawn = GetMonster(Envir.GetMonsterInfo(Settings.BombSpiderName));
+            MonsterObject spawn = GetMonster(Env.GetMonsterInfo(Settings.BombSpiderName));
 
             if (spawn == null) return;
 
             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + 3000;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + 3000;
 
             spawn.Target = Target;
-            spawn.ActionTime = Envir.Time + 1000;
+            spawn.ActionTime = Env.Time + 1000;
             Point spawnlocation = Point.Empty;
             switch (Direction)
             {
@@ -50,7 +50,7 @@ namespace Server.MirObjects.Monsters
                     break;
             }
 
-            CurrentMap.ActionList.Add(new DelayedAction(DelayedType.Spawn, Envir.Time + 500, spawn, spawnlocation, this));
+            CurrentMap.ActionList.Add(new DelayedAction(DelayedType.Spawn, Env.Time + 500, spawn, spawnlocation, this));
         }
     }
 }

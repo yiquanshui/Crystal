@@ -61,7 +61,7 @@ namespace Server.Library.Utils
                         p.UserName = name;
                         p.SecretQuestion = question;
                         p.SecretAnswer = answer;
-                        var result = Envir.Main.HTTPNewAccount(p, ip);
+                        var result = Env.Main.HTTPNewAccount(p, ip);
                         WriteResponse(response, result.ToString());
                         break;                               
                     case "/addnamelist":
@@ -77,7 +77,7 @@ namespace Server.Library.Utils
                             WriteResponse(response, "short");
                             return;
                         }
-                        Envir.Main.Broadcast(new S.Chat
+                        Env.Main.Broadcast(new S.Chat
                         {
                             Message = msg.Trim(),
                             Type = ChatType.Shout2

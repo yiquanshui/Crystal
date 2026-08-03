@@ -6,15 +6,15 @@ namespace Server.MirForms.Systems
 {
     public partial class MonsterTunerForm : Form
     {
-        public Envir Envir => SMain.Envir;
+        public Env Env => SMain.Env;
 
         public MonsterTunerForm()
         {
             InitializeComponent();
             
-            for (int i = 0; i < Envir.MonsterInfoList.Count; i++)
+            for (int i = 0; i < Env.MonsterInfoList.Count; i++)
             {
-                SelectMonsterComboBox.Items.Add(Envir.MonsterInfoList[i]);
+                SelectMonsterComboBox.Items.Add(Env.MonsterInfoList[i]);
             }
         }
 
@@ -83,7 +83,7 @@ namespace Server.MirForms.Systems
                 return;
             }
 
-            foreach (var item in Envir.Objects)
+            foreach (var item in Env.Objects)
             {
                 if (item.Race != ObjectType.Monster) continue;
 
@@ -101,12 +101,12 @@ namespace Server.MirForms.Systems
 
                 if (mob == null) continue;
 
-                if (Envir.MonsterInfoList[i].Index != mob.Index) break;
+                if (Env.MonsterInfoList[i].Index != mob.Index) break;
 
-                Envir.MonsterInfoList[i] = mob;
+                Env.MonsterInfoList[i] = mob;
             }
 
-            Envir.SaveDB();
+            Env.SaveDB();
         }
     }
 }

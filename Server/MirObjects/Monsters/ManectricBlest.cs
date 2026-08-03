@@ -37,9 +37,9 @@ namespace Server.MirObjects.Monsters
                     targets[i].Attacked(this, damage, DefenceType.MAC);
 
                     //TODO - Delay this
-                    if (Envir.Random.Next(Settings.PoisonResistWeight) >= targets[i].Stats[Stat.PoisonResist])
+                    if (Env.Random.Next(Settings.PoisonResistWeight) >= targets[i].Stats[Stat.PoisonResist])
                     {
-                        if (Envir.Random.Next(5) == 0)
+                        if (Env.Random.Next(5) == 0)
                         {
                             targets[i].ApplyPoison(new Poison { PType = PoisonType.Frozen, Duration = 5, TickSpeed = 1000 }, this);
                         }
@@ -51,7 +51,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            switch (Envir.Random.Next(3))
+            switch (Env.Random.Next(3))
             {
                 case 0:
                 case 1:
@@ -94,8 +94,8 @@ namespace Server.MirObjects.Monsters
                     }
             }
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
         }
        

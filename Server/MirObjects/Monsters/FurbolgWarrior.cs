@@ -35,8 +35,8 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
 
             bool isCrit = false;
@@ -54,7 +54,7 @@ namespace Server.MirObjects.Monsters
 
                 for (int i = 1; i <= 2; i++)
                 {
-                    if (Envir.Random.Next(10) == 0)
+                    if (Env.Random.Next(10) == 0)
                         isCrit = true;
 
                     if (isCrit)
@@ -74,12 +74,12 @@ namespace Server.MirObjects.Monsters
                         {
                             if (!ob.IsAttackTarget(this)) continue;
                             int delay = Functions.MaxDistance(CurrentLocation, ob.CurrentLocation) * 50 + 500;
-                            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + delay, ob, damage, DefenceType.ACAgility);
+                            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + delay, ob, damage, DefenceType.ACAgility);
                             ActionList.Add(action);
 
                             if (isCrit)
                             {
-                                DelayedAction action1 = new DelayedAction(DelayedType.SpellEffect, Envir.Time + delay, ob, SpellEffect.FurbolgWarriorCritical);
+                                DelayedAction action1 = new DelayedAction(DelayedType.SpellEffect, Env.Time + delay, ob, SpellEffect.FurbolgWarriorCritical);
                                 ActionList.Add(action1);
                             }
                         }
@@ -101,7 +101,7 @@ namespace Server.MirObjects.Monsters
 
                 for (int i = 0; i < 6; i++)
                 {
-                    if (Envir.Random.Next(10) == 0)
+                    if (Env.Random.Next(10) == 0)
                         isCrit = true;
 
                     if (isCrit)
@@ -121,12 +121,12 @@ namespace Server.MirObjects.Monsters
                         if (ob.Race != ObjectType.Player && ob.Race != ObjectType.Monster) continue;
                         if (!ob.IsAttackTarget(this)) continue;
 
-                        DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 600, ob, damage, DefenceType.ACAgility);
+                        DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 600, ob, damage, DefenceType.ACAgility);
                         ActionList.Add(action);
 
                         if (isCrit)
                         {
-                            DelayedAction action1 = new DelayedAction(DelayedType.SpellEffect, Envir.Time + 600, ob, SpellEffect.FurbolgWarriorCritical);
+                            DelayedAction action1 = new DelayedAction(DelayedType.SpellEffect, Env.Time + 600, ob, SpellEffect.FurbolgWarriorCritical);
                             ActionList.Add(action1);
                         }
                         break;

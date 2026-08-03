@@ -38,8 +38,8 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             bool ranged = CurrentLocation == Target.CurrentLocation || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 1);
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             if (!ranged)
             {
@@ -48,7 +48,7 @@ namespace Server.MirObjects.Monsters
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                 if (damage == 0) return;
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.AC);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.AC);
                 ActionList.Add(action);
             }
             else
@@ -79,7 +79,7 @@ namespace Server.MirObjects.Monsters
                         {
                             Spell = Spell.StoneGolemQuake,
                             Value = damage,
-                            ExpireTime = Envir.Time + 800 + start,
+                            ExpireTime = Env.Time + 800 + start,
                             TickSpeed = 1000,
                             Direction = Direction,
                             CurrentLocation = new Point(x, y),
@@ -89,7 +89,7 @@ namespace Server.MirObjects.Monsters
                             Caster = this
                         };
 
-                        DelayedAction action = new DelayedAction(DelayedType.Spawn, Envir.Time + start, ob);
+                        DelayedAction action = new DelayedAction(DelayedType.Spawn, Env.Time + start, ob);
                         CurrentMap.ActionList.Add(action);
                     }
                 }

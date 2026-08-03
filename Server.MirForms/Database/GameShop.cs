@@ -7,7 +7,7 @@ namespace Server
 
         private List<GameShopItem> SelectedItems;
 
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
 
         public GameShop()
         {
@@ -27,7 +27,7 @@ namespace Server
 
         private void GameShop_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Envir.SaveDB();
+            Env.SaveDB();
         }
 
         public class ListBoxItem
@@ -52,12 +52,12 @@ namespace Server
             ClassFilter_lb.Items.Add("All Classes");
             CategoryFilter_lb.Items.Add("All Categories");
 
-            for (int i = 0; i < SMain.EditEnvir.GameShopList.Count; i++)
+            for (int i = 0; i < SMain.EditEnv.GameShopList.Count; i++)
             {
-                if (!ClassFilter_lb.Items.Contains(SMain.EditEnvir.GameShopList[i].Class)) ClassFilter_lb.Items.Add(SMain.EditEnvir.GameShopList[i].Class);
-                if (!CategoryFilter_lb.Items.Contains(SMain.EditEnvir.GameShopList[i].Category)) CategoryFilter_lb.Items.Add(SMain.EditEnvir.GameShopList[i].Category);
+                if (!ClassFilter_lb.Items.Contains(SMain.EditEnv.GameShopList[i].Class)) ClassFilter_lb.Items.Add(SMain.EditEnv.GameShopList[i].Class);
+                if (!CategoryFilter_lb.Items.Contains(SMain.EditEnv.GameShopList[i].Category)) CategoryFilter_lb.Items.Add(SMain.EditEnv.GameShopList[i].Category);
 
-                GameShopListBox.Items.Add(SMain.EditEnvir.GameShopList[i]);
+                GameShopListBox.Items.Add(SMain.EditEnv.GameShopList[i]);
             }
 
             ClassFilter_lb.Text = "All Classes";
@@ -69,12 +69,12 @@ namespace Server
         {
 
             GameShopListBox.Items.Clear();
-            for (int i = 0; i < SMain.EditEnvir.GameShopList.Count; i++)
+            for (int i = 0; i < SMain.EditEnv.GameShopList.Count; i++)
             {
-                if (ClassFilter_lb.Text == "All Classes" || SMain.EditEnvir.GameShopList[i].Class == ClassFilter_lb.Text)
-                    if (SectionFilter_lb.Text == "All Items" || SMain.EditEnvir.GameShopList[i].TopItem && SectionFilter_lb.Text == "Top Items" || SMain.EditEnvir.GameShopList[i].Deal && SectionFilter_lb.Text == "Sale Items" || SMain.EditEnvir.GameShopList[i].Date > Envir.Now.AddDays(-7) && SectionFilter_lb.Text == "New Items")
-                        if (CategoryFilter_lb.Text == "All Categories" || SMain.EditEnvir.GameShopList[i].Category == CategoryFilter_lb.Text)
-                            GameShopListBox.Items.Add(SMain.EditEnvir.GameShopList[i]);
+                if (ClassFilter_lb.Text == "All Classes" || SMain.EditEnv.GameShopList[i].Class == ClassFilter_lb.Text)
+                    if (SectionFilter_lb.Text == "All Items" || SMain.EditEnv.GameShopList[i].TopItem && SectionFilter_lb.Text == "Top Items" || SMain.EditEnv.GameShopList[i].Deal && SectionFilter_lb.Text == "Sale Items" || SMain.EditEnv.GameShopList[i].Date > Env.Now.AddDays(-7) && SectionFilter_lb.Text == "New Items")
+                        if (CategoryFilter_lb.Text == "All Categories" || SMain.EditEnv.GameShopList[i].Category == CategoryFilter_lb.Text)
+                            GameShopListBox.Items.Add(SMain.EditEnv.GameShopList[i]);
             }
         }
 
@@ -152,7 +152,7 @@ namespace Server
         {
             int purchased;
 
-            SMain.Envir.GameshopLog.TryGetValue(SelectedItems[0].GIndex, out purchased);
+            SMain.Env.GameshopLog.TryGetValue(SelectedItems[0].GIndex, out purchased);
             TotalSold_label.Text = purchased.ToString();
 
             if (!Individual_checkbox.Checked && SelectedItems[0].Stock != 0)
@@ -232,7 +232,7 @@ namespace Server
 
             if (MessageBox.Show("Are you sure you want to remove the selected Items?", "Remove Items?", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
 
-            for (int i = 0; i < SelectedItems.Count; i++) Envir.Remove(SelectedItems[i]);
+            for (int i = 0; i < SelectedItems.Count; i++) Env.Remove(SelectedItems[i]);
 
             LoadGameShopItems();
             UpdateInterface();
@@ -353,15 +353,15 @@ namespace Server
 
         private void ServerLog_button_Click(object sender, EventArgs e)
         {
-            if (SMain.Envir.Running)
+            if (SMain.Env.Running)
             {
                 if (MessageBox.Show("Reseting purchase logs cannot be reverted and will set stock levels back to defaults, This will take effect instantly.", "Remove Logs?", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
-                SMain.Envir.ClearGameshopLog();
+                SMain.Env.ClearGameshopLog();
             }
             else
             {
                 if (MessageBox.Show("Reseting purchase logs cannot be reverted and will set stock levels back to defaults, This will take effect when you start the server", "Remove Logs?", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
-                SMain.Envir.ResetGS = true;
+                SMain.Env.ResetGS = true;
             }
         }
         private void GoldOnlyBox_CheckedChanged(object sender, EventArgs e)
@@ -391,7 +391,7 @@ namespace Server
             ItemComboBox.Items.Add("None");
 
             // Add all items from ItemInfoList
-            foreach (var item in SMain.EditEnvir.ItemInfoList)
+            foreach (var item in SMain.EditEnv.ItemInfoList)
             {
                 if (!string.IsNullOrEmpty(item.Name))
                 {
@@ -405,19 +405,19 @@ namespace Server
 
         private void Add_Button_Click(object sender, EventArgs e)
         {
-            if (SMain.EditEnvir.ItemInfoList == null || SMain.EditEnvir.ItemInfoList.Count == 0)
+            if (SMain.EditEnv.ItemInfoList == null || SMain.EditEnv.ItemInfoList.Count == 0)
             {
                 MessageBox.Show("No items available to add.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             // Get the first item's index as default
-            var defaultItem = SMain.EditEnvir.ItemInfoList.First();
+            var defaultItem = SMain.EditEnv.ItemInfoList.First();
             int firstItemIndex = defaultItem.Index;
 
             // Find the next available GIndex
-            int nextGIndex = SMain.EditEnvir.GameShopList.Count > 0
-                ? SMain.EditEnvir.GameShopList.Max(item => item.GIndex) + 1
+            int nextGIndex = SMain.EditEnv.GameShopList.Count > 0
+                ? SMain.EditEnv.GameShopList.Max(item => item.GIndex) + 1
                 : 1;
 
             // Create the new GameShopItem
@@ -434,7 +434,7 @@ namespace Server
             };
 
             // Add to GameShopList (main data source)
-            SMain.EditEnvir.GameShopList.Add(newItem);
+            SMain.EditEnv.GameShopList.Add(newItem);
 
             // Add to GameShopListBox for UI display
             GameShopListBox.Items.Add(newItem);
@@ -443,7 +443,7 @@ namespace Server
             ItemComboBox.SelectedItem = $"{defaultItem.Name}";
 
             // Save the database
-            Envir.SaveDB();
+            Env.SaveDB();
         }
 
         private void ItemComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -458,7 +458,7 @@ namespace Server
                 return;
 
             // Find the corresponding ItemInfo object by name
-            var newItemInfo = SMain.EditEnvir.ItemInfoList
+            var newItemInfo = SMain.EditEnv.ItemInfoList
                 .FirstOrDefault(x => x.Name == selectedName);
 
             if (newItemInfo == null)
@@ -481,7 +481,7 @@ namespace Server
 
             GameShopListBox.Items.Clear();
 
-            foreach (var item in SMain.EditEnvir.GameShopList)
+            foreach (var item in SMain.EditEnv.GameShopList)
             {
                 // Add to list if search text is empty or the item matches the search criteria
                 if (string.IsNullOrEmpty(searchText) ||

@@ -29,7 +29,7 @@ namespace Server.MirObjects.Monsters
 
         public override void Die()
         {
-            ActionList.Add(new DelayedAction(DelayedType.Die, Envir.Time + 1000));
+            ActionList.Add(new DelayedAction(DelayedType.Die, Env.Time + 1000));
 
             base.Die();
         }
@@ -41,8 +41,8 @@ namespace Server.MirObjects.Monsters
 
         private void SpawnSlave()
         {
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             List<int> conquestAIs = new()
             {
@@ -53,13 +53,13 @@ namespace Server.MirObjects.Monsters
                 82  // Wall
             };
 
-            var validMonsters = Envir.MonsterInfoList
+            var validMonsters = Env.MonsterInfoList
                 .Where(x => x.Level <= Level && x.Level >= (Level - 10) && !x.IsBoss && !conquestAIs.Contains(x.AI))
                 .ToList();
 
             if (validMonsters.Count > 0)
             {
-                var idx = Envir.Random.Next(validMonsters.Count);
+                var idx = Env.Random.Next(validMonsters.Count);
                 var monster = validMonsters[idx];
 
                 var mob = GetMonster(monster);
@@ -67,7 +67,7 @@ namespace Server.MirObjects.Monsters
 
                 mob.Spawn(CurrentMap, CurrentLocation);
                 mob.Target = Target;
-                mob.ActionTime = Envir.Time + 2000;
+                mob.ActionTime = Env.Time + 2000;
             }
         }
     }

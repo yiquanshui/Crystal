@@ -5,7 +5,7 @@ namespace Server
 {
     public partial class MiningInfoForm : Form
     {
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
         public bool MinesChanged = false;
         public List<string> mineIndexItems = new();
 
@@ -247,9 +247,9 @@ namespace Server
             string temp = ActiveControl.Text;
 
             ActiveControl.BackColor = Color.Red;
-            for (int i = 0; i < SMain.EditEnvir.ItemInfoList.Count; i++)
+            for (int i = 0; i < SMain.EditEnv.ItemInfoList.Count; i++)
             {
-                if (SMain.EditEnvir.ItemInfoList[i].Name == temp)
+                if (SMain.EditEnv.ItemInfoList[i].Name == temp)
                 {
                     ActiveControl.BackColor = SystemColors.Window;
                     break;

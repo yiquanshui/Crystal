@@ -31,8 +31,8 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             bool range = CurrentLocation == Target.CurrentLocation || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 1);
 
-            AttackTime = Envir.Time + AttackSpeed;
-            ActionTime = Envir.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
 
             if (range)
             {
@@ -42,7 +42,7 @@ namespace Server.MirObjects.Monsters
                 if (damage == 0) return;
 
                 int delay = Functions.MaxDistance(CurrentLocation, Target.CurrentLocation) * 50 + 500; //50 MS per Step
-                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + delay, Target, damage, DefenceType.MACAgility);
+                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + delay, Target, damage, DefenceType.MACAgility);
                 ActionList.Add(action);
             }
             else
@@ -73,7 +73,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -87,25 +87,25 @@ namespace Server.MirObjects.Monsters
             int count = Math.Min(8, 40 - SlaveList.Count);
 
             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             for (int i = 0; i < count; i++)
             {
                 MonsterObject mob = null;
-                switch (Envir.Random.Next(4))
+                switch (Env.Random.Next(4))
                 {
                     case 0:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.BoneMonster1));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.BoneMonster1));
                         break;
                     case 1:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.BoneMonster2));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.BoneMonster2));
                         break;
                     case 2:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.BoneMonster3));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.BoneMonster3));
                         break;
                     case 3:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.BoneMonster4));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.BoneMonster4));
                         break;
                 }
 
@@ -115,7 +115,7 @@ namespace Server.MirObjects.Monsters
                     mob.Spawn(CurrentMap, CurrentLocation);
 
                 mob.Target = Target;
-                mob.ActionTime = Envir.Time + 2000;
+                mob.ActionTime = Env.Time + 2000;
                 SlaveList.Add(mob);
             }
         }

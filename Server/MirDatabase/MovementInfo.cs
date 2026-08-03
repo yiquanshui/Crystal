@@ -24,10 +24,10 @@ namespace Server.MirDatabase
             NeedHole = reader.ReadBoolean();
             NeedMove = reader.ReadBoolean();
 
-            if (Envir.LoadVersion < 69) return;
+            if (Env.LoadVersion < 69) return;
             ConquestIndex = reader.ReadInt32();
 
-            if (Envir.LoadVersion < 95) return;
+            if (Env.LoadVersion < 95) return;
             ShowOnBigMap = reader.ReadBoolean();
             Icon = reader.ReadInt32();
         }

@@ -47,21 +47,21 @@ namespace Server.MirObjects.Monsters
             switch (type)
             {
                 case DefenceType.ACAgility:
-                    if (Envir.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy]) return 0;
+                    if (Env.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy]) return 0;
                     armour = GetDefencePower(Stats[Stat.MinAC], Stats[Stat.MaxAC]);
                     break;
                 case DefenceType.AC:
                     armour = GetDefencePower(Stats[Stat.MinAC], Stats[Stat.MaxAC]);
                     break;
                 case DefenceType.MACAgility:
-                    if (Envir.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy]) return 0;
+                    if (Env.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy]) return 0;
                     armour = GetDefencePower(Stats[Stat.MinMAC], Stats[Stat.MaxMAC]);
                     break;
                 case DefenceType.MAC:
                     armour = GetDefencePower(Stats[Stat.MinMAC], Stats[Stat.MaxMAC]);
                     break;
                 case DefenceType.Agility:
-                    if (Envir.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy]) return 0;
+                    if (Env.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy]) return 0;
                     break;
             }
 
@@ -89,7 +89,7 @@ namespace Server.MirObjects.Monsters
                     };
 
                 if (EXPOwner == attacker.Master)
-                    EXPOwnerTime = Envir.Time + EXPOwnerDelay;
+                    EXPOwnerTime = Env.Time + EXPOwnerDelay;
 
             }
 
@@ -105,21 +105,21 @@ namespace Server.MirObjects.Monsters
             switch (type)
             {
                 case DefenceType.ACAgility:
-                    if (Envir.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy]) return 0;
+                    if (Env.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy]) return 0;
                     armour = GetDefencePower(Stats[Stat.MinAC], Stats[Stat.MaxAC]);
                     break;
                 case DefenceType.AC:
                     armour = GetDefencePower(Stats[Stat.MinAC], Stats[Stat.MaxAC]);
                     break;
                 case DefenceType.MACAgility:
-                    if (Envir.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy]) return 0;
+                    if (Env.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy]) return 0;
                     armour = GetDefencePower(Stats[Stat.MinMAC], Stats[Stat.MaxMAC]);
                     break;
                 case DefenceType.MAC:
                     armour = GetDefencePower(Stats[Stat.MinMAC], Stats[Stat.MaxMAC]);
                     break;
                 case DefenceType.Agility:
-                    if (Envir.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy]) return 0;
+                    if (Env.Random.Next(Stats[Stat.Agility] + 1) > attacker.Stats[Stat.Accuracy]) return 0;
                     break;
             }
 
@@ -139,14 +139,14 @@ namespace Server.MirObjects.Monsters
             }
 
             if (Master != null && Master != attacker)
-                if (Envir.Time > Master.BrownTime && Master.PKPoints < 200)
-                    attacker.BrownTime = Envir.Time + Settings.Minute;
+                if (Env.Time > Master.BrownTime && Master.PKPoints < 200)
+                    attacker.BrownTime = Env.Time + Settings.Minute;
 
             if (EXPOwner == null || EXPOwner.Dead)
                 EXPOwner = GetAttacker(attacker);
 
             if (EXPOwner == attacker)
-                EXPOwnerTime = Envir.Time + EXPOwnerDelay;
+                EXPOwnerTime = Env.Time + EXPOwnerDelay;
 
             Broadcast(new S.ObjectStruck { ObjectID = ObjectID, AttackerID = attacker.ObjectID, Direction = Direction, Location = CurrentLocation });
             attacker.GatherElement();
@@ -160,7 +160,7 @@ namespace Server.MirObjects.Monsters
             if (Target == null)
                 return;
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -186,7 +186,7 @@ namespace Server.MirObjects.Monsters
 
         public override void Die()
         {
-            ActionList.Add(new DelayedAction(DelayedType.Damage, Envir.Time + 300));
+            ActionList.Add(new DelayedAction(DelayedType.Damage, Env.Time + 300));
 
             if (Info.Effect == 1)
             {
@@ -198,10 +198,10 @@ namespace Server.MirObjects.Monsters
 
         private void SpawnSlave()
         {
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
-            var mob = GetMonster(Envir.GetMonsterInfo(Settings.TucsonGeneralEgg));
+            var mob = GetMonster(Env.GetMonsterInfo(Settings.TucsonGeneralEgg));
 
             if (mob == null) return;
 
@@ -209,7 +209,7 @@ namespace Server.MirObjects.Monsters
                 mob.Spawn(CurrentMap, CurrentLocation);
 
             mob.Target = Target;
-            mob.ActionTime = Envir.Time + 2000;
+            mob.ActionTime = Env.Time + 2000;
         }
     }
 }

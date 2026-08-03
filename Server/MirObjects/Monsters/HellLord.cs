@@ -85,7 +85,7 @@ namespace Server.MirObjects.Monsters
 
             if (!CanAttack) return;
 
-            if (_raged && _rageTime < Envir.Time && _stage < 4 || _begin)
+            if (_raged && _rageTime < Env.Time && _stage < 4 || _begin)
             {
                 if (_begin)
                 {
@@ -99,23 +99,23 @@ namespace Server.MirObjects.Monsters
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
             }
 
-            if (Envir.Random.Next(_bombChance) == 0 || _raged)
+            if (Env.Random.Next(_bombChance) == 0 || _raged)
             {
                 SpawnBomb();
             }
 
             SpawnQuakes();
 
-            ActionTime = Envir.Time + 600;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 600;
+            AttackTime = Env.Time + AttackSpeed;
         }
 
         protected override void Attack() { }
 
         private void SpawnQuakes()
         {
-            int count = Envir.Random.Next(1, _raged ? _quakeCount * 2 : _quakeCount);
-            int distance = Envir.Random.Next(_quakeSpreadMin, _quakeSpreadMax);
+            int count = Env.Random.Next(1, _raged ? _quakeCount * 2 : _quakeCount);
+            int distance = Env.Random.Next(_quakeSpreadMin, _quakeSpreadMax);
 
             for (int j = 0; j < CurrentMap.Players.Count; j++)
             {
@@ -123,23 +123,23 @@ namespace Server.MirObjects.Monsters
 
                 for (int i = 0; i < count; i++)
                 {
-                    Point location = new Point(playerLocation.X + Envir.Random.Next(-distance, distance + 1),
-                                             playerLocation.Y + Envir.Random.Next(-distance, distance + 1));
+                    Point location = new Point(playerLocation.X + Env.Random.Next(-distance, distance + 1),
+                                             playerLocation.Y + Env.Random.Next(-distance, distance + 1));
 
-                    if(Envir.Random.Next(10) == 0)
+                    if(Env.Random.Next(10) == 0)
                     {
                         location = playerLocation;
                     }
 
                     if (!CurrentMap.ValidPoint(location)) continue;
 
-                    var start = Envir.Random.Next(5000);
+                    var start = Env.Random.Next(5000);
 
                     var spellObj = new SpellObject
                     {
-                        Spell = Envir.Random.Next(2) == 0 ? Spell.MapQuake1 : Spell.MapQuake2,
-                        Value = Envir.Random.Next(Envir.Random.Next(Stats[Stat.MinDC], Stats[Stat.MaxDC])),
-                        ExpireTime = Envir.Time + 2000 + start,
+                        Spell = Env.Random.Next(2) == 0 ? Spell.MapQuake1 : Spell.MapQuake2,
+                        Value = Env.Random.Next(Env.Random.Next(Stats[Stat.MinDC], Stats[Stat.MaxDC])),
+                        ExpireTime = Env.Time + 2000 + start,
                         TickSpeed = 500,
                         Caster = null,
                         CurrentLocation = location,
@@ -147,7 +147,7 @@ namespace Server.MirObjects.Monsters
                         Direction = MirDirection.Up
                     };
 
-                    DelayedAction action = new DelayedAction(DelayedType.Spawn, Envir.Time + start, spellObj);
+                    DelayedAction action = new DelayedAction(DelayedType.Spawn, Env.Time + start, spellObj);
                     CurrentMap.ActionList.Add(action);
                 }
             }
@@ -156,26 +156,26 @@ namespace Server.MirObjects.Monsters
 
         private void SpawnBomb()
         {
-            int distance = Envir.Random.Next(_bombSpreadMin, _bombSpreadMax);
+            int distance = Env.Random.Next(_bombSpreadMin, _bombSpreadMax);
 
             for (int j = 0; j < CurrentMap.Players.Count; j++)
             {
                 Point playerLocation = CurrentMap.Players[j].CurrentLocation;
 
-                Point location = new Point(playerLocation.X + Envir.Random.Next(-distance, distance + 1),
-                                             playerLocation.Y + Envir.Random.Next(-distance, distance + 1));
+                Point location = new Point(playerLocation.X + Env.Random.Next(-distance, distance + 1),
+                                             playerLocation.Y + Env.Random.Next(-distance, distance + 1));
 
                 MonsterObject mob = null;
-                switch (Envir.Random.Next(3))
+                switch (Env.Random.Next(3))
                 {
                     case 0:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.HellBomb1));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.HellBomb1));
                         break;
                     case 1:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.HellBomb2));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.HellBomb2));
                         break;
                     case 2:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.HellBomb3));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.HellBomb3));
                         break;
                 }
 
@@ -192,16 +192,16 @@ namespace Server.MirObjects.Monsters
             switch (_stage)
             {
                 case 0:
-                    mob = GetMonster(Envir.GetMonsterInfo(Settings.HellKnight1));
+                    mob = GetMonster(Env.GetMonsterInfo(Settings.HellKnight1));
                     break;
                 case 1:
-                    mob = GetMonster(Envir.GetMonsterInfo(Settings.HellKnight2));
+                    mob = GetMonster(Env.GetMonsterInfo(Settings.HellKnight2));
                     break;
                 case 2:
-                    mob = GetMonster(Envir.GetMonsterInfo(Settings.HellKnight3));
+                    mob = GetMonster(Env.GetMonsterInfo(Settings.HellKnight3));
                     break;
                 case 3:
-                    mob = GetMonster(Envir.GetMonsterInfo(Settings.HellKnight4));
+                    mob = GetMonster(Env.GetMonsterInfo(Settings.HellKnight4));
                     break;
             }
 
@@ -215,12 +215,12 @@ namespace Server.MirObjects.Monsters
 
             for (int i = 0; i < 50; i++)
             {
-                Point location = new Point(front.X + Envir.Random.Next(-10, 10),
-                                         front.Y + Envir.Random.Next(-10, 10));
+                Point location = new Point(front.X + Env.Random.Next(-10, 10),
+                                         front.Y + Env.Random.Next(-10, 10));
 
                 if (CurrentMap.ValidPoint(location))
                 {
-                    DelayedAction action = new DelayedAction(DelayedType.Spawn, Envir.Time + 500, knight, location);
+                    DelayedAction action = new DelayedAction(DelayedType.Spawn, Env.Time + 500, knight, location);
                     CurrentMap.ActionList.Add(action);
                     break;
                 }
@@ -229,7 +229,7 @@ namespace Server.MirObjects.Monsters
 
         public void KnightKilled()
         {
-            _rageTime = Envir.Time + _rageDelay;
+            _rageTime = Env.Time + _rageDelay;
             _raged = true;
 
             _stage += 1;

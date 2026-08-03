@@ -13,7 +13,7 @@ namespace Server.MirObjects.Monsters
 
         protected override bool CanMove
         {
-            get { return Route.Count > 0 && !Dead && Envir.Time > MoveTime && Envir.Time > ActionTime && Envir.Time > ShockTime; }
+            get { return Route.Count > 0 && !Dead && Env.Time > MoveTime && Env.Time > ActionTime && Env.Time > ShockTime; }
         }
 
         protected override bool CanRegen
@@ -73,8 +73,8 @@ namespace Server.MirObjects.Monsters
             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = dir, Location = target });
             Broadcast(new S.ObjectTurn { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 
-            ActionTime = Envir.Time + 500;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 500;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
 
@@ -82,7 +82,7 @@ namespace Server.MirObjects.Monsters
 
             if (damage == 0) return;
 
-            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.AC);
+            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.AC);
             ActionList.Add(action);
         }
     }

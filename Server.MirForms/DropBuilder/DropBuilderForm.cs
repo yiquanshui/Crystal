@@ -148,18 +148,18 @@ namespace Server.MirForms.DropBuilder
             };
 
             // Add monsters to list
-            for (int i = 0; i < Envir.MonsterInfoList.Count; i++)
+            for (int i = 0; i < Env.MonsterInfoList.Count; i++)
             {
-                listBoxMonsters.Items.Add(new MonsterDropInfo { Name = Envir.MonsterInfoList[i].Name, Path = Envir.MonsterInfoList[i].DropPath });
+                listBoxMonsters.Items.Add(new MonsterDropInfo { Name = Env.MonsterInfoList[i].Name, Path = Env.MonsterInfoList[i].DropPath });
             }
 
             tabControlSeperateItems_SelectedIndexChanged(tabControlSeperateItems, null);
             listBoxMonsters.SelectedIndex = 0;
-            labelMonsterList.Text = $"Monster Count: {Envir.MonsterInfoList.Count}";
+            labelMonsterList.Text = $"Monster Count: {Env.MonsterInfoList.Count}";
         }
 
         // Gets server data
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
 
         // Updates the drop file text
         private void UpdateDropFile()
@@ -344,17 +344,17 @@ namespace Server.MirForms.DropBuilder
                 list.Items.Clear();
 
             ListBox TempListBox = new ListBox();
-            for (int i = 0; i < Envir.ItemInfoList.Count; i++)
+            for (int i = 0; i < Env.ItemInfoList.Count; i++)
             {
-                if (Envir.ItemInfoList[i].Type.ToString() == Tab.SelectedTab.Tag.ToString())
+                if (Env.ItemInfoList[i].Type.ToString() == Tab.SelectedTab.Tag.ToString())
                 {
                     try
                     {
                         if (textBoxMinLevel.Text == string.Empty || textBoxMaxLevel.Text == string.Empty)                            
-                            TempListBox.Items.Add(Envir.ItemInfoList[i].Name);
-                        else if (Envir.ItemInfoList[i].RequiredAmount >= int.Parse(textBoxMinLevel.Text) &
-                            Envir.ItemInfoList[i].RequiredAmount <= int.Parse(textBoxMaxLevel.Text))
-                            TempListBox.Items.Add(Envir.ItemInfoList[i].Name);
+                            TempListBox.Items.Add(Env.ItemInfoList[i].Name);
+                        else if (Env.ItemInfoList[i].RequiredAmount >= int.Parse(textBoxMinLevel.Text) &
+                            Env.ItemInfoList[i].RequiredAmount <= int.Parse(textBoxMaxLevel.Text))
+                            TempListBox.Items.Add(Env.ItemInfoList[i].Name);
                     }
                     catch (Exception)
                     {
@@ -675,7 +675,7 @@ namespace Server.MirForms.DropBuilder
             checkBoxCap.Checked = false;
 
             labelMobLevel.Text =
-                $"Currently Editing: {((MonsterDropInfo)listBoxMonsters.SelectedItem).Name} - Level: {Envir.MonsterInfoList[listBoxMonsters.SelectedIndices[0]].Level}";
+                $"Currently Editing: {((MonsterDropInfo)listBoxMonsters.SelectedItem).Name} - Level: {Env.MonsterInfoList[listBoxMonsters.SelectedIndices[0]].Level}";
         }
 
         public string GetPathOfSelectedItem()
@@ -977,7 +977,7 @@ namespace Server.MirForms.DropBuilder
             if (checkBoxCap.Checked == true)
             {
                 textBoxMinLevel.Text = "0";
-                textBoxMaxLevel.Text = Envir.MonsterInfoList[listBoxMonsters.SelectedIndices[0]].Level.ToString();
+                textBoxMaxLevel.Text = Env.MonsterInfoList[listBoxMonsters.SelectedIndices[0]].Level.ToString();
                 tabControlSeperateItems_SelectedIndexChanged(tabControlSeperateItems, null);
             }
             else

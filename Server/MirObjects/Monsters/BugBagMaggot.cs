@@ -34,18 +34,18 @@ namespace Server.MirObjects.Monsters
 
             if (SlaveList.Count >= 20) return;       
             
-            MonsterObject spawn = GetMonster(Envir.GetMonsterInfo(Settings.BugBatName));
+            MonsterObject spawn = GetMonster(Env.GetMonsterInfo(Settings.BugBatName));
 
             if (spawn == null) return;
 
             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + 3000;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + 3000;
 
             spawn.Target = Target;
-            spawn.ActionTime = Envir.Time + 1000;
-            CurrentMap.ActionList.Add(new DelayedAction(DelayedType.Spawn, Envir.Time + 500, spawn, CurrentLocation, this));
+            spawn.ActionTime = Env.Time + 1000;
+            CurrentMap.ActionList.Add(new DelayedAction(DelayedType.Spawn, Env.Time + 500, spawn, CurrentLocation, this));
         }
 
         protected override void ProcessRoam() { }

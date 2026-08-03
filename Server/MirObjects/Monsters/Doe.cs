@@ -18,24 +18,24 @@ namespace Server.MirObjects.Monsters
         {
             if (Target == null || !CanAttack) return;
 
-            if (Envir.Time < FearTime)
+            if (Env.Time < FearTime)
             {
                 Attack();
                 return;
             }
 
-            FearTime = Envir.Time + 5000;
+            FearTime = Env.Time + 5000;
 
 
             var hpPercent = (HP * 100) / Stats[Stat.HP];
             bool halfHealth = hpPercent <= 50;
 
-            if(halfHealth == true && Envir.Time > teleportTime)
+            if(halfHealth == true && Env.Time > teleportTime)
             {
                 TeleportRandom(1, 5, CurrentMap);
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -51,7 +51,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Envir.Random.Next(2)) //No favour
+                switch (Env.Random.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)
@@ -84,10 +84,10 @@ namespace Server.MirObjects.Monsters
                 Point location;
 
                 if (distance <= 0)
-                    location = new Point(Envir.Random.Next(CurrentMap.Width), Envir.Random.Next(CurrentMap.Height));
+                    location = new Point(Env.Random.Next(CurrentMap.Width), Env.Random.Next(CurrentMap.Height));
                 else
-                    location = new Point(CurrentLocation.X + Envir.Random.Next(-distance, distance + 1),
-                                         CurrentLocation.Y + Envir.Random.Next(-distance, distance + 1));
+                    location = new Point(CurrentLocation.X + Env.Random.Next(-distance, distance + 1),
+                                         CurrentLocation.Y + Env.Random.Next(-distance, distance + 1));
 
                 if (Teleport(CurrentMap, location, true, 9)) return true;
             }

@@ -20,7 +20,7 @@ namespace Server
         {
             InitializeComponent();
 
-            PlayerObject player = SMain.Envir.GetPlayer(playerId);
+            PlayerObject player = SMain.Env.GetPlayer(playerId);
 
             if (player == null)
             {
@@ -28,7 +28,7 @@ namespace Server
                 return;
             }
 
-            Character = SMain.Envir.GetCharacterInfo(player.Name);
+            Character = SMain.Env.GetCharacterInfo(player.Name);
 
             UpdateTabs();
         }
@@ -66,7 +66,7 @@ namespace Server
             }
 
             CurrentIPLabel.Text = Character.AccountInfo.LastIP;
-            OnlineTimeLabel.Text = Character.LastLoginDate > Character.LastLogoutDate ? (SMain.Envir.Now - Character.LastLoginDate).TotalMinutes.ToString("##") + " minutes" : "Offline";
+            OnlineTimeLabel.Text = Character.LastLoginDate > Character.LastLogoutDate ? (SMain.Env.Now - Character.LastLoginDate).TotalMinutes.ToString("##") + " minutes" : "Offline";
 
             ChatBanExpiryTextBox.Text = Character.ChatBanExpiryDate.ToString();
         }
@@ -154,7 +154,7 @@ namespace Server
 
             foreach (int completedQuestID in Character.CompletedQuests)
             {
-                QuestInfo completedQuest = SMain.Envir.GetQuestInfo(completedQuestID);
+                QuestInfo completedQuest = SMain.Env.GetQuestInfo(completedQuestID);
 
                 ListViewItem item = new ListViewItem(completedQuestID.ToString());
                 item.SubItems.Add("Completed");
@@ -328,7 +328,7 @@ namespace Server
         {
             if (Character?.Player == null) return;
 
-            Character.Player.Teleport(SMain.Envir.GetMap(Character.BindMapIndex), Character.BindLocation);
+            Character.Player.Teleport(SMain.Env.GetMap(Character.BindMapIndex), Character.BindLocation);
         }
 
         private void ChatBanButton_Click(object sender, EventArgs e)

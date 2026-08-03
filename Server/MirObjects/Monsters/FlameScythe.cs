@@ -48,32 +48,32 @@ namespace Server.MirObjects.Monsters
                 {
                     for (int i = 0; i < targets.Count; i++)
                     {
-                        if (Envir.Random.Next(Settings.MagicResistWeight) >= targets[i].Stats[Stat.MagicResist])
+                        if (Env.Random.Next(Settings.MagicResistWeight) >= targets[i].Stats[Stat.MagicResist])
                         {
-                            DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 500, targets[i], damage, DefenceType.MACAgility);
+                            DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 500, targets[i], damage, DefenceType.MACAgility);
                             ActionList.Add(action);
                         }
                     }
                 }
             }
 
-            AttackTime = Envir.Time + AttackSpeed;
-            ActionTime = Envir.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
         }
 
         protected override void ProcessTarget()
         {
             if (Target == null || !CanAttack) return;
 
-            if (InAttackRange() && Envir.Time < FearTime)
+            if (InAttackRange() && Env.Time < FearTime)
             {
                 Attack();
                 return;
             }
 
-            FearTime = Envir.Time + 5000;
+            FearTime = Env.Time + 5000;
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -89,7 +89,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Envir.Random.Next(2)) //No favour
+                switch (Env.Random.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)

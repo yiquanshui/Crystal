@@ -7,7 +7,7 @@ namespace Server
 {
     public partial class GuildInfoForm : Form
     {
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
 
         public bool GuildsChanged = false;
         GuildBuffInfo SelectedBuff;
@@ -22,9 +22,9 @@ namespace Server
                 GuildCreateListcomboBox.Items.Add(i);
             GuildItemNamecomboBox.Items.Clear();
             GuildItemNamecomboBox.Items.Add("");
-            for (int i = 0; i < Envir.ItemInfoList.Count; i++)
+            for (int i = 0; i < Env.ItemInfoList.Count; i++)
             {
-                GuildItemNamecomboBox.Items.Add(Envir.ItemInfoList[i]);
+                GuildItemNamecomboBox.Items.Add(Env.ItemInfoList[i]);
             }
             for (int i = 0; i < Settings.Guild_BuffList.Count; i++)
                 BuffList.Items.Add(Settings.Guild_BuffList[i]);
@@ -71,9 +71,9 @@ namespace Server
                     GuildItemNamecomboBox.SelectedIndex = 0;
                 else
                 {
-                    if (Envir.GetItemInfo(Settings.Guild_CreationCostList[GuildCreateListcomboBox.SelectedIndex].Item.Index) != null)
+                    if (Env.GetItemInfo(Settings.Guild_CreationCostList[GuildCreateListcomboBox.SelectedIndex].Item.Index) != null)
                     {
-                        GuildItemNamecomboBox.SelectedItem = Envir.GetItemInfo(Settings.Guild_CreationCostList[GuildCreateListcomboBox.SelectedIndex].Item.Index);
+                        GuildItemNamecomboBox.SelectedItem = Env.GetItemInfo(Settings.Guild_CreationCostList[GuildCreateListcomboBox.SelectedIndex].Item.Index);
                     }
                     else
                     {

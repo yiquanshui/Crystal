@@ -27,14 +27,14 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             bool ranged = CurrentLocation == Target.CurrentLocation || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 3);
 
-            if (Envir.Time > _PoisonRainTime)
+            if (Env.Time > _PoisonRainTime)
             {
                 //TODO - Animation broken as too large
 
@@ -45,34 +45,34 @@ namespace Server.MirObjects.Monsters
                 //DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 500, Target, damage, DefenceType.ACAgility, true);
                 //ActionList.Add(action);
 
-                _PoisonRainTime = Envir.Time + 30000;
+                _PoisonRainTime = Env.Time + 30000;
                 //return;
             }
 
-            if (!ranged && Envir.Random.Next(4) > 0)
+            if (!ranged && Env.Random.Next(4) > 0)
             {
-                if (Envir.Time > _PoisonTime) //Poison
+                if (Env.Time > _PoisonTime) //Poison
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 2 });
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                     if (damage == 0) return;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.MACAgility, true, false);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.MACAgility, true, false);
                     ActionList.Add(action);
 
-                    _PoisonTime = Envir.Time + 20000;
+                    _PoisonTime = Env.Time + 20000;
 
                     return;
                 }
 
-                if (Envir.Random.Next(3) > 0) //Normal
+                if (Env.Random.Next(3) > 0) //Normal
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                     if (damage == 0) return;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.ACAgility, false, false);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.ACAgility, false, false);
                     ActionList.Add(action);
                 }
                 else //Front Stomp
@@ -87,7 +87,7 @@ namespace Server.MirObjects.Monsters
             }
             else
             {
-                if (Envir.Random.Next(5) == 0)
+                if (Env.Random.Next(5) == 0)
                 {
                     Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID, Type = 0 });
 
@@ -116,7 +116,7 @@ namespace Server.MirObjects.Monsters
                 for (int i = 0; i < targets.Count; i++)
                 {
                     if (targets[i].Attacked(this, damage, defence) <= 0) continue;
-                    PoisonTarget(targets[i], 2, Envir.Random.Next(2, 6), PoisonType.Green, 1000);
+                    PoisonTarget(targets[i], 2, Env.Random.Next(2, 6), PoisonType.Green, 1000);
                 }
 
                 return;
@@ -124,7 +124,7 @@ namespace Server.MirObjects.Monsters
             if (daze)
             {
                 if (target.Attacked(this, damage, defence) <= 0) return;
-                PoisonTarget(target, 2, Envir.Random.Next(2, 6), PoisonType.Dazed, 1000);
+                PoisonTarget(target, 2, Env.Random.Next(2, 6), PoisonType.Dazed, 1000);
                 return;
             }
 
@@ -155,7 +155,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;

@@ -50,9 +50,9 @@
 
     public class RespawnTimer
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public byte BaseSpawnRate = 20;//amount of minutes between respawnticks (with no bonus)
@@ -73,7 +73,7 @@
         {
             BaseSpawnRate = reader.ReadByte();
             CurrentTickcounter = reader.ReadUInt64();
-            LastTick = Envir.Time;
+            LastTick = Env.Time;
             Respawn.Clear();
             int Optioncount = reader.ReadInt32();
             for (int i = 0; i < Optioncount; i++)
@@ -98,21 +98,21 @@
             //by always rechecking tickspeed we reduce the chance of having respawns get silly on situations where usercount goes up or down fast (like say after a server reboot)
             GetTickSpeed();
 
-            if (Envir.Time >= (LastTick + CurrentDelay))
+            if (Env.Time >= (LastTick + CurrentDelay))
             {
                 CurrentTickcounter++;
                 if (CurrentTickcounter == long.MaxValue) //by using long instead of ulong here you basicaly have a huge safe zone on the respawn ticks of mobs
                 {
                     CurrentTickcounter = 0;
                 }
-                LastTick = Envir.Time;
+                LastTick = Env.Time;
             }
         }
 
         public void GetTickSpeed()
         {
-            if (LastUsercount == Envir.PlayerCount) return;
-            LastUsercount = Envir.PlayerCount;
+            if (LastUsercount == Env.PlayerCount) return;
+            LastUsercount = Env.PlayerCount;
             double bonus = 1.0;
             foreach (RespawnTickOption Option in Respawn)
             {

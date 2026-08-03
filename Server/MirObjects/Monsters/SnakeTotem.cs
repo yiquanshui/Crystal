@@ -13,7 +13,7 @@ namespace Server.MirObjects.Monsters
 
         protected internal SnakeTotem(MonsterInfo info) : base(info)
         {
-            ActionTime = Envir.Time + 1000;
+            ActionTime = Env.Time + 1000;
             Direction = MirDirection.Up;
         }
 
@@ -40,16 +40,16 @@ namespace Server.MirObjects.Monsters
                 if (Master != null)
                 {
                     if (Master.CurrentMap != CurrentMap || !Functions.InRange(Master.CurrentLocation, CurrentLocation, 15)) selfDestruct = true;
-                    if (Summoned && Envir.Time > AliveTime) selfDestruct = true;
+                    if (Summoned && Env.Time > AliveTime) selfDestruct = true;
                     if (selfDestruct)
                     {
                         Die();
-                        DieTime = Envir.Time + 3000;
+                        DieTime = Env.Time + 3000;
                     }
                 }
                 base.Process();
             }
-            else if (Envir.Time >= DieTime) Despawn();
+            else if (Env.Time >= DieTime) Despawn();
         }
 
         public override void Process(DelayedAction action)
@@ -67,11 +67,11 @@ namespace Server.MirObjects.Monsters
             if (Dead) return;
 
             //Search for target
-            if (Envir.Time < SearchTime) return;
-            SearchTime = Envir.Time + SearchDelay;
+            if (Env.Time < SearchTime) return;
+            SearchTime = Env.Time + SearchDelay;
 
             //Cant agro when shocked
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -131,7 +131,7 @@ namespace Server.MirObjects.Monsters
         {
             if (Pets.Count >= MaxMinions) return false;
 
-            MonsterInfo info = Envir.GetMonsterInfo(Settings.SnakesName);
+            MonsterInfo info = Env.GetMonsterInfo(Settings.SnakesName);
             if (info == null) return false;
 
             MonsterObject monster;
@@ -140,9 +140,9 @@ namespace Server.MirObjects.Monsters
             monster.Master = this;
             monster.MaxPetLevel = (byte)(1 + PetLevel * 2);
             monster.Direction = Direction;
-            monster.ActionTime = Envir.Time + 1000;
+            monster.ActionTime = Env.Time + 1000;
 
-            ((Monsters.CharmedSnake)monster).AliveTime = Envir.Time + ((PetLevel * 2000) + 10000);
+            ((Monsters.CharmedSnake)monster).AliveTime = Env.Time + ((PetLevel * 2000) + 10000);
             ((Monsters.CharmedSnake)monster).MasterTotem = this;
 
             SlaveList.Add(monster);

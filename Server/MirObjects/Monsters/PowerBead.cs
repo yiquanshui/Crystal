@@ -30,10 +30,10 @@ namespace Server.MirObjects.Monsters
 
         protected override void ProcessSearch()
         {
-            if (Envir.Time < SearchTime) return;
+            if (Env.Time < SearchTime) return;
             if (Master != null && (Master.PMode == PetMode.MoveOnly || Master.PMode == PetMode.None || Master.PMode == PetMode.FocusMasterTarget)) return;
 
-            SearchTime = Envir.Time + SearchDelay;
+            SearchTime = Env.Time + SearchDelay;
 
             if (Info.Effect == 0)
             {
@@ -41,7 +41,7 @@ namespace Server.MirObjects.Monsters
 
                 if (targets.Count > 0)
                 {
-                    Target = targets[Envir.Random.Next(targets.Count)];
+                    Target = targets[Env.Random.Next(targets.Count)];
                 }
             }
             else if (Info.Effect == 1 || Info.Effect == 2)
@@ -52,7 +52,7 @@ namespace Server.MirObjects.Monsters
 
                     if (friends.Count > 0)
                     {
-                        Target = friends[Envir.Random.Next(friends.Count)];
+                        Target = friends[Env.Random.Next(friends.Count)];
                     }
                 }
                 else
@@ -77,12 +77,12 @@ namespace Server.MirObjects.Monsters
 
             Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID, Type = 0 });
 
-            DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 300, Target);
+            DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 300, Target);
 
             ActionList.Add(action);
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
         }
 
@@ -151,13 +151,13 @@ namespace Server.MirObjects.Monsters
 
         public static bool SpawnRandom(MonsterObject owner, Point spawn)
         {
-            var beads = Envir.MonsterInfoList.Where(x => x.AI == 149).ToList();
+            var beads = Env.MonsterInfoList.Where(x => x.AI == 149).ToList();
 
             if (beads.Count > 0)
             {
-                var randomBead = beads[Envir.Random.Next(beads.Count)];
+                var randomBead = beads[Env.Random.Next(beads.Count)];
 
-                var mob = GetMonster(Envir.GetMonsterInfo(randomBead.Name));
+                var mob = GetMonster(Env.GetMonsterInfo(randomBead.Name));
 
                 if (mob.Spawn(owner.CurrentMap, spawn))
                 {

@@ -22,25 +22,25 @@ namespace Server.MirObjects.Monsters
 
         protected override void ProcessAI()
         {
-            if (!Dead && Envir.Time > VisibleTime)
+            if (!Dead && Env.Time > VisibleTime)
             {
-                VisibleTime = Envir.Time + 2000;
+                VisibleTime = Env.Time + 2000;
 
                 bool playersInRange = FindNearby(4);
 
                 if (!Visible && playersInRange)
                 {
                     Visible = true;
-                    CellTime = Envir.Time + 500;
+                    CellTime = Env.Time + 500;
                     Broadcast(GetInfo());
                     Broadcast(new S.ObjectShow { ObjectID = ObjectID });
-                    ActionTime = Envir.Time + 1000;
+                    ActionTime = Env.Time + 1000;
                 }
 
                 if (Visible && !playersInRange)
                 {
                     Visible = false;
-                    VisibleTime = Envir.Time + 3000;
+                    VisibleTime = Env.Time + 3000;
 
                     Broadcast(new S.ObjectHide { ObjectID = ObjectID });
 
@@ -70,8 +70,8 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             bool ranged = CurrentLocation == Target.CurrentLocation || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 1);
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             if (!ranged)
             {
@@ -79,7 +79,7 @@ namespace Server.MirObjects.Monsters
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                 if (damage == 0) return;
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility);
                 ActionList.Add(action);
             }
             else
@@ -88,7 +88,7 @@ namespace Server.MirObjects.Monsters
                 int damage = GetAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC]);
                 if (damage == 0) return;
 
-                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 500, Target, damage, DefenceType.MACAgility);
+                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 500, Target, damage, DefenceType.MACAgility);
                 ActionList.Add(action);
             }
         }

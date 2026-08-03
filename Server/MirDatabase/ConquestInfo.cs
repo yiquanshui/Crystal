@@ -54,7 +54,7 @@ namespace Server.MirDatabase
         {
             Index = reader.ReadInt32();
 
-            if (Envir.LoadVersion > 73)
+            if (Env.LoadVersion > 73)
             {
                 FullMap = reader.ReadBoolean();
             }
@@ -69,7 +69,7 @@ namespace Server.MirDatabase
             WallIndex = reader.ReadInt32();
             SiegeIndex = reader.ReadInt32();
 
-            if (Envir.LoadVersion > 72)
+            if (Env.LoadVersion > 72)
             {
                 FlagIndex = reader.ReadInt32();
             }
@@ -104,7 +104,7 @@ namespace Server.MirDatabase
                 ConquestSieges.Add(new ConquestSiegeInfo(reader));
             }
 
-            if (Envir.LoadVersion > 72)
+            if (Env.LoadVersion > 72)
             {
                 counter = reader.ReadInt32();
                 for (int i = 0; i < counter; i++)
@@ -129,7 +129,7 @@ namespace Server.MirDatabase
             KingLocation = new Point(reader.ReadInt32(), reader.ReadInt32());
             KingSize = reader.ReadUInt16();
 
-            if (Envir.LoadVersion > 74)
+            if (Env.LoadVersion > 74)
             {
                 ControlPointIndex = reader.ReadInt32();
                 counter = reader.ReadInt32();
@@ -240,7 +240,7 @@ namespace Server.MirDatabase
             MobIndex = reader.ReadInt32();
             Name = reader.ReadString();
 
-            if (Envir.LoadVersion <= 84)
+            if (Env.LoadVersion <= 84)
             {
                 RepairCost = (int)reader.ReadUInt32();
             }
@@ -283,7 +283,7 @@ namespace Server.MirDatabase
             MobIndex = reader.ReadInt32();
             Name = reader.ReadString();
 
-            if (Envir.LoadVersion <= 84)
+            if (Env.LoadVersion <= 84)
             {
                 RepairCost = (int)reader.ReadUInt32();
             }
@@ -326,7 +326,7 @@ namespace Server.MirDatabase
             MobIndex = reader.ReadInt32();
             Name = reader.ReadString();
 
-            if (Envir.LoadVersion <= 84)
+            if (Env.LoadVersion <= 84)
             {
                 RepairCost = (int)reader.ReadUInt32();
             }

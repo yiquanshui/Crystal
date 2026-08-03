@@ -29,8 +29,8 @@ namespace Server.MirObjects.Monsters
             {
                 if (CurrentLocation == Target.CurrentLocation)
                 {
-                    MirDirection direction = (MirDirection)Envir.Random.Next(8);
-                    int rotation = Envir.Random.Next(2) == 0 ? 1 : -1;
+                    MirDirection direction = (MirDirection)Env.Random.Next(8);
+                    int rotation = Env.Random.Next(2) == 0 ? 1 : -1;
 
                     for (int d = 0; d < 8; d++)
                     {
@@ -61,21 +61,21 @@ namespace Server.MirObjects.Monsters
             }
 
             ShockTime = 0;
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
 
             if (damage == 0) return;
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
-            if (Envir.Random.Next(3) == 0)
+            if (Env.Random.Next(3) == 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Spell = Spell.TwinDrakeBlade });
                 Target.Attacked(this, (int)(damage * 0.8), DefenceType.ACAgility);
                 ProjectileAttack((int)(damage * 0.8),DefenceType.ACAgility);
 
-                if (((Target.Race != ObjectType.Player || Settings.PvpCanResistPoison) && (Envir.Random.Next(Settings.PoisonAttackWeight) >= Target.Stats[Stat.PoisonResist])) && (Target.Level <= Level + 8 && Envir.Random.Next(20) <= 5))
+                if (((Target.Race != ObjectType.Player || Settings.PvpCanResistPoison) && (Env.Random.Next(Settings.PoisonAttackWeight) >= Target.Stats[Stat.PoisonResist])) && (Target.Level <= Level + 8 && Env.Random.Next(20) <= 5))
                 {
                     Target.ApplyPoison(new Poison { PType = PoisonType.Stun, Duration = 5, TickSpeed = 1000 }, this);
                     Target.Broadcast(new S.ObjectEffect { ObjectID = Target.ObjectID, Effect = SpellEffect.TwinDrakeBlade });
@@ -164,9 +164,9 @@ namespace Server.MirObjects.Monsters
             }
 
 
-            CellTime = Envir.Time + 500;
-            ActionTime = Envir.Time + 300;
-            MoveTime = Envir.Time + MoveSpeed;
+            CellTime = Env.Time + 500;
+            ActionTime = Env.Time + 300;
+            MoveTime = Env.Time + MoveSpeed;
             if (MoveTime > AttackTime)
                 AttackTime = MoveTime;
 
@@ -215,7 +215,7 @@ namespace Server.MirObjects.Monsters
             Master = null;
 
             PoisonList.Clear();
-            Envir.MonsterCount--;
+            Env.MonsterCount--;
 
             if (CurrentMap != null)
                 CurrentMap.MonsterCount--;
@@ -241,10 +241,10 @@ namespace Server.MirObjects.Monsters
                 Name = master != null ? master.Name : Name,
                 NameColour = NameColour,
                 Class = MirClass.Warrior,
-                Gender = master != null ? master.Gender : Envir.Random.Next(2) == 0 ? MirGender.Male : MirGender.Female,
+                Gender = master != null ? master.Gender : Env.Random.Next(2) == 0 ? MirGender.Male : MirGender.Female,
                 Location = CurrentLocation,
                 Direction = Direction,
-                Hair = master != null ? master.Hair : (byte)Envir.Random.Next(0, 5),
+                Hair = master != null ? master.Hair : (byte)Env.Random.Next(0, 5),
                 Weapon = 29,
                 Armour = 6,
                 Light = master != null ? master.Light : Light,

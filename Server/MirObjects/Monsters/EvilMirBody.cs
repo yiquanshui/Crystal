@@ -7,7 +7,7 @@ namespace Server.MirObjects.Monsters
         private bool _dragonlink;
         public bool DragonLink
         {
-            get { return _dragonlink && Envir.DragonSystem != null; }
+            get { return _dragonlink && Env.DragonSystem != null; }
             set
             {
                 if (_dragonlink == value) return;
@@ -39,9 +39,9 @@ namespace Server.MirObjects.Monsters
         {
             if (DragonLink)
             {
-                if (Envir.DragonSystem.LinkedMonster != null)
+                if (Env.DragonSystem.LinkedMonster != null)
                 {
-                    MonsterObject ob = Envir.DragonSystem.LinkedMonster;
+                    MonsterObject ob = Env.DragonSystem.LinkedMonster;
                     if (attacker.Info.AI == 6)
                         EXPOwner = null;
 
@@ -60,12 +60,12 @@ namespace Server.MirObjects.Monsters
                                 };
 
                             if (ob.EXPOwner == attacker.Master)
-                                ob.EXPOwnerTime = Envir.Time + EXPOwnerDelay;
+                                ob.EXPOwnerTime = Env.Time + EXPOwnerDelay;
                         }
 
                     }
                 }
-                Envir.DragonSystem.GainExp(Envir.Random.Next(1, 40));
+                Env.DragonSystem.GainExp(Env.Random.Next(1, 40));
                 return 1;
             }
 
@@ -76,20 +76,20 @@ namespace Server.MirObjects.Monsters
         {
             if (DragonLink)
             {
-                if (Envir.DragonSystem.LinkedMonster != null)
+                if (Env.DragonSystem.LinkedMonster != null)
                 {
-                    MonsterObject ob = Envir.DragonSystem.LinkedMonster;
+                    MonsterObject ob = Env.DragonSystem.LinkedMonster;
                     if (ob.EXPOwner == null || ob.EXPOwner.Dead)
                         ob.EXPOwner = GetAttacker(attacker);
 
                     if (ob.EXPOwner == attacker)
-                        ob.EXPOwnerTime = Envir.Time + EXPOwnerDelay;
+                        ob.EXPOwnerTime = Env.Time + EXPOwnerDelay;
                 }
 
                 if (damageWeapon)
                     attacker.DamageWeapon();
 
-                Envir.DragonSystem.GainExp(Envir.Random.Next(1, 40));
+                Env.DragonSystem.GainExp(Env.Random.Next(1, 40));
                 return 1;
             }
 

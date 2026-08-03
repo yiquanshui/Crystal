@@ -20,7 +20,7 @@ namespace Server.MirObjects.Monsters
 
             int ownDamage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
 
-            if (attackerDamage > ownDamage && Envir.Random.Next(2) == 0)
+            if (attackerDamage > ownDamage && Env.Random.Next(2) == 0)
             {
                 FindWeakerTarget();
             }
@@ -34,7 +34,7 @@ namespace Server.MirObjects.Monsters
 
             int ownDamage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
 
-            if (attackerDamage > ownDamage && Envir.Random.Next(10) == 0)
+            if (attackerDamage > ownDamage && Env.Random.Next(10) == 0)
             {
                 FindWeakerTarget();
             }
@@ -92,16 +92,16 @@ namespace Server.MirObjects.Monsters
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
-            if (Envir.Random.Next(3) > 0)
+            if (Env.Random.Next(3) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                 if (damage == 0) return;
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.ACAgility, false, false);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.ACAgility, false, false);
                 ActionList.Add(action);
             }
             else
@@ -112,7 +112,7 @@ namespace Server.MirObjects.Monsters
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                     if (damage == 0) return;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.ACAgility, true, false);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.ACAgility, true, false);
                     ActionList.Add(action);
                 }
                 else if (HealthPercent >= 30)
@@ -121,7 +121,7 @@ namespace Server.MirObjects.Monsters
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                     if (damage == 0) return;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.ACAgility, false, true);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.ACAgility, false, true);
                     ActionList.Add(action);
                 }
                 else
@@ -130,7 +130,7 @@ namespace Server.MirObjects.Monsters
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                     if (damage == 0) return;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.ACAgility, false, false);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.ACAgility, false, false);
                     ActionList.Add(action);
                 }
             }
@@ -154,7 +154,7 @@ namespace Server.MirObjects.Monsters
 
         public override void Die()
         {
-            ActionList.Add(new DelayedAction(DelayedType.Die, Envir.Time + 500));
+            ActionList.Add(new DelayedAction(DelayedType.Die, Env.Time + 500));
             base.Die();
         }
 
@@ -190,7 +190,7 @@ namespace Server.MirObjects.Monsters
 
                     if (!Settings.PetSave)
                     {
-                        mob.TameTime = Envir.Time + (Settings.Minute * 60);
+                        mob.TameTime = Env.Time + (Settings.Minute * 60);
                     }
 
                     mob.Broadcast(new S.ObjectName { ObjectID = mob.ObjectID, Name = mob.Name });
@@ -204,19 +204,19 @@ namespace Server.MirObjects.Monsters
         {
             _SpawnedSlaves = true;
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             for (int i = 0; i < 3; i++)
             {
-                MonsterObject mob = GetMonster(Envir.GetMonsterInfo(Settings.SnowWolfKingMob));
+                MonsterObject mob = GetMonster(Env.GetMonsterInfo(Settings.SnowWolfKingMob));
                 if (mob == null) continue;
 
                 if (!mob.Spawn(CurrentMap, Target.Back))
                     mob.Spawn(CurrentMap, CurrentLocation);
 
                 mob.Target = Target;
-                mob.ActionTime = Envir.Time + 2000;
+                mob.ActionTime = Env.Time + 2000;
                 SlaveList.Add(mob);
             }
         }

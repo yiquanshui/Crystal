@@ -9,7 +9,7 @@ namespace Server.MirForms.VisualMapInfo.Control
     {
         public List<int> IndexList = new List<int>();
 
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
 
         public RectangleShape RegionHighlight = new RectangleShape();
 
@@ -192,9 +192,9 @@ namespace Server.MirForms.VisualMapInfo.Control
 
         private void RespawnEntry_Load(object sender, EventArgs e)
         {
-            for (int i = 0; i < Envir.MonsterInfoList.Count; i++) MonsterComboBox.Items.Add(Envir.MonsterInfoList[i]);
+            for (int i = 0; i < Env.MonsterInfoList.Count; i++) MonsterComboBox.Items.Add(Env.MonsterInfoList[i]);
 
-            MonsterComboBox.SelectedItem = Envir.MonsterInfoList.FirstOrDefault(x => x.Index == MonsterIndex);
+            MonsterComboBox.SelectedItem = Env.MonsterInfoList.FirstOrDefault(x => x.Index == MonsterIndex);
 
             Details.Text =
                 $"C               D            X: {X.ToString()} | Y: {Y.ToString()} | Range: {Range.ToString()}";

@@ -27,26 +27,26 @@ namespace Server.MirObjects.Monsters
 
             List<MapObject> targets = FindAllTargets(1, CurrentLocation);
 
-            if ((targets.Count > 1 && Envir.Random.Next(2) == 0) || Envir.Random.Next(8) == 0)
+            if ((targets.Count > 1 && Env.Random.Next(2) == 0) || Env.Random.Next(8) == 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 
                 for (int i = 0; i < targets.Count; i++)
                 {
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 1000, targets[i], (int)(damage * 0.8), DefenceType.ACAgility);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 1000, targets[i], (int)(damage * 0.8), DefenceType.ACAgility);
                     ActionList.Add(action);
                 }
             }
             else
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
-                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 600, Target, damage, DefenceType.ACAgility);
+                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 600, Target, damage, DefenceType.ACAgility);
                 ActionList.Add(action);
             }
 
             ShockTime = 0;
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             if (Target.Dead)
                 FindTarget();

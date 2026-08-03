@@ -19,7 +19,7 @@ namespace Server.Database
             MarketListing.Items.Clear();
 
             // Retrieve all auctions from the user database and filter out expired or sold items
-            List<AuctionInfo> allAuctions = Envir.Main.Auctions.ToList();
+            List<AuctionInfo> allAuctions = Env.Main.Auctions.ToList();
             List<AuctionInfo> activeAuctions = allAuctions.Where(a => !a.Expired && !a.Sold).ToList();
 
             // Update the TotalItemsLabel with the count of active items
@@ -104,7 +104,7 @@ namespace Server.Database
             }
 
             // Find the auction in Envir.Main.Auctions by AuctionID
-            var auction = Envir.Main.Auctions.FirstOrDefault(a => a.AuctionID == auctionId);
+            var auction = Env.Main.Auctions.FirstOrDefault(a => a.AuctionID == auctionId);
             if (auction == null)
             {
                 MessageBox.Show("Auction listing not found.");
@@ -137,7 +137,7 @@ namespace Server.Database
                 return;
             }
 
-            var auction = Envir.Main.Auctions.FirstOrDefault(a => a.AuctionID == auctionId);
+            var auction = Env.Main.Auctions.FirstOrDefault(a => a.AuctionID == auctionId);
             if (auction == null)
             {
                 MessageBox.Show("Auction listing not found.");
@@ -161,7 +161,7 @@ namespace Server.Database
             }
 
             // Remove the auction from the main auction list and the seller's account
-            Envir.Main.Auctions.Remove(auction);
+            Env.Main.Auctions.Remove(auction);
             auction.SellerInfo.AccountInfo.Auctions.Remove(auction);
 
             LoadMarket();

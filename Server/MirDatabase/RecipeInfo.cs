@@ -5,9 +5,9 @@ namespace Server.MirDatabase
 {
     public class RecipeInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         protected static MessageQueue MessageQueue
@@ -30,14 +30,14 @@ namespace Server.MirDatabase
 
         public RecipeInfo(string name)
         {
-            ItemInfo itemInfo = Envir.GetItemInfo(name);
+            ItemInfo itemInfo = Env.GetItemInfo(name);
             if (itemInfo == null)
             {
                 MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CouldNotFindItem), name));
                 return;
             }
 
-            Item = Envir.CreateShopItem(itemInfo, ++Envir.NextRecipeID);
+            Item = Env.CreateShopItem(itemInfo, ++Env.NextRecipeID);
 
             LoadIngredients(name);
         }
@@ -94,7 +94,7 @@ namespace Server.MirDatabase
                         {
                             var data = lines[i].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                            ItemInfo info = Envir.GetItemInfo(data[0]);
+                            ItemInfo info = Env.GetItemInfo(data[0]);
 
                             if (info == null)
                             {
@@ -102,7 +102,7 @@ namespace Server.MirDatabase
                                 continue;
                             }
 
-                            UserItem tool = Envir.CreateShopItem(info, 0);
+                            UserItem tool = Env.CreateShopItem(info, 0);
 
                             Tools.Add(tool);
                         }
@@ -111,7 +111,7 @@ namespace Server.MirDatabase
                         {
                             var data = lines[i].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                            ItemInfo info = Envir.GetItemInfo(data[0]);
+                            ItemInfo info = Env.GetItemInfo(data[0]);
 
                             if (info == null)
                             {
@@ -119,7 +119,7 @@ namespace Server.MirDatabase
                                 continue;
                             }
 
-                            UserItem ingredient = Envir.CreateShopItem(info, 0);
+                            UserItem ingredient = Env.CreateShopItem(info, 0);
 
                             ushort count = 1;
                             if (data.Length >= 2)

@@ -41,8 +41,8 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             bool ranged = CurrentLocation == Target.CurrentLocation || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 1);
 
-            ActionTime = Envir.Time + 500;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 500;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
 
             int damage;
@@ -59,12 +59,12 @@ namespace Server.MirObjects.Monsters
 
                     for (int i = 0; i < targets.Count; i++)
                     {
-                        action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 1000, targets[i], damage, DefenceType.ACAgility);
+                        action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 1000, targets[i], damage, DefenceType.ACAgility);
                         ActionList.Add(action);
                     }
 
-                    ActionTime = Envir.Time + 800;
-                    AttackTime = Envir.Time + AttackSpeed;
+                    ActionTime = Env.Time + 800;
+                    AttackTime = Env.Time + AttackSpeed;
 
                     tornado = false;
                     return;
@@ -100,31 +100,31 @@ namespace Server.MirObjects.Monsters
                             if (ob.Race != ObjectType.Player && ob.Race != ObjectType.Monster) continue;
                             if (!ob.IsAttackTarget(this)) continue;
 
-                            action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility, AttackType.Stomp);
+                            action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility, AttackType.Stomp);
                             ActionList.Add(action);
                             break;
                         }
                     }
 
-                    ActionTime = Envir.Time + 800;
-                    AttackTime = Envir.Time + AttackSpeed;
+                    ActionTime = Env.Time + 800;
+                    AttackTime = Env.Time + AttackSpeed;
 
                     stomp = false;
                     return;
                 }
 
-                switch (Envir.Random.Next(2))
+                switch (Env.Random.Next(2))
                 {
                     case 0:
                         //Slash
                         Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
                         damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
-                        action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility, AttackType.SingleSlash);
+                        action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility, AttackType.SingleSlash);
                         ActionList.Add(action);
 
                         damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
-                        action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.ACAgility, AttackType.SingleSlash);
+                        action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.ACAgility, AttackType.SingleSlash);
                         ActionList.Add(action);
                         break;
                     case 1:
@@ -132,15 +132,15 @@ namespace Server.MirObjects.Monsters
                         Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 
                         damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
-                        action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility, AttackType.SingleSlash);
+                        action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility, AttackType.SingleSlash);
                         ActionList.Add(action);
                         break;
                 }
 
-                if (Envir.Random.Next(5) == 0)
+                if (Env.Random.Next(5) == 0)
                     stomp = true;
 
-                if (Envir.Random.Next(2) == 0)
+                if (Env.Random.Next(2) == 0)
                     tornado = true;
             }
         }
@@ -191,7 +191,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;

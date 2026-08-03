@@ -4,9 +4,9 @@ namespace Server.MirDatabase
 {
     public class AuctionInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public ulong AuctionID; 
@@ -30,10 +30,10 @@ namespace Server.MirDatabase
 
         public AuctionInfo(CharacterInfo info, UserItem item, uint price, MarketItemType itemType)
         {
-            AuctionID = ++Envir.NextAuctionID;
+            AuctionID = ++Env.NextAuctionID;
             SellerIndex = info.Index;
             SellerInfo = info;
-            ConsignmentDate = Envir.Now;
+            ConsignmentDate = Env.Now;
             Item = item;
             Price = price;
             ItemType = itemType;

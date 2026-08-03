@@ -28,8 +28,8 @@ namespace Server.MirObjects.Monsters
         {
             if (!CanAttack) return;
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             var targets = FindAllNearby(Info.ViewRange, CurrentLocation, true);
             targets.Shuffle();
@@ -44,20 +44,20 @@ namespace Server.MirObjects.Monsters
 
                 if (target.Info.AI == Info.AI) continue;
 
-                var mob = GetMonster(Envir.GetMonsterInfo(target.Info.Name));
+                var mob = GetMonster(Env.GetMonsterInfo(target.Info.Name));
 
                 mob.PetLevel = target.PetLevel;
-                mob.ActionTime = Envir.Time + 1000;
+                mob.ActionTime = Env.Time + 1000;
 
-                if (Envir.Random.Next(3) == 0)
+                if (Env.Random.Next(3) == 0)
                 {
                     var attempts = 4;
                     var distance = 5;
 
                     for (int j = 0; j < attempts; j++)
                     {
-                        var location = new Point(CurrentLocation.X + Envir.Random.Next(-distance, distance + 1),
-                                             CurrentLocation.Y + Envir.Random.Next(-distance, distance + 1));
+                        var location = new Point(CurrentLocation.X + Env.Random.Next(-distance, distance + 1),
+                                             CurrentLocation.Y + Env.Random.Next(-distance, distance + 1));
 
                         if (location == CurrentLocation) continue;
 
@@ -95,7 +95,7 @@ namespace Server.MirObjects.Monsters
 
             for (int i = 0; i < targets.Count; i++)
             {
-                DelayedAction action = new DelayedAction(DelayedType.Die, Envir.Time + 300, targets[i], damage, DefenceType.AC);
+                DelayedAction action = new DelayedAction(DelayedType.Die, Env.Time + 300, targets[i], damage, DefenceType.AC);
                 ActionList.Add(action);
             }
 

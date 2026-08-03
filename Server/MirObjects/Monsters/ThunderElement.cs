@@ -37,11 +37,11 @@ namespace Server.MirObjects.Monsters
 
             if (InAttackRange() && CanAttack)
             {
-                if (Envir.Random.Next(3) == 1)
+                if (Env.Random.Next(3) == 1)
                 {
                     int targetXOffset, targetYOffset;
-                    targetXOffset = Envir.Random.Next(-1, 2);
-                    targetYOffset = Envir.Random.Next(-1, 2);
+                    targetXOffset = Env.Random.Next(-1, 2);
+                    targetYOffset = Env.Random.Next(-1, 2);
                     Point point = new Point(Target.CurrentLocation.X + targetXOffset, Target.CurrentLocation.Y + targetYOffset);
                     MoveTo(point);
                 }
@@ -49,7 +49,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -66,13 +66,13 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage == 0) return;
 
-            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.MAC);
+            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.MAC);
             ActionList.Add(action);
         }
 
@@ -95,7 +95,7 @@ namespace Server.MirObjects.Monsters
             if (result > 0)
             {
                 int damage;
-                damage = distance * (Math.Max(50, (Envir.Random.Next(Stats[Stat.HP]) / 5)));
+                damage = distance * (Math.Max(50, (Env.Random.Next(Stats[Stat.HP]) / 5)));
                 if (pusher is PlayerObject)
                 {
                     //int damage = Math.Max(50, Envir.Random.Next(Stats[Stat.HP]));

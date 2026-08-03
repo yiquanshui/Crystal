@@ -30,11 +30,11 @@ namespace Server.Account
         #region Load Characters
         private void LoadCharacters()
         {
-            CharacterCountLabel.Text = string.Format("Characters count: {0}", SMain.Envir.CharacterList.Count);
+            CharacterCountLabel.Text = string.Format("Characters count: {0}", SMain.Env.CharacterList.Count);
 
             CharactersList.Items.Clear();
 
-            var characterList = SMain.Envir.CharacterList;
+            var characterList = SMain.Env.CharacterList;
 
             if (characterList == null)
             {
@@ -74,19 +74,19 @@ namespace Server.Account
             }
 
             // Update Character count label
-            CharacterCountLabel.Text = string.Format("Characters count: {0}", SMain.Envir.CharacterList.Count);
+            CharacterCountLabel.Text = string.Format("Characters count: {0}", SMain.Env.CharacterList.Count);
 
             // Get filtered characters based on filter text and checkbox state
-            List<CharacterInfo> filteredCharacters = SMain.Envir.CharacterList;
+            List<CharacterInfo> filteredCharacters = SMain.Env.CharacterList;
 
             if (FilterPlayerTextBox.Text.Length > 0)
             {
-                filteredCharacters = SMain.Envir.MatchPlayer(FilterPlayerTextBox.Text, MatchFilterCheckBox.Checked);
+                filteredCharacters = SMain.Env.MatchPlayer(FilterPlayerTextBox.Text, MatchFilterCheckBox.Checked);
             }
 
             if (FilterItemTextBox.Text.Length > 0)
             {
-                filteredCharacters = SMain.Envir.MatchPlayerByItem(FilterItemTextBox.Text, MatchFilterCheckBox.Checked);
+                filteredCharacters = SMain.Env.MatchPlayerByItem(FilterItemTextBox.Text, MatchFilterCheckBox.Checked);
             }
 
             // Clear existing items in CharactersList

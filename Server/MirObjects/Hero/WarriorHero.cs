@@ -48,7 +48,7 @@ namespace Server.MirObjects
             if (Target == null || Target.Dead) return;
             TargetDistance = Functions.MaxDistance(CurrentLocation, Target.CurrentLocation);
 
-            if (HasMagic(Spell.FlamingSword) && Envir.Time > FlamingSwordTime)
+            if (HasMagic(Spell.FlamingSword) && Env.Time > FlamingSwordTime)
                 SpellToggle(Spell.FlamingSword, SpellToggleState.True);
         }
         protected override void Attack()

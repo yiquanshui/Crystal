@@ -8,9 +8,9 @@ namespace Server.MirObjects
 {
     public class NPCScript
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         protected static MessageQueue MessageQueue
@@ -20,12 +20,12 @@ namespace Server.MirObjects
 
         public static NPCScript Get(int index)
         {
-            return Envir.Scripts[index];
+            return Env.Scripts[index];
         }
 
         public static NPCScript GetOrAdd(uint loadedObjectID, string fileName, NPCScriptType type)
         {
-            var script = Envir.Scripts.SingleOrDefault(x => x.Value.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase) && x.Value.LoadedObjectID == loadedObjectID).Value;
+            var script = Env.Scripts.SingleOrDefault(x => x.Value.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase) && x.Value.LoadedObjectID == loadedObjectID).Value;
 
             if (script != null)
             {
@@ -91,7 +91,7 @@ namespace Server.MirObjects
 
         private NPCScript(uint loadedObjectID, string fileName, NPCScriptType type)
         {
-            ScriptID = ++Envir.ScriptIndex;
+            ScriptID = ++Env.ScriptIndex;
 
             LoadedObjectID = loadedObjectID;
             FileName = fileName;
@@ -99,7 +99,7 @@ namespace Server.MirObjects
 
             Load();
 
-            Envir.Scripts.Add(ScriptID, this);
+            Env.Scripts.Add(ScriptID, this);
         }
 
         public void Load()
@@ -110,7 +110,7 @@ namespace Server.MirObjects
 
         public float PriceRate(PlayerObject player, bool baseRate = false)
         {
-            var callingNPC = Envir.NPCs.SingleOrDefault(x => x.ObjectID == player.NPCObjectID);
+            var callingNPC = Env.NPCs.SingleOrDefault(x => x.ObjectID == player.NPCObjectID);
 
             if (callingNPC == null)
             {
@@ -174,7 +174,7 @@ namespace Server.MirObjects
 
             if (Type == NPCScriptType.AutoPlayer)
             {
-                Envir.CustomCommands.Clear();
+                Env.CustomCommands.Clear();
             }
         }
         public void LoadGoods()
@@ -195,7 +195,7 @@ namespace Server.MirObjects
                     {
                         int version = reader.ReadInt32();
                         int count = version;
-                        int customversion = Envir.LoadCustomVersion;
+                        int customversion = Env.LoadCustomVersion;
                         if (version == 9999)//the only real way to tell if the file was made before or after version code got added: assuming nobody had a config option to save more then 10000 sold items
                         {
                             version = reader.ReadInt32();
@@ -203,12 +203,12 @@ namespace Server.MirObjects
                             count = reader.ReadInt32();
                         }
                         else
-                            version = Envir.LoadVersion;
+                            version = Env.LoadVersion;
 
                         for (int k = 0; k < count; k++)
                         {
                             UserItem item = new UserItem(reader, version, customversion);
-                            if (Envir.BindItem(item))
+                            if (Env.BindItem(item))
                                 loadedNPC.UsedGoods.Add(item);
                         }
                     }
@@ -231,7 +231,7 @@ namespace Server.MirObjects
 
                         if (!match.Success) continue;
 
-                        Map map = Envir.MapList.FirstOrDefault(m => m.Info.FileName == match.Groups[1].Value);
+                        Map map = Env.MapList.FirstOrDefault(m => m.Info.FileName == match.Groups[1].Value);
 
                         if (map == null) continue;
 
@@ -250,7 +250,7 @@ namespace Server.MirObjects
 
                         if (!match.Success) continue;
 
-                        Envir.CustomCommands.Add(match.Groups[1].Value);
+                        Env.CustomCommands.Add(match.Groups[1].Value);
                     }
                 }
                 else if (Type == NPCScriptType.AutoMonster)
@@ -262,7 +262,7 @@ namespace Server.MirObjects
                         Match match = regex.Match(lines[i]);
 
                         if (!match.Success) continue;
-                        MobInfo = Envir.GetMonsterInfo(Convert.ToInt16(match.Groups[1].Value));
+                        MobInfo = Env.GetMonsterInfo(Convert.ToInt16(match.Groups[1].Value));
                         if (MobInfo == null) continue;
                         MobInfo.HasSpawnScript = true;
                     }
@@ -272,7 +272,7 @@ namespace Server.MirObjects
                         Match match = regex.Match(lines[i]);
 
                         if (!match.Success) continue;
-                        MobInfo = Envir.GetMonsterInfo(Convert.ToInt16(match.Groups[1].Value));
+                        MobInfo = Env.GetMonsterInfo(Convert.ToInt16(match.Groups[1].Value));
                         if (MobInfo == null) continue;
                         MobInfo.HasDieScript = true;
                     }
@@ -660,11 +660,11 @@ namespace Server.MirObjects
 
                     var data = lines[i].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                    ItemInfo info = Envir.GetItemInfo(data[0]);
+                    ItemInfo info = Env.GetItemInfo(data[0]);
                     if (info == null)
                         continue;
 
-                    UserItem goods = Envir.CreateShopItem(info, (uint)i);
+                    UserItem goods = Env.CreateShopItem(info, (uint)i);
 
                     if (goods == null || Goods.Contains(goods))
                     {
@@ -704,7 +704,7 @@ namespace Server.MirObjects
 
                     if (index == 0) continue;
 
-                    QuestInfo info = Envir.GetQuestInfo(Math.Abs(index));
+                    QuestInfo info = Env.GetQuestInfo(Math.Abs(index));
 
                     if (info == null) return;
 
@@ -759,11 +759,11 @@ namespace Server.MirObjects
 
                     var data = lines[i].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                    ItemInfo info = Envir.GetItemInfo(data[0]);
+                    ItemInfo info = Env.GetItemInfo(data[0]);
                     if (info == null)
                         continue;
 
-                    RecipeInfo recipe = Envir.RecipeInfoList.SingleOrDefault(x => x.MatchItem(info.Index));
+                    RecipeInfo recipe = Env.RecipeInfoList.SingleOrDefault(x => x.MatchItem(info.Index));
 
                     if (recipe == null)
                     {
@@ -1194,7 +1194,7 @@ namespace Server.MirObjects
             }
             else if (cost > player.Account.Gold) return;
 
-            UserItem item = (isBuyBack || isUsed) ? goods : Envir.CreateFreshItem(goods.Info);
+            UserItem item = (isBuyBack || isUsed) ? goods : Env.CreateFreshItem(goods.Info);
             item.Count = goods.Count;
 
             if (!player.CanGainItem(item)) return;
@@ -1360,7 +1360,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            UserItem craftedItem = Envir.CreateFreshItem(goods.Info);
+            UserItem craftedItem = Env.CreateFreshItem(goods.Info);
             craftedItem.Count = (ushort)(goods.Count * count);
 
             if (!player.CanGainItem(craftedItem))
@@ -1434,7 +1434,7 @@ namespace Server.MirObjects
             player.Account.Gold -= (recipe.Gold * count);
             player.Enqueue(new S.LoseGold { Gold = (recipe.Gold * count) });
 
-            if (Envir.Random.Next(100) >= recipe.Chance + player.Stats[Stat.CraftRatePercent])
+            if (Env.Random.Next(100) >= recipe.Chance + player.Stats[Stat.CraftRatePercent])
             {
                 player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CraftingAttemptFailed), ChatType.System);
             }

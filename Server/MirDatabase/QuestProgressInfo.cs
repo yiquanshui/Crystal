@@ -5,9 +5,9 @@ namespace Server.MirDatabase
 {
     public class QuestProgressInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public PlayerObject Owner;
@@ -39,14 +39,14 @@ namespace Server.MirDatabase
 
         public bool New
         {
-            get { return StartDateTime > Envir.Now.AddDays(-1); }
+            get { return StartDateTime > Env.Now.AddDays(-1); }
         }
 
         public QuestProgressInfo(int index)
         {
             Index = index;
 
-            Info = Envir.QuestInfoList.FirstOrDefault(e => e.Index == index);
+            Info = Env.QuestInfoList.FirstOrDefault(e => e.Index == index);
 
             if (Info == null)
             {
@@ -85,7 +85,7 @@ namespace Server.MirDatabase
         public QuestProgressInfo(BinaryReader reader, int version, int customVersion)
         {
             Index = reader.ReadInt32();
-            Info = Envir.QuestInfoList.FirstOrDefault(e => e.Index == Index);
+            Info = Env.QuestInfoList.FirstOrDefault(e => e.Index == Index);
 
             StartDateTime = DateTime.FromBinary(reader.ReadInt64());
             EndDateTime = DateTime.FromBinary(reader.ReadInt64());
@@ -284,7 +284,7 @@ namespace Server.MirDatabase
 
             if (StartDateTime == DateTime.MinValue)
             {
-                StartDateTime = Envir.Now;
+                StartDateTime = Env.Now;
             }
         }
 
@@ -349,7 +349,7 @@ namespace Server.MirDatabase
 
             if (!Completed)
             {
-                EndDateTime = Envir.Now;
+                EndDateTime = Env.Now;
 
                 if (Info.TimeLimitInSeconds > 0)
                 {
@@ -544,7 +544,7 @@ namespace Server.MirDatabase
 
             if (Info.TimeLimitInSeconds > 0)
             {
-                var secondsSinceStarted = (int)(Envir.Now - StartDateTime).TotalSeconds;
+                var secondsSinceStarted = (int)(Env.Now - StartDateTime).TotalSeconds;
 
                 var remainingSeconds = Info.TimeLimitInSeconds - secondsSinceStarted;
 
@@ -553,7 +553,7 @@ namespace Server.MirDatabase
                     Owner.SetTimer($"Quest-{Index}", remainingSeconds, 1);
                 }
 
-                DelayedAction action = new DelayedAction(DelayedType.Quest, Envir.Time + (remainingSeconds * 1000), this, QuestAction.TimeExpired, true);
+                DelayedAction action = new DelayedAction(DelayedType.Quest, Env.Time + (remainingSeconds * 1000), this, QuestAction.TimeExpired, true);
                 Owner.ActionList.Add(action);
             }
         }

@@ -5,14 +5,14 @@ namespace Server.MirDatabase
 {
     public class MonsterInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
-        protected static Envir EditEnvir
+        protected static Env EditEnv
         {
-            get { return Envir.Edit; }
+            get { return Env.Edit; }
         }
 
         protected static MessageQueue MessageQueue
@@ -59,7 +59,7 @@ namespace Server.MirDatabase
             AI = reader.ReadByte();
             Effect = reader.ReadByte();
 
-            if (Envir.LoadVersion < 62)
+            if (Env.LoadVersion < 62)
             {
                 Level = (ushort)reader.ReadByte();
             }
@@ -71,18 +71,18 @@ namespace Server.MirDatabase
             ViewRange = reader.ReadByte();
             CoolEye = reader.ReadByte();
 
-            if (Envir.LoadVersion > 84)
+            if (Env.LoadVersion > 84)
             {
                 Stats = new Stats(reader);
             }
 
-            if (Envir.LoadVersion <= 84)
+            if (Env.LoadVersion <= 84)
             {
                 Stats = new Stats();
                 Stats[Stat.HP] = (int)reader.ReadUInt32(); //Monster form prevented greater than ushort, so this should never overflow.
             }
 
-            if (Envir.LoadVersion < 62)
+            if (Env.LoadVersion < 62)
             {
                 Stats[Stat.MinAC] = reader.ReadByte();
                 Stats[Stat.MaxAC] = reader.ReadByte();
@@ -97,7 +97,7 @@ namespace Server.MirDatabase
             }
             else
             {
-                if (Envir.LoadVersion <= 84)
+                if (Env.LoadVersion <= 84)
                 {
                     Stats[Stat.MinAC] = reader.ReadUInt16();
                     Stats[Stat.MaxAC] = reader.ReadUInt16();
@@ -112,7 +112,7 @@ namespace Server.MirDatabase
                 }
             }
 
-            if (Envir.LoadVersion <= 84)
+            if (Env.LoadVersion <= 84)
             {
                 Stats[Stat.Accuracy] = reader.ReadByte();
                 Stats[Stat.Agility] = reader.ReadByte();
@@ -128,20 +128,20 @@ namespace Server.MirDatabase
             CanPush = reader.ReadBoolean();
             CanTame = reader.ReadBoolean();
 
-            if (Envir.LoadVersion < 18) return;
+            if (Env.LoadVersion < 18) return;
             AutoRev = reader.ReadBoolean();
             Undead = reader.ReadBoolean();
 
-            if (Envir.LoadVersion < 89) return;
+            if (Env.LoadVersion < 89) return;
 
             DropPath = reader.ReadString();
 
-            if (Envir.LoadVersion >= 115)
+            if (Env.LoadVersion >= 115)
             {
                 CanRecall = reader.ReadBoolean();
             }
 
-            if (Envir.LoadVersion >= 116)
+            if (Env.LoadVersion >= 116)
             {
                 IsBoss = reader.ReadBoolean();
             }
@@ -275,8 +275,8 @@ namespace Server.MirDatabase
 
             //if (28 + count * 3 > data.Length) return;
 
-            info.Index = ++EditEnvir.MonsterIndex;
-            EditEnvir.MonsterInfoList.Add(info);
+            info.Index = ++EditEnv.MonsterIndex;
+            EditEnv.MonsterInfoList.Add(info);
         }
         public string ToText()
         {
@@ -307,9 +307,9 @@ namespace Server.MirDatabase
 
     public class DropInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         protected static MessageQueue MessageQueue
@@ -353,7 +353,7 @@ namespace Server.MirDatabase
             }
             else
             {
-                info.Item = Envir.GetItemInfo(parts[1]);
+                info.Item = Env.GetItemInfo(parts[1]);
                 if (info.Item == null) return null;
 
                 if (parts.Length > 2)
@@ -518,7 +518,7 @@ namespace Server.MirDatabase
 
             if (rate < 1) rate = 1;
 
-            if (Envir.Random.Next(rate) != 0)
+            if (Env.Random.Next(rate) != 0)
             {
                 return null;
             }
@@ -538,7 +538,7 @@ namespace Server.MirDatabase
 
                 if (lowerGoldRange > upperGoldRange) lowerGoldRange = upperGoldRange;
 
-                gold = (uint)Envir.Random.Next(lowerGoldRange, upperGoldRange);
+                gold = (uint)Env.Random.Next(lowerGoldRange, upperGoldRange);
             }
             else if (Item != null)
             {
@@ -569,7 +569,7 @@ namespace Server.MirDatabase
                 {
                     if (tempItems.Count > 0)
                     {
-                        items.Add(tempItems[Envir.Random.Next(tempItems.Count)]);
+                        items.Add(tempItems[Env.Random.Next(tempItems.Count)]);
                     }
                 }
                 else

@@ -4,9 +4,9 @@ namespace Server.MirDatabase
 {
     public class IntelligentCreatureInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public static List<IntelligentCreatureInfo> Creatures = new List<IntelligentCreatureInfo>();
@@ -63,9 +63,9 @@ namespace Server.MirDatabase
 
     public class UserIntelligentCreature
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public IntelligentCreatureType PetType;
@@ -85,11 +85,11 @@ namespace Server.MirDatabase
         {
             PetType = creatureType;
             Info = IntelligentCreatureInfo.GetCreatureInfo(PetType);
-            CustomName = Envir.Main.GetMonsterInfo(64, (byte)PetType)?.Name ?? PetType.ToString();
+            CustomName = Env.Main.GetMonsterInfo(64, (byte)PetType)?.Name ?? PetType.ToString();
             Fullness = 7500;//starts at 75% food
             SlotIndex = slot;
 
-            if (effect > 0) Expire = Envir.Now.AddDays(effect);//effect holds the amount in days
+            if (effect > 0) Expire = Env.Now.AddDays(effect);//effect holds the amount in days
             else Expire = DateTime.MinValue;//permanent
 
             BlackstoneTime = 0;
@@ -115,7 +115,7 @@ namespace Server.MirDatabase
             }
             else
             {
-                Expire = Envir.Now.AddSeconds(expireTime);
+                Expire = Env.Now.AddSeconds(expireTime);
             }
 
             BlackstoneTime = reader.ReadInt64();
@@ -145,7 +145,7 @@ namespace Server.MirDatabase
             }
             else
             {
-                writer.Write((long)(Expire - Envir.Now).TotalSeconds);
+                writer.Write((long)(Expire - Env.Now).TotalSeconds);
             }
 
             writer.Write(BlackstoneTime);

@@ -36,25 +36,25 @@ namespace Server.MirObjects.Monsters
         {
             if (!Visible)
                 SetHP(Stats[Stat.HP]);
-            if (!Dead && Envir.Time > VisibleTime)
+            if (!Dead && Env.Time > VisibleTime)
             {
-                VisibleTime = Envir.Time + 2000;
+                VisibleTime = Env.Time + 2000;
 
                 bool visible = FindNearby(Visible ? 7 : 3);
 
                 if (!Visible && visible)
                 {
                     Visible = true;
-                    CellTime = Envir.Time + 500;
+                    CellTime = Env.Time + 500;
                     Broadcast(GetInfo());
                     Broadcast(new S.ObjectShow { ObjectID = ObjectID });
-                    ActionTime = Envir.Time + 2000;
+                    ActionTime = Env.Time + 2000;
                 }
 
                 if (Visible && !visible)
                 {
                     Visible = false;
-                    VisibleTime = Envir.Time + 3000;
+                    VisibleTime = Env.Time + 3000;
 
                     Broadcast(new S.ObjectHide { ObjectID = ObjectID });
 
@@ -109,10 +109,10 @@ namespace Server.MirObjects.Monsters
             ShockTime = 0;
 
             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
-            ActionList.Add(new DelayedAction(DelayedType.Damage, Envir.Time + 500));
+            ActionList.Add(new DelayedAction(DelayedType.Damage, Env.Time + 500));
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
         }
 
         protected override void Attack()

@@ -54,19 +54,19 @@ namespace Server.MirObjects
 
             if (Caster != null && Caster.Node == null) Caster = null;
 
-            if (Envir.Time > ExpireTime || ((Spell == Spell.FireWall || Spell == Spell.Portal || Spell == Spell.ExplosiveTrap || Spell == Spell.Reincarnation || Spell == Spell.HealingCircle) && Caster == null) || (Spell == Spell.TrapHexagon && Target != null) || (Spell == Spell.Trap && Target != null))
+            if (Env.Time > ExpireTime || ((Spell == Spell.FireWall || Spell == Spell.Portal || Spell == Spell.ExplosiveTrap || Spell == Spell.Reincarnation || Spell == Spell.HealingCircle) && Caster == null) || (Spell == Spell.TrapHexagon && Target != null) || (Spell == Spell.Trap && Target != null))
             {
                 if (Spell == Spell.TrapHexagon && Target != null || Spell == Spell.Trap && Target != null)
                 {
                     MonsterObject ob = (MonsterObject)Target;
 
-                    if (Envir.Time < ExpireTime && ob.ShockTime != 0) return;
+                    if (Env.Time < ExpireTime && ob.ShockTime != 0) return;
                 }
 
                 if (Spell == Spell.Reincarnation && Caster != null)
                 {
                     ((HumanObject)Caster).ReincarnationReady = true;
-                    ((HumanObject)Caster).ReincarnationExpireTime = Envir.Time + 6000;
+                    ((HumanObject)Caster).ReincarnationExpireTime = Env.Time + 6000;
                 }
 
                 if ((Spell == Spell.Blizzard || Spell == Spell.MeteorStrike) &&  Caster != null)
@@ -108,8 +108,8 @@ namespace Server.MirObjects
                 Despawn();
                 return;
             }
-            if (Envir.Time < TickTime) return;
-            TickTime = Envir.Time + TickSpeed;
+            if (Env.Time < TickTime) return;
+            TickTime = Env.Time + TickSpeed;
 
             Cell cell = CurrentMap.GetCell(CurrentLocation);
             for (int i = 0; i < cell.Objects.Count; i++)
@@ -122,7 +122,7 @@ namespace Server.MirObjects
         }
         public void ProcessSpell(MapObject ob)
         {
-            if (Envir.Time < StartTime) return;
+            if (Env.Time < StartTime) return;
             switch (Spell)
             {
                 case Spell.FireWall:
@@ -172,10 +172,10 @@ namespace Server.MirObjects
                         if (Caster != null && ((HumanObject)Caster).ActiveBlizzard == false) return;
                         if (!ob.IsAttackTarget(Caster)) return;
                         ob.Attacked(((HumanObject)Caster), Value, DefenceType.MAC, false);
-                        if (!ob.Dead && Envir.Random.Next(8) == 0)
+                        if (!ob.Dead && Env.Random.Next(8) == 0)
                             ob.ApplyPoison(new Poison
                             {
-                                Duration = 5 + Envir.Random.Next(Caster.Stats[Stat.Freezing]),
+                                Duration = 5 + Env.Random.Next(Caster.Stats[Stat.Freezing]),
                                 Owner = Caster,
                                 PType = PoisonType.Slow,
                                 TickSpeed = 2000,
@@ -262,7 +262,7 @@ namespace Server.MirObjects
 
                         ob.Struck(Value, DefenceType.MAC);
 
-                        if (Envir.Random.Next(3) > 0)
+                        if (Env.Random.Next(3) > 0)
                         {
                             ob.ApplyPoison(new Poison { PType = PoisonType.Paralysis, Duration = 5, TickSpeed = 1000 }, this);
                         }
@@ -306,7 +306,7 @@ namespace Server.MirObjects
                         if (ob.Race != ObjectType.Player) return;
                         if (Caster != ob && (Caster == null || (Caster.GroupMembers == null) || (!Caster.GroupMembers.Contains((HumanObject)ob)))) return;
 
-                        var portal = Envir.Spells.SingleOrDefault(ob => ob != this && ob.Node != null
+                        var portal = Env.Spells.SingleOrDefault(ob => ob != this && ob.Node != null
                             && ob.Spell == Spell.Portal
                             && ob.Caster == Caster);
 
@@ -336,7 +336,7 @@ namespace Server.MirObjects
 
                         ob.Struck(Value, DefenceType.MAC);
 
-                        if (Envir.Random.Next(8) == 0)
+                        if (Env.Random.Next(8) == 0)
                         {
                             ob.ApplyPoison(new Poison { PType = PoisonType.Slow, Duration = 5, TickSpeed = 1000 }, this);
                         }
@@ -398,7 +398,7 @@ namespace Server.MirObjects
                         ob.ApplyPoison(new Poison
                         {
                             Owner = Caster,
-                            Duration = ob.Race == ObjectType.Player ? 4 : 5 + Envir.Random.Next(5),
+                            Duration = ob.Race == ObjectType.Player ? 4 : 5 + Env.Random.Next(5),
                             PType = PoisonType.Slow,
                             TickSpeed = 1000,
                         }, Caster);
@@ -412,53 +412,53 @@ namespace Server.MirObjects
         {
             DetonatedTrap = true;
             Broadcast(GetInfo());
-            ExpireTime = Envir.Time + 1000;
+            ExpireTime = Env.Time + 1000;
         }
 
         public override void SetOperateTime()
         {
-            long time = Envir.Time + 2000;
+            long time = Env.Time + 2000;
 
-            if (TickTime < time && TickTime > Envir.Time)
+            if (TickTime < time && TickTime > Env.Time)
                 time = TickTime;
 
-            if (OwnerTime < time && OwnerTime > Envir.Time)
+            if (OwnerTime < time && OwnerTime > Env.Time)
                 time = OwnerTime;
 
-            if (ExpireTime < time && ExpireTime > Envir.Time)
+            if (ExpireTime < time && ExpireTime > Env.Time)
                 time = ExpireTime;
 
-            if (PKPointTime < time && PKPointTime > Envir.Time)
+            if (PKPointTime < time && PKPointTime > Env.Time)
                 time = PKPointTime;
 
-            if (LastHitTime < time && LastHitTime > Envir.Time)
+            if (LastHitTime < time && LastHitTime > Env.Time)
                 time = LastHitTime;
 
-            if (EXPOwnerTime < time && EXPOwnerTime > Envir.Time)
+            if (EXPOwnerTime < time && EXPOwnerTime > Env.Time)
                 time = EXPOwnerTime;
 
-            if (BrownTime < time && BrownTime > Envir.Time)
+            if (BrownTime < time && BrownTime > Env.Time)
                 time = BrownTime;
 
             for (int i = 0; i < ActionList.Count; i++)
             {
-                if (ActionList[i].Time >= time && ActionList[i].Time > Envir.Time) continue;
+                if (ActionList[i].Time >= time && ActionList[i].Time > Env.Time) continue;
                 time = ActionList[i].Time;
             }
 
             for (int i = 0; i < PoisonList.Count; i++)
             {
-                if (PoisonList[i].TickTime >= time && PoisonList[i].TickTime > Envir.Time) continue;
+                if (PoisonList[i].TickTime >= time && PoisonList[i].TickTime > Env.Time) continue;
                 time = PoisonList[i].TickTime;
             }
 
             for (int i = 0; i < Buffs.Count; i++)
             {
-                if (Buffs[i].NextTime >= time && Buffs[i].NextTime > Envir.Time) continue;
+                if (Buffs[i].NextTime >= time && Buffs[i].NextTime > Env.Time) continue;
                 time = Buffs[i].NextTime;
             }
 
-            if (OperateTime <= Envir.Time || time < OperateTime)
+            if (OperateTime <= Env.Time || time < OperateTime)
                 OperateTime = time;
         }
 
@@ -571,14 +571,14 @@ namespace Server.MirObjects
         {
             base.Spawned();
 
-            Envir.Spells.Add(this);
+            Env.Spells.Add(this);
         }
 
         public override void Despawn()
         {
             base.Despawn();
 
-            Envir.Spells.Remove(this);
+            Env.Spells.Remove(this);
 
             if (Spell == Spell.Reincarnation && Caster != null && Caster.Node != null)
             {
@@ -598,7 +598,7 @@ namespace Server.MirObjects
 
             if (Spell == Spell.Portal && Caster != null)
             {
-                var portal = Envir.Spells.SingleOrDefault(ob => ob.Node != null && ob != this
+                var portal = Env.Spells.SingleOrDefault(ob => ob.Node != null && ob != this
                     && ob.Spell == Spell.Portal    
                     && ob.Caster == Caster);
 

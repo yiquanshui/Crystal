@@ -34,8 +34,8 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            AttackTime = Envir.Time + AttackSpeed;
-            ActionTime = Envir.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
@@ -60,7 +60,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;

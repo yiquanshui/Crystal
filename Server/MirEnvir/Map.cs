@@ -8,9 +8,9 @@ namespace Server.MirEnvir
 {
     public class Map
     {
-        private static Envir Envir
+        private static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         protected static MessageQueue MessageQueue
@@ -44,7 +44,7 @@ namespace Server.MirEnvir
         public Map(MapInfo info)
         {
             Info = info;
-            Thread = Envir.Random.Next(Settings.ThreadLimit);
+            Thread = Env.Random.Next(Settings.ThreadLimit);
         }
 
         public Door AddDoor(byte DoorIndex, Point location)
@@ -64,7 +64,7 @@ namespace Server.MirEnvir
                 if (Doors[i].index == DoorIndex)
                 {
                     Doors[i].DoorState = DoorState.Open;
-                    Doors[i].LastTick = Envir.Time;
+                    Doors[i].LastTick = Env.Time;
                     return true;
                 }
             return false;
@@ -484,7 +484,7 @@ namespace Server.MirEnvir
                         Respawns.Add(info);
 
                         if ((info.Info.SaveRespawnTime) && (info.Info.RespawnTicks != 0))
-                            Envir.SavedSpawns.Add(info);
+                            Env.SavedSpawns.Add(info);
                     }
 
                     for (int i = 0; i < Info.NPCs.Count; i++)
@@ -598,7 +598,7 @@ namespace Server.MirEnvir
                     Mine[i, j] = new MineSpot();
             if ((Info.MineIndex != 0) && (Settings.MineSetList.Count > Info.MineIndex - 1))
             {
-                Settings.MineSetList[Info.MineIndex - 1].SetDrops(Envir.ItemInfoList);
+                Settings.MineSetList[Info.MineIndex - 1].SetDrops(Env.ItemInfoList);
                 for (int i = 0; i < Width; i++)
                     for (int j = 0; j < Height; j++)
                         Mine[i,j].Mine = Settings.MineSetList[Info.MineIndex - 1];
@@ -609,7 +609,7 @@ namespace Server.MirEnvir
                 {
                     MineZone Zone = Info.MineZones[i];
                     if (Zone.Mine != 0)
-                        Settings.MineSetList[Zone.Mine - 1].SetDrops(Envir.ItemInfoList);
+                        Settings.MineSetList[Zone.Mine - 1].SetDrops(Env.ItemInfoList);
                     if (Settings.MineSetList.Count < Zone.Mine) continue;
                     for (int x =  Zone.Location.X - Zone.Size; x < Zone.Location.X + Zone.Size; x++)
                         for (int y = Zone.Location.Y - Zone.Size; y < Zone.Location.Y + Zone.Size; y++)
@@ -656,7 +656,7 @@ namespace Server.MirEnvir
 
             for (int i = 0; i < Doors.Count; i++)
             {
-                if ((Doors[i].DoorState == DoorState.Open) && (Doors[i].LastTick + 5000 < Envir.Time))
+                if ((Doors[i].DoorState == DoorState.Open) && (Doors[i].LastTick + 5000 < Env.Time))
                 {
                     Doors[i].DoorState = 0;
 
@@ -664,27 +664,27 @@ namespace Server.MirEnvir
                 }
             }
 
-            if ((Info.Lightning) && Envir.Time > LightningTime)
+            if ((Info.Lightning) && Env.Time > LightningTime)
             {
-                LightningTime = Envir.Time + Envir.Random.Next(3000, 15000);
+                LightningTime = Env.Time + Env.Random.Next(3000, 15000);
                 for (int i = Players.Count - 1; i >= 0; i--)
                 {
                     PlayerObject player = Players[i];
                     Point location;
-                    if (Envir.Random.Next(4) == 0)
+                    if (Env.Random.Next(4) == 0)
                     {
                         location = player.CurrentLocation;          
                     }
                     else
-                        location = new Point(player.CurrentLocation.X - 10 + Envir.Random.Next(20), player.CurrentLocation.Y - 10 + Envir.Random.Next(20));
+                        location = new Point(player.CurrentLocation.X - 10 + Env.Random.Next(20), player.CurrentLocation.Y - 10 + Env.Random.Next(20));
 
                     if (!ValidPoint(location)) continue;
 
                     SpellObject lightning = new SpellObject
                     {
                         Spell = Spell.MapLightning,
-                        Value = Envir.Random.Next(Info.LightningDamage),
-                        ExpireTime = Envir.Time + (1000),
+                        Value = Env.Random.Next(Info.LightningDamage),
+                        ExpireTime = Env.Time + (1000),
                         TickSpeed = 500,
                         Caster = null,
                         CurrentLocation = location,
@@ -696,28 +696,28 @@ namespace Server.MirEnvir
                 }
             }
 
-            if ((Info.Fire) && Envir.Time > FireTime)
+            if ((Info.Fire) && Env.Time > FireTime)
             {
-                FireTime = Envir.Time + Envir.Random.Next(3000, 15000);
+                FireTime = Env.Time + Env.Random.Next(3000, 15000);
                 for (int i = Players.Count - 1; i >= 0; i--)
                 {
                     PlayerObject player = Players[i];
                     Point location;
-                    if (Envir.Random.Next(4) == 0)
+                    if (Env.Random.Next(4) == 0)
                     {
                         location = player.CurrentLocation;
 
                     }
                     else
-                        location = new Point(player.CurrentLocation.X - 10 + Envir.Random.Next(20), player.CurrentLocation.Y - 10 + Envir.Random.Next(20));
+                        location = new Point(player.CurrentLocation.X - 10 + Env.Random.Next(20), player.CurrentLocation.Y - 10 + Env.Random.Next(20));
 
                     if (!ValidPoint(location)) continue;
 
                     SpellObject lightning = new SpellObject
                     {
                         Spell = Spell.MapLava,
-                        Value = Envir.Random.Next(Info.FireDamage),
-                        ExpireTime = Envir.Time + (1000),
+                        Value = Env.Random.Next(Info.FireDamage),
+                        ExpireTime = Env.Time + (1000),
                         TickSpeed = 500,
                         Caster = null,
                         CurrentLocation = location,
@@ -731,7 +731,7 @@ namespace Server.MirEnvir
 
             for (int i = 0; i < ActionList.Count; i++)
             {
-                if (Envir.Time < ActionList[i].Time) continue;
+                if (Env.Time < ActionList[i].Time) continue;
                 Process(ActionList[i]);
                 ActionList.RemoveAt(i);
             }
@@ -743,12 +743,12 @@ namespace Server.MirEnvir
             for (int i = 0; i < Respawns.Count; i++)
             {
                 MapRespawn respawn = Respawns[i];
-                if ((respawn.Info.RespawnTicks != 0) && (Envir.RespawnTick.CurrentTickcounter < respawn.NextSpawnTick)) continue;
-                if ((respawn.Info.RespawnTicks == 0) && (Envir.Time < respawn.RespawnTime)) continue;
+                if ((respawn.Info.RespawnTicks != 0) && (Env.RespawnTick.CurrentTickcounter < respawn.NextSpawnTick)) continue;
+                if ((respawn.Info.RespawnTicks == 0) && (Env.Time < respawn.RespawnTime)) continue;
 
-                if (respawn.Count < (respawn.Info.Count * Envir.SpawnMultiplier))
+                if (respawn.Count < (respawn.Info.Count * Env.SpawnMultiplier))
                 {
-                    int count = (respawn.Info.Count * Envir.SpawnMultiplier) - respawn.Count;
+                    int count = (respawn.Info.Count * Env.SpawnMultiplier) - respawn.Count;
 
                     for (int c = 0; c < count; c++)
                         Success = respawn.Spawn();
@@ -756,18 +756,18 @@ namespace Server.MirEnvir
                 if (Success)
                 {
                     respawn.ErrorCount = 0;
-                    long delay = Math.Max(1, respawn.Info.Delay - respawn.Info.RandomDelay + Envir.Random.Next(respawn.Info.RandomDelay * 2));
-                    respawn.RespawnTime = Envir.Time + (delay * Settings.Minute);
+                    long delay = Math.Max(1, respawn.Info.Delay - respawn.Info.RandomDelay + Env.Random.Next(respawn.Info.RandomDelay * 2));
+                    respawn.RespawnTime = Env.Time + (delay * Settings.Minute);
                     if (respawn.Info.RespawnTicks != 0)
                     {
-                        respawn.NextSpawnTick = Envir.RespawnTick.CurrentTickcounter + (ulong)respawn.Info.RespawnTicks;
+                        respawn.NextSpawnTick = Env.RespawnTick.CurrentTickcounter + (ulong)respawn.Info.RespawnTicks;
                         if (respawn.NextSpawnTick > long.MaxValue)//since nextspawntick is ulong this simple thing allows an easy way of preventing the counter from overflowing
                             respawn.NextSpawnTick -= long.MaxValue;
                     }
                 }
                 else
                 {
-                    respawn.RespawnTime = Envir.Time + 1 * Settings.Minute; // each time it fails to spawn, give it a 1 minute cooldown
+                    respawn.RespawnTime = Env.Time + 1 * Settings.Minute; // each time it fails to spawn, give it a 1 minute cooldown
                     if (respawn.ErrorCount < 5)
                         respawn.ErrorCount++;
                     else
@@ -882,7 +882,7 @@ namespace Server.MirEnvir
 
                     if (count > 0)
                     {
-                        DelayedAction action = new DelayedAction(DelayedType.Magic, Envir.Time + 100, player, magic, value, location, dir, count);
+                        DelayedAction action = new DelayedAction(DelayedType.Magic, Env.Time + 100, player, magic, value, location, dir, count);
                         ActionList.Add(action);
                     }
 
@@ -1130,7 +1130,7 @@ namespace Server.MirEnvir
                             {
                                 Spell = Spell.FireWall,
                                 Value = value,
-                                ExpireTime = Envir.Time + (10 + value / 2) * 1000,
+                                ExpireTime = Env.Time + (10 + value / 2) * 1000,
                                 TickSpeed = 2000,
                                 Caster = player,
                                 CurrentLocation = location,
@@ -1169,7 +1169,7 @@ namespace Server.MirEnvir
                         {
                             Spell = Spell.FireWall,
                             Value = value,
-                            ExpireTime = Envir.Time + (10 + value / 2) * 1000,
+                            ExpireTime = Env.Time + (10 + value / 2) * 1000,
                             TickSpeed = 2000,
                             Caster = player,
                             CurrentLocation = location,
@@ -1472,7 +1472,7 @@ namespace Server.MirEnvir
                                     Spell = Spell.PoisonCloud,
                                     Value = value,
                                     BonusDmg = bonusdmg,
-                                    ExpireTime = Envir.Time + 6000,
+                                    ExpireTime = Env.Time + 6000,
                                     TickSpeed = 1000,
                                     Caster = player,
                                     CurrentLocation = new Point(x, y),
@@ -1535,24 +1535,24 @@ namespace Server.MirEnvir
                                                 //Only targets
                                                 if (target.Attacked(player, j <= 1 ? nearDamage : farDamage, DefenceType.MAC, false) > 0)
                                                 {
-                                                    if (player.Level + (target.Race == ObjectType.Player ? 2 : 10) >= target.Level && Envir.Random.Next(target.Race == ObjectType.Player ? 100 : 20) <= magic.Level)
+                                                    if (player.Level + (target.Race == ObjectType.Player ? 2 : 10) >= target.Level && Env.Random.Next(target.Race == ObjectType.Player ? 100 : 20) <= magic.Level)
                                                     {
                                                         target.ApplyPoison(new Poison
                                                         {
                                                             Owner = player,
-                                                            Duration = target.Race == ObjectType.Player ? 4 : 5 + Envir.Random.Next(5),
+                                                            Duration = target.Race == ObjectType.Player ? 4 : 5 + Env.Random.Next(5),
                                                             PType = PoisonType.Slow,
                                                             TickSpeed = 1000,
                                                         }, player);
                                                         target.OperateTime = 0;
                                                     }
 
-                                                    if (player.Level + (target.Race == ObjectType.Player ? 2 : 10) >= target.Level && Envir.Random.Next(target.Race == ObjectType.Player ? 100 : 40) <= magic.Level)
+                                                    if (player.Level + (target.Race == ObjectType.Player ? 2 : 10) >= target.Level && Env.Random.Next(target.Race == ObjectType.Player ? 100 : 40) <= magic.Level)
                                                     {
                                                         target.ApplyPoison(new Poison
                                                         {
                                                             Owner = player,
-                                                            Duration = target.Race == ObjectType.Player ? 2 : 5 + Envir.Random.Next(player.Stats[Stat.Freezing]),
+                                                            Duration = target.Race == ObjectType.Player ? 2 : 5 + Env.Random.Next(player.Stats[Stat.Freezing]),
                                                             PType = PoisonType.Frozen,
                                                             TickSpeed = 1000,
                                                         }, player);
@@ -1667,14 +1667,14 @@ namespace Server.MirEnvir
                                 {
                                     Spell = Spell.Blizzard,
                                     Value = value,
-                                    ExpireTime = Envir.Time + 3000,
+                                    ExpireTime = Env.Time + 3000,
                                     TickSpeed = 440,
                                     Caster = player,
                                     CurrentLocation = new Point(x, y),
                                     CastLocation = location,
                                     Show = show,
                                     CurrentMap = this,
-                                    StartTime = Envir.Time + 800,
+                                    StartTime = Env.Time + 800,
                                 };
 
                             show = false;
@@ -1728,14 +1728,14 @@ namespace Server.MirEnvir
                             {
                                 Spell = Spell.MeteorStrike,
                                 Value = value,
-                                ExpireTime = Envir.Time + 3000,
+                                ExpireTime = Env.Time + 3000,
                                 TickSpeed = 440,
                                 Caster = player,
                                 CurrentLocation = new Point(x, y),
                                 CastLocation = location,
                                 Show = show,
                                 CurrentMap = this,
-                                StartTime = Envir.Time + 800,
+                                StartTime = Env.Time + 800,
                             };
 
                             show = false;
@@ -1789,7 +1789,7 @@ namespace Server.MirEnvir
 
                                         if (centerTarget == null) centerTarget = mobTarget;
 
-                                        mobTarget.ShockTime = Envir.Time + value;
+                                        mobTarget.ShockTime = Env.Time + value;
                                         mobTarget.Target = null;
                                         break;
                                 }
@@ -1812,7 +1812,7 @@ namespace Server.MirEnvir
                             SpellObject ob = new SpellObject
                             {
                                 Spell = Spell.TrapHexagon,
-                                ExpireTime = Envir.Time + value,
+                                ExpireTime = Env.Time + value,
                                 TickSpeed = 100,
                                 Caster = player,
                                 CurrentLocation = spawnpoint,
@@ -1864,7 +1864,7 @@ namespace Server.MirEnvir
                                     case ObjectType.Monster:
                                     case ObjectType.Player:
 
-                                        if (Envir.Random.Next(10) >= 4) continue;
+                                        if (Env.Random.Next(10) >= 4) continue;
 
                                         //Only targets
                                         if (target.IsAttackTarget(player))
@@ -1949,7 +1949,7 @@ namespace Server.MirEnvir
                                 {
                                     Spell = Spell.ExplosiveTrap,
                                     Value = value,
-                                    ExpireTime = Envir.Time + (10 + value / 2) * 1000,
+                                    ExpireTime = Env.Time + (10 + value / 2) * 1000,
                                     TickSpeed = 500,
                                     Caster = player,
                                     CurrentLocation = traps[i],
@@ -1996,7 +1996,7 @@ namespace Server.MirEnvir
                                     if (target.IsAttackTarget(player))
                                     {
 
-                                        int chance = Envir.Random.Next(15);
+                                        int chance = Env.Random.Next(15);
                                         PoisonType poison;
                                         if (new int[] { 0, 1, 2 }.Contains(chance)) //3 in 15 chances it'll slow
                                             poison = PoisonType.Slow;
@@ -2066,7 +2066,7 @@ namespace Server.MirEnvir
                             selectTarget = (MonsterObject)target;
 
                             if (selectTarget == null || !selectTarget.IsAttackTarget(player) || selectTarget.Node == null || selectTarget.Level >= player.Level + 2) continue;
-                            selectTarget.ShockTime = Envir.Time + value;
+                            selectTarget.ShockTime = Env.Time + value;
                             selectTarget.Target = null;
                             break;
                         }
@@ -2079,7 +2079,7 @@ namespace Server.MirEnvir
                     SpellObject spellOb = new SpellObject
                     {
                         Spell = Spell.Trap,
-                        ExpireTime = Envir.Time + value,
+                        ExpireTime = Env.Time + value,
                         TickSpeed = 100,
                         Caster = player,
                         CurrentLocation = location,
@@ -2139,7 +2139,7 @@ namespace Server.MirEnvir
 
                                         if (hasVampBuff)//Vampire Effect
                                         {
-                                            if (player.VampAmount == 0) player.VampTime = Envir.Time + 1000;
+                                            if (player.VampAmount == 0) player.VampTime = Env.Time + 1000;
                                             player.VampAmount += (ushort)(value * (magic.Level + 1) * 0.25F);
                                         }
                                         if (hasPoisonBuff)//Poison Effect
@@ -2150,7 +2150,7 @@ namespace Server.MirEnvir
                                                 Owner = player,
                                                 PType = PoisonType.Green,
                                                 TickSpeed = 2000,
-                                                Value = value / 15 + magic.Level + 1 + Envir.Random.Next(player.Stats[Stat.PoisonAttack])
+                                                Value = value / 15 + magic.Level + 1 + Env.Random.Next(player.Stats[Stat.PoisonAttack])
                                             }, player);
                                             target.OperateTime = 0;
                                         }
@@ -2187,7 +2187,7 @@ namespace Server.MirEnvir
                     {
                         Spell = Spell.Portal,
                         Value = value2,
-                        ExpireTime = Envir.Time + value * 1000,
+                        ExpireTime = Env.Time + value * 1000,
                         TickSpeed = 2000,
                         Caster = player,
                         CurrentLocation = location,
@@ -2255,7 +2255,7 @@ namespace Server.MirEnvir
                     int startY = Math.Max(location.Y - 2, 0);
                     int endY = Math.Min(location.Y + 2, Height - 1);
 
-                    int randomValue = Envir.Random.Next(100);
+                    int randomValue = Env.Random.Next(100);
 
                     for (int y = startY; y <= endY; y++)
                     {
@@ -2332,7 +2332,7 @@ namespace Server.MirEnvir
                             {
                                 Spell = Spell.HealingCircle,
                                 Value = value,
-                                ExpireTime = Envir.Time + (10000) + (5000 * magic.Level),
+                                ExpireTime = Env.Time + (10000) + (5000 * magic.Level),
                                 TickSpeed = 400,
                                 Caster = player,
                                 CurrentLocation = new Point(x, y),
@@ -2531,9 +2531,9 @@ namespace Server.MirEnvir
     }
     public class MapRespawn
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public RespawnInfo Info;
@@ -2550,7 +2550,7 @@ namespace Server.MirEnvir
         public MapRespawn(RespawnInfo info)
         {
             Info = info;
-            Monster = Envir.GetMonsterInfo(info.MonsterIndex);
+            Monster = Env.GetMonsterInfo(info.MonsterIndex);
 
             LoadRoutes();
         }

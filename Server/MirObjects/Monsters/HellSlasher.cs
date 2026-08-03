@@ -21,14 +21,14 @@ namespace Server.MirObjects.Monsters
             
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            if (Envir.Random.Next(3) > 0)
+            if (Env.Random.Next(3) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                 if (damage == 0) return;
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility, false);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility, false);
                 ActionList.Add(action);
             }
             else
@@ -42,8 +42,8 @@ namespace Server.MirObjects.Monsters
             }
 
             ShockTime = 0;
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
         }
 
         protected override void CompleteAttack(IList<object> data)
@@ -59,7 +59,7 @@ namespace Server.MirObjects.Monsters
 
             if (poison)
             {
-                PoisonTarget(target, 5, Envir.Random.Next(1, 4), PoisonType.Dazed, 1000);
+                PoisonTarget(target, 5, Env.Random.Next(1, 4), PoisonType.Dazed, 1000);
             }
         }
     }

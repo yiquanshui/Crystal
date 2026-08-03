@@ -12,7 +12,7 @@ namespace Server.MirObjects.Monsters
 
         protected internal SpittingToad(MonsterInfo info) : base(info)
         {
-            ActionTime = Envir.Time + 1000;
+            ActionTime = Env.Time + 1000;
         }
         public override string Name
         {
@@ -28,7 +28,7 @@ namespace Server.MirObjects.Monsters
                 {
                     bool selfDestruct = false;
                     if (FindObject(Master.ObjectID, 15) == null) selfDestruct = true;
-                    if (Summoned && Envir.Time > AliveTime) selfDestruct = true;
+                    if (Summoned && Env.Time > AliveTime) selfDestruct = true;
                     if (selfDestruct && Master != null) Die();
                 }
             }
@@ -61,8 +61,8 @@ namespace Server.MirObjects.Monsters
         protected override void ProcessAI()
         {
             //ProcessSearch
-            if (Envir.Time < SearchTime) return;
-            SearchTime = Envir.Time + SearchDelay;
+            if (Env.Time < SearchTime) return;
+            SearchTime = Env.Time + SearchDelay;
 
             if (Target == null) FindTarget();
 
@@ -77,7 +77,7 @@ namespace Server.MirObjects.Monsters
             }
             else FindTarget();//Target out of range find new
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -107,20 +107,20 @@ namespace Server.MirObjects.Monsters
             }
 
             ShockTime = 0;
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             Turn(Direction);
             Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID });
-            AttackTime = Envir.Time + AttackSpeed + 500;
+            AttackTime = Env.Time + AttackSpeed + 500;
             if (damage == 0) return;
 
             int delay = Functions.MaxDistance(CurrentLocation, Target.CurrentLocation) * 50 + 500; //50 MS per Step
 
-            DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + delay, Target, damage, DefenceType.MAC);
+            DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + delay, Target, damage, DefenceType.MAC);
             ActionList.Add(action);
         }
 

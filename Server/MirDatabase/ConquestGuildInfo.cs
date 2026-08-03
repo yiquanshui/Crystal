@@ -93,9 +93,9 @@ namespace Server.MirDatabase
 
     public class ConquestGuildSiegeInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public int Index;
@@ -111,7 +111,7 @@ namespace Server.MirDatabase
         {
             Index = reader.ReadInt32();
 
-            if (Envir.LoadVersion <= 84)
+            if (Env.LoadVersion <= 84)
             {
                 Health = (int)reader.ReadUInt32();
             }
@@ -132,7 +132,7 @@ namespace Server.MirDatabase
         {
             if (Gate != null) Gate.Despawn();
 
-            MonsterInfo monsterInfo = Envir.GetMonsterInfo(Info.MobIndex);
+            MonsterInfo monsterInfo = Env.GetMonsterInfo(Info.MobIndex);
 
             if (monsterInfo == null) return;
             if (monsterInfo.AI != 72) return;
@@ -273,9 +273,9 @@ namespace Server.MirDatabase
 
     public class ConquestGuildWallInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public int Index;
@@ -293,7 +293,7 @@ namespace Server.MirDatabase
         {
             Index = reader.ReadInt32();
 
-            if (Envir.LoadVersion <= 84)
+            if (Env.LoadVersion <= 84)
             {
                 Health = (int)reader.ReadUInt32();
             }
@@ -314,7 +314,7 @@ namespace Server.MirDatabase
         {
             if (Wall != null) Wall.Despawn();
 
-            MonsterInfo monsterInfo = Envir.GetMonsterInfo(Info.MobIndex);
+            MonsterInfo monsterInfo = Env.GetMonsterInfo(Info.MobIndex);
 
             if (monsterInfo == null) return;
 
@@ -374,9 +374,9 @@ namespace Server.MirDatabase
 
     public class ConquestGuildGateInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public int Index;
@@ -393,7 +393,7 @@ namespace Server.MirDatabase
         {
             Index = reader.ReadInt32();
 
-            if (Envir.LoadVersion <= 84)
+            if (Env.LoadVersion <= 84)
             {
                 Health = (int)reader.ReadUInt32();
             }
@@ -414,7 +414,7 @@ namespace Server.MirDatabase
         {
             if (Gate != null) Gate.Despawn();
 
-            MonsterInfo monsterInfo = Envir.GetMonsterInfo(Info.MobIndex);
+            MonsterInfo monsterInfo = Env.GetMonsterInfo(Info.MobIndex);
 
             if (monsterInfo == null) return;
             if (monsterInfo.AI != 81) return;
@@ -477,9 +477,9 @@ namespace Server.MirDatabase
 
     public class ConquestGuildArcherInfo
     {
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public int Index;
@@ -519,7 +519,7 @@ namespace Server.MirDatabase
         {
             if (Revive) Alive = true;
 
-            MonsterInfo monsterInfo = Envir.GetMonsterInfo(Info.MobIndex);
+            MonsterInfo monsterInfo = Env.GetMonsterInfo(Info.MobIndex);
 
             if (monsterInfo == null) return;
             if (monsterInfo.AI != 80) return;
@@ -539,7 +539,7 @@ namespace Server.MirDatabase
             {
                 ArcherMonster.Spawn(Conquest.ConquestMap, Info.Location);
                 ArcherMonster.Die();
-                ArcherMonster.DeadTime = Envir.Time;
+                ArcherMonster.DeadTime = Env.Time;
             }
         }
 

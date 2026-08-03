@@ -5,7 +5,7 @@ namespace Server
 {
     public partial class SystemInfoForm : Form
     {
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
 
         public bool FishingChanged = false, MailChanged = false, GoodsChanged = false, RefineChanged = false, MarriageChanged = false, MentorChanged = false, GemChanged = false, SpawnChanged = false, HeroesChanged;
 
@@ -44,15 +44,15 @@ namespace Server
             MonsterSpawnChanceTextBox.Text = Settings.FishingMobSpawnChance.ToString();
 
             FishingMobIndexComboBox.Items.Clear();
-            for (int i = 0; i < Envir.MonsterInfoList.Count; i++)
+            for (int i = 0; i < Env.MonsterInfoList.Count; i++)
             {
-                FishingMobIndexComboBox.Items.Add(Envir.MonsterInfoList[i]);
+                FishingMobIndexComboBox.Items.Add(Env.MonsterInfoList[i]);
             }
 
-            MirDatabase.MonsterInfo fishingMob = Envir.GetMonsterInfo(Settings.FishingMonster);
+            MirDatabase.MonsterInfo fishingMob = Env.GetMonsterInfo(Settings.FishingMonster);
 
             if (fishingMob != null)
-                FishingMobIndexComboBox.SelectedIndex = Envir.GetMonsterInfo(Settings.FishingMonster).Index - 1;
+                FishingMobIndexComboBox.SelectedIndex = Env.GetMonsterInfo(Settings.FishingMonster).Index - 1;
         }
 
         private void UpdateMail()
@@ -112,12 +112,12 @@ namespace Server
 
         private void UpdateSpawnTick()
         {
-            txtSpawnTickDefault.Text = Envir.RespawnTick.BaseSpawnRate.ToString();
-            if (lbSpawnTickList.Items.Count != Envir.RespawnTick.Respawn.Count)
+            txtSpawnTickDefault.Text = Env.RespawnTick.BaseSpawnRate.ToString();
+            if (lbSpawnTickList.Items.Count != Env.RespawnTick.Respawn.Count)
             {
                 lbSpawnTickList.ClearSelected();
                 lbSpawnTickList.Items.Clear();
-                foreach (RespawnTickOption Option in Envir.RespawnTick.Respawn)
+                foreach (RespawnTickOption Option in Env.RespawnTick.Respawn)
                     lbSpawnTickList.Items.Add(Option);
                 pnlSpawnTickConfig.Enabled = false;
                 txtSpawnTickSpeed.Text = string.Empty;
@@ -153,11 +153,11 @@ namespace Server
             MaxPlayerHeroCount_textBox.Text = Settings.MaximumHeroCount.ToString();
             MinPlayerLevelHero_textBox.Text = Settings.Hero_RequiredLevel.ToString();
             HeroSealItem_ComboBox.Items.Clear();
-            for (int i = 0; i < Envir.ItemInfoList.Count; i++)
+            for (int i = 0; i < Env.ItemInfoList.Count; i++)
             {
-                HeroSealItem_ComboBox.Items.Add(Envir.ItemInfoList[i]);
+                HeroSealItem_ComboBox.Items.Add(Env.ItemInfoList[i]);
             }
-            ItemInfo sealItem = Envir.GetItemInfo(Settings.HeroSealItemName);
+            ItemInfo sealItem = Env.GetItemInfo(Settings.HeroSealItemName);
             if (sealItem != null)
                 HeroSealItem_ComboBox.SelectedIndex = sealItem.Index - 4;
         }
@@ -190,7 +190,7 @@ namespace Server
                 Settings.SaveHeroSettings();
 
             if (SpawnChanged)
-                Envir.SaveDB();
+                Env.SaveDB();
         }
 
         #region Fishing
@@ -279,7 +279,7 @@ namespace Server
         {
             if (ActiveControl != sender) return;
 
-            MirDatabase.MonsterInfo mob = Envir.MonsterInfoList[FishingMobIndexComboBox.SelectedIndex];
+            MirDatabase.MonsterInfo mob = Env.MonsterInfoList[FishingMobIndexComboBox.SelectedIndex];
 
             if (mob == null) return;
 
@@ -737,7 +737,7 @@ namespace Server
             }
 
             ActiveControl.BackColor = SystemColors.Window;
-            Envir.RespawnTick.BaseSpawnRate = temp;
+            Env.RespawnTick.BaseSpawnRate = temp;
             SpawnChanged = true;
         }
 
@@ -745,9 +745,9 @@ namespace Server
         {
             if (ActiveControl != sender) return;
             RespawnTickOption Option = new RespawnTickOption();
-            Envir.RespawnTick.Respawn.Add(Option);
+            Env.RespawnTick.Respawn.Add(Option);
             lbSpawnTickList.Items.Add(Option);
-            lbSpawnTickList.SelectedIndex = Envir.RespawnTick.Respawn.Count - 1;
+            lbSpawnTickList.SelectedIndex = Env.RespawnTick.Respawn.Count - 1;
             UpdateSpawnTick();
             SpawnChanged = true;
         }
@@ -757,7 +757,7 @@ namespace Server
             if (ActiveControl != sender) return;
             if (lbSpawnTickList.SelectedIndex == -1) return;
             if (MessageBox.Show("Are you sure you want to delete the index?", "Delete?", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
-            Envir.RespawnTick.Respawn.RemoveAt(lbSpawnTickList.SelectedIndex);
+            Env.RespawnTick.Respawn.RemoveAt(lbSpawnTickList.SelectedIndex);
             //lbSpawnTickList.Items.RemoveAt(lbSpawnTickList.SelectedIndex);
 
             UpdateSpawnTick();
@@ -781,7 +781,7 @@ namespace Server
                 return;
             }
             ActiveControl.BackColor = SystemColors.Window;
-            Envir.RespawnTick.Respawn[lbSpawnTickList.SelectedIndex].UserCount = temp;
+            Env.RespawnTick.Respawn[lbSpawnTickList.SelectedIndex].UserCount = temp;
             lbSpawnTickList.Items[lbSpawnTickList.SelectedIndex] = lbSpawnTickList.SelectedItem;//need this to update the string displayed
             //lbSpawnTickList.Refresh();
             txtSpawnTickUsers.Focus();
@@ -801,7 +801,7 @@ namespace Server
                 return;
             }
             ActiveControl.BackColor = SystemColors.Window;
-            Envir.RespawnTick.Respawn[lbSpawnTickList.SelectedIndex].DelayLoss = temp;
+            Env.RespawnTick.Respawn[lbSpawnTickList.SelectedIndex].DelayLoss = temp;
             SpawnChanged = true;
         }
 
@@ -899,7 +899,7 @@ namespace Server
         {
             if (ActiveControl != sender) return;
 
-            ItemInfo item = Envir.ItemInfoList[HeroSealItem_ComboBox.SelectedIndex];
+            ItemInfo item = Env.ItemInfoList[HeroSealItem_ComboBox.SelectedIndex];
 
             if (item == null) return;
 

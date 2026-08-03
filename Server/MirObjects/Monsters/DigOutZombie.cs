@@ -41,20 +41,20 @@ namespace Server.MirObjects.Monsters
 
         protected override void ProcessAI()
         {
-            if (!Dead && Envir.Time > VisibleTime)
+            if (!Dead && Env.Time > VisibleTime)
             {
-                VisibleTime = Envir.Time + 2000;
+                VisibleTime = Env.Time + 2000;
 
                 bool visible = FindNearby(3);
 
                 if (!Visible && visible)
                 {
                     Visible = true;
-                    CellTime = Envir.Time + 500;
+                    CellTime = Env.Time + 500;
                     Broadcast(GetInfo());
                     Broadcast(new S.ObjectShow { ObjectID = ObjectID });
-                    ActionTime = Envir.Time + 2000;
-                    DigOutTime = Envir.Time;
+                    ActionTime = Env.Time + 2000;
+                    DigOutTime = Env.Time;
                     DigOutLocation = CurrentLocation;
                     DigOutDirection = Direction;
                 }
@@ -67,13 +67,13 @@ namespace Server.MirObjects.Monsters
 
         protected virtual void SpawnDigOutEffect()
         {
-            if (Visible && Envir.Time > DigOutTime + 1000 && !DoneDigOut)
+            if (Visible && Env.Time > DigOutTime + 1000 && !DoneDigOut)
             {
                 SpellObject ob = new SpellObject
                 {
                     Spell = Spell.DigOutZombie,
                     Value = 1,
-                    ExpireTime = Envir.Time + (5 * 60 * 1000),
+                    ExpireTime = Env.Time + (5 * 60 * 1000),
                     TickSpeed = 2000,
                     Caster = null,
                     CurrentLocation = DigOutLocation,

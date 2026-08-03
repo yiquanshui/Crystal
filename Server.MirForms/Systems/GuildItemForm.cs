@@ -142,7 +142,7 @@ namespace Server.Systems
             if (MemberListView == null) return;
             if (MemberListView.SelectedItems == null) return;
 
-            Server.MirObjects.GuildObject Guild = SMain.Envir.GetGuild(GuildName);
+            Server.MirObjects.GuildObject Guild = SMain.Env.GetGuild(GuildName);
             if (Guild == null) return;
 
             foreach (var m in MemberListView.SelectedItems)
@@ -160,7 +160,7 @@ namespace Server.Systems
         #region Update Guild Notice
         private void RefreshNoticeButton_Click(object sender, EventArgs e)
         {
-            var guild = SMain.Envir.GetGuild(GuildName);
+            var guild = SMain.Env.GetGuild(GuildName);
             if (guild == null) return;
 
             List<string> newNotice = GuildNoticeBox.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None).ToList();
@@ -180,7 +180,7 @@ namespace Server.Systems
         #region Send Guild Message
         private void SendGuildMessageButton_Click(object sender, EventArgs e)
         {
-            var guild = SMain.Envir.GetGuild(GuildName);
+            var guild = SMain.Env.GetGuild(GuildName);
             if (guild == null) return;
 
             string message = SendGuildMesageBox.Text.Trim();

@@ -42,17 +42,17 @@ namespace Server.MirObjects.Monsters
 
             bool range = !Functions.InRange(CurrentLocation, Target.CurrentLocation, 1);
 
-            if (!range && Envir.Random.Next(3) > 0)
+            if (!range && Env.Random.Next(3) > 0)
             {
-                if (Envir.Time >= PullTime)
+                if (Env.Time >= PullTime)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 2 });
-                    PullTime = Envir.Time + 10000;
-                    AttackTime = Envir.Time + AttackSpeed;
-                    ActionTime = Envir.Time + 300;
+                    PullTime = Env.Time + 10000;
+                    AttackTime = Env.Time + AttackSpeed;
+                    ActionTime = Env.Time + 300;
 
-                    Target.Pushed(this, Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation), 2 + Envir.Random.Next(3));
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.AC);
+                    Target.Pushed(this, Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation), 2 + Env.Random.Next(3));
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.AC);
                     ActionList.Add(action);
 
                 }
@@ -65,14 +65,14 @@ namespace Server.MirObjects.Monsters
             {
 
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage * 2, DefenceType.AC);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage * 2, DefenceType.AC);
                 ActionList.Add(action);
 
             }
 
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
 
 

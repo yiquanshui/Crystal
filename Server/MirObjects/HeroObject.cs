@@ -165,7 +165,7 @@ namespace Server.MirObjects
         protected override void NewCharacter()
         {
             base.NewCharacter();
-            Grade = (byte)Envir.Random.Next(4);
+            Grade = (byte)Env.Random.Next(4);
         }
 
         public override void Enqueue(Packet p) 
@@ -204,7 +204,7 @@ namespace Server.MirObjects
             CurrentLocation = p;
             map.AddObject(this);
             CurrentMap = map;            
-            Envir.Heroes.Add(this);
+            Env.Heroes.Add(this);
             Spawned();
         }
 
@@ -218,7 +218,7 @@ namespace Server.MirObjects
 
         public override void Despawn()
         {
-            Envir.Heroes.Remove(this);
+            Env.Heroes.Remove(this);
             
             if (Node != null)
             {
@@ -290,9 +290,9 @@ namespace Server.MirObjects
             }
 
             if (HPItemIndex > 0)
-                Owner.CheckItemInfo(Envir.GetItemInfo(HPItemIndex));
+                Owner.CheckItemInfo(Env.GetItemInfo(HPItemIndex));
             if (MPItemIndex > 0)
-                Owner.CheckItemInfo(Envir.GetItemInfo(MPItemIndex));
+                Owner.CheckItemInfo(Env.GetItemInfo(MPItemIndex));
         }
         public override void SendMagicInfo(UserMagic magic)
         {
@@ -557,7 +557,7 @@ namespace Server.MirObjects
                     var spawnAsPet = item.Info.Shape == 1;
                     var conquestOnly = item.Info.Shape == 2;
 
-                    var monsterInfo = Envir.GetMonsterInfo(monsterID);
+                    var monsterInfo = Env.GetMonsterInfo(monsterID);
                     if (monsterInfo == null) break;
 
                     MonsterObject monster = MonsterObject.GetMonster(monsterInfo);
@@ -591,7 +591,7 @@ namespace Server.MirObjects
                     }
 
                     monster.Direction = Direction;
-                    monster.ActionTime = Envir.Time + 5000;
+                    monster.ActionTime = Env.Time + 5000;
 
                     if (!monster.Spawn(CurrentMap, Front))
                         monster.Spawn(CurrentMap, CurrentLocation);
@@ -614,9 +614,9 @@ namespace Server.MirObjects
         }
         public override void Die()
         {
-            if (SpecialMode.HasFlag(SpecialItemMode.Revival) && Envir.Time > LastRevivalTime)
+            if (SpecialMode.HasFlag(SpecialItemMode.Revival) && Env.Time > LastRevivalTime)
             {
-                LastRevivalTime = Envir.Time + 300000;
+                LastRevivalTime = Env.Time + 300000;
 
                 for (var i = (int)EquipmentSlot.RingL; i <= (int)EquipmentSlot.RingR; i++)
                 {
@@ -648,8 +648,8 @@ namespace Server.MirObjects
             HP = 0;
             Dead = true;
 
-            LogTime = Envir.Time;
-            BrownTime = Envir.Time;
+            LogTime = Env.Time;
+            BrownTime = Env.Time;
 
             Broadcast(new S.ObjectDied { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
             Owner.Enqueue(new S.UpdateHeroSpawnState { State = HeroSpawnState.Dead });
@@ -678,7 +678,7 @@ namespace Server.MirObjects
             Broadcast(new S.ObjectRemove { ObjectID = ObjectID });
 
             Dead = false;
-            ActionTime = Envir.Time + RevivalDelay;
+            ActionTime = Env.Time + RevivalDelay;
 
             CurrentMap.AddObject(this);
             BroadcastInfo();
@@ -700,10 +700,10 @@ namespace Server.MirObjects
 
         public override void BroadcastHealthChange()
         {
-            byte time = Math.Min(byte.MaxValue, (byte)Math.Max(5, (RevTime - Envir.Time) / 1000));
+            byte time = Math.Min(byte.MaxValue, (byte)Math.Max(5, (RevTime - Env.Time) / 1000));
             Packet p = new S.ObjectHealth { ObjectID = ObjectID, Percent = PercentHealth, Expire = time };
 
-            if (Envir.Time < RevTime)
+            if (Env.Time < RevTime)
             {
                 CurrentMap.Broadcast(p, CurrentLocation);
                 return;
@@ -801,9 +801,9 @@ namespace Server.MirObjects
 
         protected void ProcessAutoPot()
         {
-            if (Envir.Time < AutoPotTime) return;
+            if (Env.Time < AutoPotTime) return;
 
-            AutoPotTime = Envir.Time + AutoPotDelay;
+            AutoPotTime = Env.Time + AutoPotDelay;
 
             if (PercentHealth < AutoHPPercent && HPItemIndex > 0 && PotHealthAmount <= 0)
                 TryAutoPot(HPItemIndex);
@@ -844,7 +844,7 @@ namespace Server.MirObjects
                 {
                     MirDirection dir = Direction;
 
-                    switch (Envir.Random.Next(3)) 
+                    switch (Env.Random.Next(3)) 
                     {
                         case 0:
                             for (int i = 0; i < 7; i++)
@@ -873,18 +873,18 @@ namespace Server.MirObjects
 
         protected virtual void ProcessSearch()
         {
-            if (Envir.Time < SearchTime) return;
+            if (Env.Time < SearchTime) return;
             if (Owner.Info.HeroBehaviour == HeroBehaviour.Follow || !Mount.CanAttack) return;
 
-            SearchTime = Envir.Time + SearchDelay;
+            SearchTime = Env.Time + SearchDelay;
 
-            if (Target == null || Envir.Random.Next(3) == 0)
+            if (Target == null || Env.Random.Next(3) == 0)
                 FindTarget();
         }
 
         protected virtual void ProcessRoam()
         {
-            if (Target != null || Envir.Time < RoamTime) return;
+            if (Target != null || Env.Time < RoamTime) return;
 
             if (Owner != null)
             {
@@ -892,7 +892,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            RoamTime = Envir.Time + RoamDelay;
+            RoamTime = Env.Time + RoamDelay;
         }
         protected virtual void ProcessFriend() { }
         protected virtual void ProcessAttack() { }
@@ -1014,7 +1014,7 @@ namespace Server.MirObjects
 
             if (Walk(dir)) return;
 
-            switch (Envir.Random.Next(2))
+            switch (Env.Random.Next(2))
             {
                 case 0:
                     for (int i = 0; i < 7; i++)
@@ -1235,11 +1235,11 @@ namespace Server.MirObjects
 
         public override void SendHealth(HumanObject player)
         {
-            byte time = Math.Min(byte.MaxValue, (byte)Math.Max(5, (RevTime - Envir.Time) / 1000));
+            byte time = Math.Min(byte.MaxValue, (byte)Math.Max(5, (RevTime - Env.Time) / 1000));
 
             Packet p = new S.ObjectHealth { ObjectID = ObjectID, Percent = PercentHealth, Expire = time };
 
-            if (Envir.Time < RevTime)
+            if (Env.Time < RevTime)
             {
                 CurrentMap.Broadcast(p, CurrentLocation);
                 return;

@@ -31,13 +31,13 @@ namespace Server.MirObjects.Monsters
             {
                 if (CanAttack)
                 {
-                    if (Envir.Random.Next(2) == 0)
+                    if (Env.Random.Next(2) == 0)
                         RangeAttack();
                 }
                 if (CurrentLocation == Target.CurrentLocation)
                 {
-                    MirDirection direction = (MirDirection)Envir.Random.Next(8);
-                    int rotation = Envir.Random.Next(2) == 0 ? 1 : -1;
+                    MirDirection direction = (MirDirection)Env.Random.Next(8);
+                    int rotation = Env.Random.Next(2) == 0 ? 1 : -1;
 
                     for (int d = 0; d < 8; d++)
                     {
@@ -52,14 +52,14 @@ namespace Server.MirObjects.Monsters
 
             if (!CanAttack) return;
 
-            if (Envir.Random.Next(3) > 0)
+            if (Env.Random.Next(3) > 0)
             {
                 if (InAttackRange())
                     Attack();
             }
             else RangeAttack();
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -79,8 +79,8 @@ namespace Server.MirObjects.Monsters
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
 
             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
@@ -88,7 +88,7 @@ namespace Server.MirObjects.Monsters
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage == 0) return;
 
-            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 600, Target, damage, DefenceType.ACAgility, false);
+            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 600, Target, damage, DefenceType.ACAgility, false);
             ActionList.Add(action);
 
         }
@@ -102,8 +102,8 @@ namespace Server.MirObjects.Monsters
             }
 
             ShockTime = 0;
-            ActionTime = Envir.Time + 1500;
-            AttackTime = Envir.Time + AttackSpeed + 1000;
+            ActionTime = Env.Time + 1500;
+            AttackTime = Env.Time + AttackSpeed + 1000;
             int damage = GetAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC]);
             if (damage == 0) return;
 
@@ -111,11 +111,11 @@ namespace Server.MirObjects.Monsters
 
             int delay = Functions.MaxDistance(CurrentLocation, Target.CurrentLocation) * 50 + 500; //50 MS per Step
 
-            if (Envir.Random.Next(3) > 0)
+            if (Env.Random.Next(3) > 0)
             {
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID });
                 if (damage == 0) return;
-                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 100 + delay, Target, damage, DefenceType.MACAgility);
+                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 100 + delay, Target, damage, DefenceType.MACAgility);
                 ActionList.Add(action);
             }
             else
@@ -123,7 +123,7 @@ namespace Server.MirObjects.Monsters
 
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID, Type = 1 });
                 if (damage == 0) return;
-                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 250 + delay, Target, damage * 3 / 2, DefenceType.MACAgility);
+                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 250 + delay, Target, damage * 3 / 2, DefenceType.MACAgility);
                 ActionList.Add(action);
             }
         }

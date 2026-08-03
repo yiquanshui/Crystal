@@ -14,7 +14,7 @@ namespace Server.MirObjects.Monsters
         protected internal HellBomb(MonsterInfo info)
             : base(info)
         {
-            ExplosionTime = Envir.Time + (10 * Settings.Second);
+            ExplosionTime = Env.Time + (10 * Settings.Second);
             Direction = MirDirection.Up;
         }
 
@@ -43,7 +43,7 @@ namespace Server.MirObjects.Monsters
 
         protected override void ProcessTarget()
         {
-            if (Envir.Time > ExplosionTime) { Die(); return; }
+            if (Env.Time > ExplosionTime) { Die(); return; }
         }
 
         public override void Die()
@@ -51,7 +51,7 @@ namespace Server.MirObjects.Monsters
             if (HP > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
-                ActionList.Add(new DelayedAction(DelayedType.Die, Envir.Time + 500));
+                ActionList.Add(new DelayedAction(DelayedType.Die, Env.Time + 500));
             }
             
             base.Die();

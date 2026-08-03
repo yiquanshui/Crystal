@@ -12,7 +12,7 @@ namespace Server.MirObjects.Monsters
 
         protected internal CharmedSnake(MonsterInfo info) : base(info)
         {
-            ActionTime = Envir.Time + 1000;
+            ActionTime = Env.Time + 1000;
         }
 
         public override string Name
@@ -29,7 +29,7 @@ namespace Server.MirObjects.Monsters
                 if (Master != null)
                 {
                     if (FindObject(Master.ObjectID, 15) == null) selfDestruct = true;
-                    if (Summoned && Envir.Time > AliveTime) selfDestruct = true;
+                    if (Summoned && Env.Time > AliveTime) selfDestruct = true;
                     if (selfDestruct && Master != null) Die();
                 }
             }
@@ -64,8 +64,8 @@ namespace Server.MirObjects.Monsters
 
         protected override void ProcessSearch()
         {
-            if (Envir.Time < SearchTime) return;
-            SearchTime = Envir.Time + SearchDelay;
+            if (Env.Time < SearchTime) return;
+            SearchTime = Env.Time + SearchDelay;
 
             //Stacking or Infront of master - Move
             bool stacking = false;
@@ -88,7 +88,7 @@ namespace Server.MirObjects.Monsters
                 {
                     MirDirection dir = Direction;
 
-                    switch (Envir.Random.Next(3)) // favour Clockwise
+                    switch (Env.Random.Next(3)) // favour Clockwise
                     {
                         case 0:
                             for (int i = 0; i < 7; i++)
@@ -112,12 +112,12 @@ namespace Server.MirObjects.Monsters
                 }
             }
 
-            if (Target == null || Envir.Random.Next(3) == 0) FindTarget();
+            if (Target == null || Env.Random.Next(3) == 0) FindTarget();
         }
 
         protected override void ProcessRoam()
         {
-            if (Target != null || Envir.Time < RoamTime) return;
+            if (Target != null || Env.Time < RoamTime) return;
 
             if (ProcessRoute()) return;
 
@@ -127,13 +127,13 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            RoamTime = Envir.Time + RoamDelay;
-            if (Envir.Random.Next(10) != 0) return;
+            RoamTime = Env.Time + RoamDelay;
+            if (Env.Random.Next(10) != 0) return;
 
-            switch (Envir.Random.Next(3)) //Face Walk
+            switch (Env.Random.Next(3)) //Face Walk
             {
                 case 0:
-                    Turn((MirDirection)Envir.Random.Next(8));
+                    Turn((MirDirection)Env.Random.Next(8));
                     break;
                 default:
                     Walk(Direction);
@@ -154,7 +154,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;
@@ -177,12 +177,12 @@ namespace Server.MirObjects.Monsters
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage > 0)
             {
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.MAC);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.MAC);
                 ActionList.Add(action);
             }
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
         }
 

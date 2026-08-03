@@ -7,9 +7,9 @@ namespace Server.MirDatabase
 {
     public class AccountInfo
     {       
-        protected static Envir Envir
+        protected static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
         protected static MessageQueue MessageQueue => MessageQueue.Instance;
 
@@ -93,25 +93,25 @@ namespace Server.MirDatabase
             EMailAddress = p.EMailAddress;
 
             BirthDate = p.BirthDate;
-            CreationDate = Envir.Now;
+            CreationDate = Env.Now;
         }
         public AccountInfo(BinaryReader reader)
         {
             Index = reader.ReadInt32();
 
             AccountID = reader.ReadString();
-            if (Envir.LoadVersion < 94)
+            if (Env.LoadVersion < 94)
                 Password = reader.ReadString();
             else
                 password = reader.ReadString();
 
-            if (Envir.LoadVersion > 93)
+            if (Env.LoadVersion > 93)
                 Salt = reader.ReadBytes(reader.ReadInt32());
 
-            if (Envir.LoadVersion > 97)
+            if (Env.LoadVersion > 97)
                 RequirePasswordChange = reader.ReadBoolean();
 
-            if (Envir.LoadVersion >= 117)
+            if (Env.LoadVersion >= 117)
             {
                 storagePassword = reader.ReadString();
                 StorageSalt = reader.ReadBytes(reader.ReadInt32());
@@ -138,40 +138,40 @@ namespace Server.MirDatabase
 
             for (int i = 0; i < count; i++)
             {
-                var info = new CharacterInfo(reader, Envir.LoadVersion, Envir.LoadCustomVersion) { AccountInfo = this };
+                var info = new CharacterInfo(reader, Env.LoadVersion, Env.LoadCustomVersion) { AccountInfo = this };
 
-                if (info.Deleted && info.DeleteDate.AddMonths(Settings.ArchiveDeletedCharacterAfterMonths) <= Envir.Now)
+                if (info.Deleted && info.DeleteDate.AddMonths(Settings.ArchiveDeletedCharacterAfterMonths) <= Env.Now)
                 {
                     MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerArchivedAfterDeletionMonths), info.Name, Settings.ArchiveDeletedCharacterAfterMonths));
-                    Envir.SaveArchivedCharacter(info);
+                    Env.SaveArchivedCharacter(info);
                     continue;
                 }
 
-                if (info.LastLoginDate == DateTime.MinValue && info.CreationDate.AddMonths(Settings.ArchiveInactiveCharacterAfterMonths) <= Envir.Now)
+                if (info.LastLoginDate == DateTime.MinValue && info.CreationDate.AddMonths(Settings.ArchiveInactiveCharacterAfterMonths) <= Env.Now)
                 {
                     MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerArchivedAfterNoLoginMonths), info.Name, Settings.ArchiveInactiveCharacterAfterMonths));
-                    Envir.SaveArchivedCharacter(info);
+                    Env.SaveArchivedCharacter(info);
                     continue;
                 }
                 
-                if (info.LastLoginDate > DateTime.MinValue && info.LastLoginDate.AddMonths(Settings.ArchiveInactiveCharacterAfterMonths) <= Envir.Now)
+                if (info.LastLoginDate > DateTime.MinValue && info.LastLoginDate.AddMonths(Settings.ArchiveInactiveCharacterAfterMonths) <= Env.Now)
                 {
                     MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerArchivedAfterInactivityMonths), info.Name, Settings.ArchiveInactiveCharacterAfterMonths));
-                    Envir.SaveArchivedCharacter(info);
+                    Env.SaveArchivedCharacter(info);
                     continue;
                 }
 
                 Characters.Add(info);
             }
 
-            if (Envir.LoadVersion > 75)
+            if (Env.LoadVersion > 75)
             {
                 HasExpandedStorage = reader.ReadBoolean();
                 ExpandedStorageExpiryDate = DateTime.FromBinary(reader.ReadInt64());
             }
             
             Gold = reader.ReadUInt32();
-            if (Envir.LoadVersion >= 63) Credit = reader.ReadUInt32();
+            if (Env.LoadVersion >= 63) Credit = reader.ReadUInt32();
 
             count = reader.ReadInt32();
 
@@ -180,20 +180,20 @@ namespace Server.MirDatabase
             for (int i = 0; i < count; i++)
             {
                 if (!reader.ReadBoolean()) continue;
-                UserItem item = new UserItem(reader, Envir.LoadVersion, Envir.LoadCustomVersion);
-                if (Envir.BindItem(item) && i < Storage.Length)
+                UserItem item = new UserItem(reader, Env.LoadVersion, Env.LoadCustomVersion);
+                if (Env.BindItem(item) && i < Storage.Length)
                     Storage[i] = item;
             }
 
-            if (Envir.LoadVersion >= 10) AdminAccount = reader.ReadBoolean();
+            if (Env.LoadVersion >= 10) AdminAccount = reader.ReadBoolean();
             if (!AdminAccount)
             {
                 for (int i = 0; i < Characters.Count; i++)
                 {
                     if (Characters[i] == null) continue;
                     if (Characters[i].Deleted) continue;
-                    if ((Envir.Now - Characters[i].LastLogoutDate).TotalDays > 13) continue;
-                    Envir.CheckRankUpdate(Characters[i]);
+                    if ((Env.Now - Characters[i].LastLogoutDate).TotalDays > 13) continue;
+                    Env.CheckRankUpdate(Characters[i]);
                 }
             }
         }

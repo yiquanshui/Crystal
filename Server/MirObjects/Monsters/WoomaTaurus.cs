@@ -19,15 +19,15 @@ namespace Server.MirObjects.Monsters
         {
             if (Dead) return;
 
-            if (_madTime > 0 && Envir.Time > _madTime)
+            if (_madTime > 0 && Env.Time > _madTime)
             {
                 _madTime = 0;
                 RefreshAll();
             }
 
-            if (Envir.Time > _teleTime)
+            if (Env.Time > _teleTime)
             {
-                _teleTime = Envir.Time + TeleDelay;
+                _teleTime = Env.Time + TeleDelay;
 
                 int count = 0;
                 MirDirection dir = Direction;
@@ -68,7 +68,7 @@ namespace Server.MirObjects.Monsters
 
                 if (stage < _stage)
                 {
-                    _madTime = Envir.Time + 8000;
+                    _madTime = Env.Time + 8000;
                     MoveSpeed = 400;
                     AttackSpeed = 500;
                 }

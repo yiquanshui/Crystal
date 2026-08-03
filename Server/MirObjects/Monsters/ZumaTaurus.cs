@@ -42,13 +42,13 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage == 0) return;
 
-            DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.MACAgility);
+            DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.MACAgility);
             ActionList.Add(action);
         }
 
@@ -59,28 +59,28 @@ namespace Server.MirObjects.Monsters
             for (int i = 0; i < count; i++)
             {
                 MonsterObject mob = null;
-                switch (Envir.Random.Next(7))
+                switch (Env.Random.Next(7))
                 {
                     case 0:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.Zuma1));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.Zuma1));
                         break;
                     case 1:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.Zuma2));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.Zuma2));
                         break;
                     case 2:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.Zuma3));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.Zuma3));
                         break;
                     case 3:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.Zuma4));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.Zuma4));
                         break;
                     case 4:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.Zuma5));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.Zuma5));
                         break;
                     case 5:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.Zuma6));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.Zuma6));
                         break;
                     case 6:
-                        mob = GetMonster(Envir.GetMonsterInfo(Settings.Zuma7));
+                        mob = GetMonster(Env.GetMonsterInfo(Settings.Zuma7));
                         break;
                 }
 
@@ -90,7 +90,7 @@ namespace Server.MirObjects.Monsters
                     mob.Spawn(CurrentMap, CurrentLocation);
 
                 mob.Target = Target;
-                mob.ActionTime = Envir.Time + 2000;
+                mob.ActionTime = Env.Time + 2000;
                 SlaveList.Add(mob);
             }
         }

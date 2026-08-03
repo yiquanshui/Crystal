@@ -161,7 +161,7 @@ namespace Server.Database
         private void SetItemComboBoxSelection(string recipeName)
         {
             // Look for an item name matching the recipe
-            foreach (var item in SMain.EditEnvir.ItemInfoList)
+            foreach (var item in SMain.EditEnv.ItemInfoList)
             {
                 if (item.Name.Equals(recipeName, StringComparison.OrdinalIgnoreCase))
                 {
@@ -313,7 +313,7 @@ namespace Server.Database
             toolComboBox.Items.Add("None");
 
             // Add items from the item database
-            foreach (var item in SMain.EditEnvir.ItemInfoList)
+            foreach (var item in SMain.EditEnv.ItemInfoList)
             {
                 if (!string.IsNullOrEmpty(item.Name))
                 {
@@ -342,10 +342,10 @@ namespace Server.Database
             comboBox.Items.Add("None");
 
             // Ensure ItemInfoList is populated
-            if (SMain.EditEnvir.ItemInfoList != null && SMain.EditEnvir.ItemInfoList.Count > 0)
+            if (SMain.EditEnv.ItemInfoList != null && SMain.EditEnv.ItemInfoList.Count > 0)
             {
                 // Add item names to the ComboBox
-                foreach (var item in SMain.EditEnvir.ItemInfoList)
+                foreach (var item in SMain.EditEnv.ItemInfoList)
                 {
                     if (!string.IsNullOrEmpty(item.Name))
                     {
@@ -374,12 +374,12 @@ namespace Server.Database
         private void LoadItemsIntoComboBox()
         {
             // Ensure ItemInfoList is populated
-            if (SMain.EditEnvir.ItemInfoList != null && SMain.EditEnvir.ItemInfoList.Count > 0)
+            if (SMain.EditEnv.ItemInfoList != null && SMain.EditEnv.ItemInfoList.Count > 0)
             {
                 ItemComboBox.Items.Clear();
 
                 // Loop through ItemInfoList and add item names to the combo box
-                foreach (var item in SMain.EditEnvir.ItemInfoList)
+                foreach (var item in SMain.EditEnv.ItemInfoList)
                 {
                     if (!string.IsNullOrEmpty(item.Name))
                     {

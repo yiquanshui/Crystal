@@ -19,15 +19,15 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            if (Envir.Random.Next(5) > 0)
+            if (Env.Random.Next(5) > 0)
             {
-                if (Envir.Random.Next(3) > 0)
+                if (Env.Random.Next(3) > 0)
                 {
                     base.Attack();        
                 }

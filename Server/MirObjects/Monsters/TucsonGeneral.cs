@@ -30,67 +30,67 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             bool ranged = CurrentLocation == Target.CurrentLocation || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 2);
 
-            if (Envir.Time > _RageTime)
+            if (Env.Time > _RageTime)
             {
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
-                _RageTime = Envir.Time + 20000;
+                _RageTime = Env.Time + 20000;
 
-                AttackTime = Envir.Time + 8000;
+                AttackTime = Env.Time + 8000;
 
                 var targets = FindAllTargets(10, CurrentLocation, false);
 
                 for (int i = 0; i < _RockCount; i++)
                 {
-                    Point location = new Point(CurrentLocation.X + Envir.Random.Next(-Info.ViewRange, Info.ViewRange + 1),
-                                                                 CurrentLocation.Y + Envir.Random.Next(-Info.ViewRange, Info.ViewRange + 1));
+                    Point location = new Point(CurrentLocation.X + Env.Random.Next(-Info.ViewRange, Info.ViewRange + 1),
+                                                                 CurrentLocation.Y + Env.Random.Next(-Info.ViewRange, Info.ViewRange + 1));
 
-                    if (Envir.Random.Next(3) == 0 && targets.Count > 0)
+                    if (Env.Random.Next(3) == 0 && targets.Count > 0)
                     {
-                        location = targets[Envir.Random.Next(targets.Count)].CurrentLocation;
+                        location = targets[Env.Random.Next(targets.Count)].CurrentLocation;
                     }
 
                     if (location.X == CurrentLocation.X || location.Y == CurrentLocation.Y) continue;
 
-                    var start = Envir.Random.Next(0, 5000);
-                    var value = Envir.Random.Next(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
+                    var start = Env.Random.Next(0, 5000);
+                    var value = Env.Random.Next(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
 
                     var spellObj = new SpellObject
                     {
                         Spell = Spell.TucsonGeneralRock,
                         Value = value,
-                        ExpireTime = Envir.Time + 2000 + start,
+                        ExpireTime = Env.Time + 2000 + start,
                         TickSpeed = 1000,
                         Caster = this,
                         CurrentLocation = location,
                         CurrentMap = CurrentMap,
                         Direction = MirDirection.Up,
-                        StartTime = Envir.Time + 1000 + start
+                        StartTime = Env.Time + 1000 + start
                     };
 
-                    DelayedAction action = new DelayedAction(DelayedType.Spawn, Envir.Time + start, spellObj);
+                    DelayedAction action = new DelayedAction(DelayedType.Spawn, Env.Time + start, spellObj);
                     CurrentMap.ActionList.Add(action);
                 }
 
                 return;
             }
 
-            if (!ranged && Envir.Random.Next(4) > 0)
+            if (!ranged && Env.Random.Next(4) > 0)
             {
-                if (Envir.Random.Next(3) > 0)
+                if (Env.Random.Next(3) > 0)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                     if (damage == 0) return;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.ACAgility, false);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.ACAgility, false);
                     ActionList.Add(action);
                 }
                 else
@@ -99,13 +99,13 @@ namespace Server.MirObjects.Monsters
                     int damage = GetAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC]);
                     if (damage == 0) return;
 
-                    DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 500, Target, damage, DefenceType.ACAgility, true);
+                    DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.ACAgility, true);
                     ActionList.Add(action);
                 }
             }
             else
             {
-                if (Envir.Random.Next(4) > 0)
+                if (Env.Random.Next(4) > 0)
                 {
                     Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID, Type = 1 });
                     int damage = GetAttackPower(Stats[Stat.MinSC], Stats[Stat.MaxSC]);
@@ -119,7 +119,7 @@ namespace Server.MirObjects.Monsters
                     int damage = GetAttackPower(Stats[Stat.MinSC], Stats[Stat.MaxSC] * 2);
                     if (damage == 0) return;
 
-                    DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 500, Target, damage, DefenceType.ACAgility, true);
+                    DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 500, Target, damage, DefenceType.ACAgility, true);
                     ActionList.Add(action);
                 }
             }
@@ -161,7 +161,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;

@@ -33,23 +33,23 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             bool ranged = CurrentLocation == Target.CurrentLocation || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 1);
 
-            if(ranged || Envir.Time > _thrustTime)
+            if(ranged || Env.Time > _thrustTime)
             {
-                if (ranged && Envir.Random.Next(2) == 0)
+                if (ranged && Env.Random.Next(2) == 0)
                 {
                     MoveTo(Target.CurrentLocation);
-                    ActionTime = Envir.Time + 300;
+                    ActionTime = Env.Time + 300;
                     return;
                 }
 
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID });
 
-                AttackTime = Envir.Time + AttackSpeed;
+                AttackTime = Env.Time + AttackSpeed;
 
-                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Envir.Time + 500);
+                DelayedAction action = new DelayedAction(DelayedType.RangeDamage, Env.Time + 500);
                 ActionList.Add(action);
 
-                _thrustTime = Envir.Time + 5000;
+                _thrustTime = Env.Time + 5000;
 
                 return;
             }
@@ -103,8 +103,8 @@ namespace Server.MirObjects.Monsters
                                 {
                                     if (target.Attacked(this, j <= 1 ? nearDamage : farDamage, DefenceType.MAC) > 0)
                                     {
-                                        PoisonTarget(target, 5, target.Race == ObjectType.Player ? 4 : 5 + Envir.Random.Next(5), PoisonType.Slow, 1000);
-                                        PoisonTarget(target, 5, target.Race == ObjectType.Player ? 2 : 5 + Envir.Random.Next(this.Stats[Stat.Freezing]), PoisonType.Frozen, 1000);
+                                        PoisonTarget(target, 5, target.Race == ObjectType.Player ? 4 : 5 + Env.Random.Next(5), PoisonType.Slow, 1000);
+                                        PoisonTarget(target, 5, target.Race == ObjectType.Player ? 2 : 5 + Env.Random.Next(this.Stats[Stat.Freezing]), PoisonType.Frozen, 1000);
                                     }
                                 }
                                 break;

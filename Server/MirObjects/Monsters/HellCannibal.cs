@@ -22,24 +22,24 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
             ShockTime = 0;
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
-            if (Envir.Random.Next(4) > 0)
+            if (Env.Random.Next(4) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                 if (damage == 0) return;
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, damage, DefenceType.ACAgility, false);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, damage, DefenceType.ACAgility, false);
                 ActionList.Add(action);
             }
             else
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 
-                DelayedAction action = new DelayedAction(DelayedType.Damage, Envir.Time + 300, Target, 0, DefenceType.ACAgility, true);
+                DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 300, Target, 0, DefenceType.ACAgility, true);
                 ActionList.Add(action);
             }
         }
@@ -60,7 +60,7 @@ namespace Server.MirObjects.Monsters
 
                 for (int i = 0; i < targets.Count; i++)
                 {
-                    PoisonTarget(targets[i], 1, Envir.Random.Next(GetAttackPower(Stats[Stat.MinSC], Stats[Stat.MaxSC]) / 2), PoisonType.Red, 1000);
+                    PoisonTarget(targets[i], 1, Env.Random.Next(GetAttackPower(Stats[Stat.MinSC], Stats[Stat.MaxSC]) / 2), PoisonType.Red, 1000);
                 }
             }
             else

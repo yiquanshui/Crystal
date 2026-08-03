@@ -32,7 +32,7 @@ namespace Server.MirObjects.Monsters
             : base(info)
         {
             Visible = false;
-            VisibleTime = Envir.Time + 2000;
+            VisibleTime = Env.Time + 2000;
             FirstAttack = true;
         }
 
@@ -54,18 +54,18 @@ namespace Server.MirObjects.Monsters
         {
             if (Dead) return;
 
-            if (Envir.Time > VisibleTime)
+            if (Env.Time > VisibleTime)
             {
-                VisibleTime = Envir.Time + 2000;
+                VisibleTime = Env.Time + 2000;
 
                 bool visible = Target != null;
 
                 if (!Visible && visible && !Target.Dead && !Target.InTrapRock)
                 {
-                    SpawnCorner = (byte)(Envir.Random.Next(4) * 2);
+                    SpawnCorner = (byte)(Env.Random.Next(4) * 2);
                     if (Teleport(CurrentMap, Functions.PointMove(Target.CurrentLocation, (MirDirection)SpawnCorner, 1), false))
                     {
-                        ActionTime = Envir.Time + 1000;
+                        ActionTime = Env.Time + 1000;
                         Show();
                         return;
                     }
@@ -95,10 +95,10 @@ namespace Server.MirObjects.Monsters
             }
             else Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 
-            ActionTime = Envir.Time + 300;
-            AttackTime = Envir.Time + AttackSpeed;
+            ActionTime = Env.Time + 300;
+            AttackTime = Env.Time + AttackSpeed;
 
-            if (Envir.Random.Next(8) == 0 && !ChildRock)
+            if (Env.Random.Next(8) == 0 && !ChildRock)
             {
                 Target.ApplyPoison(new Poison { PType = PoisonType.Paralysis, Duration = 3, TickSpeed = 1000 }, this, true);
             }
@@ -116,9 +116,9 @@ namespace Server.MirObjects.Monsters
                     if (CurrentMap == Target.CurrentMap && Functions.InRange(CurrentLocation, Target.CurrentLocation, 1))
                         Target.InTrapRock = false;
                 }
-                if (Info.HasDieScript && (Envir.MonsterNPC != null))
+                if (Info.HasDieScript && (Env.MonsterNPC != null))
                 {
-                    Envir.MonsterNPC.Call(this,string.Format("[@_DIE({0})]", Info.Index));
+                    Env.MonsterNPC.Call(this,string.Format("[@_DIE({0})]", Info.Index));
                 }
 
 
@@ -187,7 +187,7 @@ namespace Server.MirObjects.Monsters
         {
             TargetLocation = Target.CurrentLocation;
             Visible = true;
-            CellTime = ChildRock ? ParentRock.CellTime : Envir.Time + 500;
+            CellTime = ChildRock ? ParentRock.CellTime : Env.Time + 500;
 
             Broadcast(GetInfo());
             Broadcast(new S.ObjectShow { ObjectID = ObjectID });
@@ -200,7 +200,7 @@ namespace Server.MirObjects.Monsters
                 for (byte i = 0; i <= 6; i += 2)
                 {
                     if (i == SpawnCorner) continue;
-                    var mob = GetMonster(Envir.GetMonsterInfo(Name));
+                    var mob = GetMonster(Env.GetMonsterInfo(Name));
 
                     if (mob == null) return;
                     var childmob = (TrapRock)mob;

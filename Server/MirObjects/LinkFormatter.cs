@@ -42,11 +42,11 @@ namespace Server.MirObjects
             switch (type)
             {
                 case "MONSTER":
-                    return Envir.Main.GetMonsterInfo(index)?.Name;
+                    return Env.Main.GetMonsterInfo(index)?.Name;
                 case "NPC":
-                    return Envir.Main.GetNPCInfo(index)?.Name;
+                    return Env.Main.GetNPCInfo(index)?.Name;
                 case "ITEM":
-                    return Envir.Main.GetItemInfo(index)?.Name;
+                    return Env.Main.GetItemInfo(index)?.Name;
                 default:
                     return null;
             }

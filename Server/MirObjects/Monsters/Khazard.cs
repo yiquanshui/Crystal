@@ -12,14 +12,14 @@ namespace Server.MirObjects.Monsters
         protected internal Khazard(MonsterInfo info)
             : base(info)
         {
-            PullTime = Envir.Time;
+            PullTime = Env.Time;
         }
 
         protected bool CanPull
         {
             get
             {
-                return Range && Envir.Time >= PullTime;
+                return Range && Env.Time >= PullTime;
             }
         }
 
@@ -55,9 +55,9 @@ namespace Server.MirObjects.Monsters
             {
                 PullAttack();
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
-                ActionTime = Envir.Time + 300;
-                AttackTime = Envir.Time + AttackSpeed;
-                PullTime = Envir.Time + 5000;
+                ActionTime = Env.Time + 300;
+                AttackTime = Env.Time + AttackSpeed;
+                PullTime = Env.Time + 5000;
             }
             else
             {
@@ -73,7 +73,7 @@ namespace Server.MirObjects.Monsters
 
                 if (target == Target.CurrentLocation)
                 {
-                    if (Envir.Random.Next(Settings.MagicResistWeight) < Target.Stats[Stat.MagicResist]) continue;
+                    if (Env.Random.Next(Settings.MagicResistWeight) < Target.Stats[Stat.MagicResist]) continue;
                     MirDirection pushdir = Functions.DirectionFromPoint(Target.CurrentLocation, CurrentLocation);
                     Target.Pushed(this, pushdir, i);
                 }
@@ -93,7 +93,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Envir.Time < ShockTime)
+            if (Env.Time < ShockTime)
             {
                 Target = null;
                 return;

@@ -2,9 +2,9 @@
 {
     public class Timer
     {
-        private static Envir Envir
+        private static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         public string Key;
@@ -19,7 +19,7 @@
             Seconds = seconds;
             Type = type;
 
-            RelativeTime = Envir.Time + (seconds * Settings.Second);
+            RelativeTime = Env.Time + (seconds * Settings.Second);
         }
     }
 }

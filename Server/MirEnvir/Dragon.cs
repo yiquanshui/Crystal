@@ -15,9 +15,9 @@ namespace Server.MirEnvir
         public long DeLevelTime;
         public bool Loaded;
 
-        private static Envir Envir
+        private static Env Env
         {
-            get { return Envir.Main; }
+            get { return Env.Main; }
         }
 
         protected static MessageQueue MessageQueue
@@ -65,7 +65,7 @@ namespace Server.MirEnvir
         {
             try
             {
-                MonsterInfo info = Envir.GetMonsterInfo(Info.MonsterName);
+                MonsterInfo info = Env.GetMonsterInfo(Info.MonsterName);
                 if (info == null)
                 {
                     MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.FailedLoadDragonBadMonsterName) + Info.MonsterName);
@@ -73,7 +73,7 @@ namespace Server.MirEnvir
                 }
                 LinkedMonster = MonsterObject.GetMonster(info);
 
-                Map map = Envir.GetMapByNameAndInstance(Info.MapFileName);
+                Map map = Env.GetMapByNameAndInstance(Info.MapFileName);
                 if (map == null)
                 {
                     MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.FailedToLoadDragonBadMapName) + Info.MapFileName);
@@ -95,7 +95,7 @@ namespace Server.MirEnvir
                             mob.DragonLink = true;
                         }
                     }
-                    MonsterInfo bodyinfo = Envir.GetMonsterInfo(Info.BodyName);
+                    MonsterInfo bodyinfo = Env.GetMonsterInfo(Info.BodyName);
                     if (bodyinfo != null)
                     {
                         MonsterObject bodymob;
@@ -138,7 +138,7 @@ namespace Server.MirEnvir
             if (Info.Level < Globals.MaxDragonLevel) Info.Level = (byte)(Math.Max(1, (Info.Level + 1)));
             //if it reaches max level > make it stay that level for 6*deleveldelay and then reset to 0, rather then letting ppl farm it by making it drop every hour
             if (Info.Level == Globals.MaxDragonLevel)
-                DeLevelTime = Envir.Time + (6 * DeLevelDelay);
+                DeLevelTime = Env.Time + (6 * DeLevelDelay);
         }
         public void LevelDown()
         {
@@ -160,11 +160,11 @@ namespace Server.MirEnvir
                 DragonInfo.DropInfo drop = droplist[i];
 
                 int rate = (int)(drop.Chance / Settings.DropRate); if (rate < 1) rate = 1;
-                if (Envir.Random.Next(rate) != 0) continue;
+                if (Env.Random.Next(rate) != 0) continue;
 
                 if (drop.Gold > 0)
                 {
-                    int gold = Envir.Random.Next((int)(drop.Gold / 2), (int)(drop.Gold + drop.Gold / 2)); //Messy
+                    int gold = Env.Random.Next((int)(drop.Gold / 2), (int)(drop.Gold + drop.Gold / 2)); //Messy
 
                     if (gold <= 0) continue;
 
@@ -172,7 +172,7 @@ namespace Server.MirEnvir
                 }
                 else
                 {
-                    UserItem item = Envir.CreateDropItem(drop.Item);
+                    UserItem item = Env.CreateDropItem(drop.Item);
                     if (item == null) continue;
                     if (!DropItem(item)) return;
                 }
@@ -184,7 +184,7 @@ namespace Server.MirEnvir
             ItemObject ob = new ItemObject(this.LinkedMonster, item, droplocation)
             {
                 Owner = this.LinkedMonster.EXPOwner,
-                OwnerTime = Envir.Time + Settings.Minute,
+                OwnerTime = Env.Time + Settings.Minute,
             };
 
             return ob.DragonDrop(DropArea.Width / 2);
@@ -202,7 +202,7 @@ namespace Server.MirEnvir
             ItemObject ob = new ItemObject(this.LinkedMonster, gold, droplocation)
             {
                 Owner = this.LinkedMonster.EXPOwner,
-                OwnerTime = Envir.Time + Settings.Minute,
+                OwnerTime = Env.Time + Settings.Minute,
             };
 
             return ob.DragonDrop(DropArea.Width / 2);
@@ -211,21 +211,21 @@ namespace Server.MirEnvir
         public void Process()
         {
             if (!Loaded) return;
-            if (Envir.Time < ProcessTime) return;
+            if (Env.Time < ProcessTime) return;
 
-            ProcessTime = Envir.Time + ProcessDelay;
+            ProcessTime = Env.Time + ProcessDelay;
 
-            if ((Info.Level >= Globals.MaxDragonLevel) && (Envir.Time > DeLevelTime))
+            if ((Info.Level >= Globals.MaxDragonLevel) && (Env.Time > DeLevelTime))
             {
                 Info.Level = (byte)1;
                 Info.Experience = 0;
-                DeLevelTime = Envir.Time + DeLevelDelay;
+                DeLevelTime = Env.Time + DeLevelDelay;
             }
 
-            if (Info.Level > 1 && Envir.Time > DeLevelTime)
+            if (Info.Level > 1 && Env.Time > DeLevelTime)
             {
                 LevelDown();
-                DeLevelTime = Envir.Time + DeLevelDelay;
+                DeLevelTime = Env.Time + DeLevelDelay;
             }
         }
     }

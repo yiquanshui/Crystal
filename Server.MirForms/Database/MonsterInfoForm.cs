@@ -7,7 +7,7 @@ namespace Server
     {
         public string MonsterListPath = Path.Combine(Settings.ExportPath, "MonsterList.txt");
 
-        public Envir Envir => SMain.EditEnvir;
+        public Env Env => SMain.EditEnv;
 
         private List<MonsterInfo> _selectedMonsterInfos;
 
@@ -21,7 +21,7 @@ namespace Server
 
         private void AddButton_Click(object sender, EventArgs e)
         {
-            Envir.CreateMonsterInfo();
+            Env.CreateMonsterInfo();
             UpdateInterface();
         }
         private void RemoveButton_Click(object sender, EventArgs e)
@@ -30,21 +30,21 @@ namespace Server
 
             if (MessageBox.Show("Are you sure you want to remove the selected Monsters?", "Remove Monsters?", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
 
-            for (int i = 0; i < _selectedMonsterInfos.Count; i++) Envir.Remove(_selectedMonsterInfos[i]);
+            for (int i = 0; i < _selectedMonsterInfos.Count; i++) Env.Remove(_selectedMonsterInfos[i]);
 
-            if (Envir.MonsterInfoList.Count == 0) Envir.MonsterIndex = 0;
+            if (Env.MonsterInfoList.Count == 0) Env.MonsterIndex = 0;
 
             UpdateInterface();
         }
 
         private void UpdateInterface()
         {
-            if (MonsterInfoListBox.Items.Count != Envir.MonsterInfoList.Count)
+            if (MonsterInfoListBox.Items.Count != Env.MonsterInfoList.Count)
             {
                 MonsterInfoListBox.Items.Clear();
 
-                for (int i = 0; i < Envir.MonsterInfoList.Count; i++)
-                    MonsterInfoListBox.Items.Add(Envir.MonsterInfoList[i]);
+                for (int i = 0; i < Env.MonsterInfoList.Count; i++)
+                    MonsterInfoListBox.Items.Add(Env.MonsterInfoList[i]);
             }
 
             _selectedMonsterInfos = MonsterInfoListBox.SelectedItems.Cast<MonsterInfo>().ToList();
@@ -184,7 +184,7 @@ namespace Server
 
             for (int i = 0; i < MonsterInfoListBox.Items.Count; i++) selected.Add(MonsterInfoListBox.GetSelected(i));
             MonsterInfoListBox.Items.Clear();
-            for (int i = 0; i < Envir.MonsterInfoList.Count; i++) MonsterInfoListBox.Items.Add(Envir.MonsterInfoList[i]);
+            for (int i = 0; i < Env.MonsterInfoList.Count; i++) MonsterInfoListBox.Items.Add(Env.MonsterInfoList[i]);
             for (int i = 0; i < selected.Count; i++) MonsterInfoListBox.SetSelected(i, selected[i]);
 
             MonsterInfoListBox.SelectedIndexChanged += MonsterInfoListBox_SelectedIndexChanged;
@@ -594,7 +594,7 @@ namespace Server
         }
         private void MonsterInfoForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Envir.SaveDB();
+            Env.SaveDB();
         }
 
         private void PasteMButton_Click(object sender, EventArgs e)
@@ -649,7 +649,7 @@ namespace Server
 
         private void ExportAllButton_Click(object sender, EventArgs e)
         {
-            ExportMonsters(Envir.MonsterInfoList);
+            ExportMonsters(Env.MonsterInfoList);
         }
 
         private void ExportSelected_Click(object sender, EventArgs e)
