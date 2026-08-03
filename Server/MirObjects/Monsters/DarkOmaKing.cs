@@ -107,9 +107,9 @@ namespace Server.MirObjects.Monsters
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                     if (damage == 0) return;
 
-                    FullmoonAttack(damage, 500, DefenceType.ACAgility, 1, 2);
-                    FullmoonAttack(damage, 1700, DefenceType.ACAgility, 1, 2);
-                    FullmoonAttack(damage, 2500, DefenceType.ACAgility, 1, 2);
+                    FullMoonAttack(damage, 500, DefenceType.ACAgility, 1, 2);
+                    FullMoonAttack(damage, 1700, DefenceType.ACAgility, 1, 2);
+                    FullMoonAttack(damage, 2500, DefenceType.ACAgility, 1, 2);
 
                     var start = 3000;
 

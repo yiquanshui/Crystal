@@ -5,20 +5,11 @@ namespace Server.MirDatabase
 {
     public class MonsterInfo
     {
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
 
-        protected static Env EditEnv
-        {
-            get { return Env.Edit; }
-        }
+        protected static Env EditEnv => Env.Edit;
 
-        protected static MessageQueue MessageQueue
-        {
-            get { return MessageQueue.Instance; }
-        }
+        protected static MessageQueue MessageQueue => MessageQueue.Instance;
 
         public int Index;
         public string Name = string.Empty;
@@ -34,7 +25,7 @@ namespace Server.MirDatabase
 
         public string DropPath = "";
         
-        public List<DropInfo> Drops = new List<DropInfo>();
+        public List<DropInfo> Drops = [];
 
         public bool CanTame = true, CanPush = true, AutoRev = true, Undead = false;
         public bool CanRecall = false;
@@ -43,11 +34,10 @@ namespace Server.MirDatabase
         public bool HasSpawnScript;
         public bool HasDieScript;
 
-        public Stats Stats;
+        public readonly Stats Stats = new();
 
         public MonsterInfo()
         {
-            Stats = new Stats();
         }
 
         public MonsterInfo(BinaryReader reader)
@@ -78,7 +68,6 @@ namespace Server.MirDatabase
 
             if (Env.LoadVersion <= 84)
             {
-                Stats = new Stats();
                 Stats[Stat.HP] = (int)reader.ReadUInt32(); //Monster form prevented greater than ushort, so this should never overflow.
             }
 
@@ -147,27 +136,26 @@ namespace Server.MirDatabase
             }
         }
 
-        public string GameName
-        {
-            get { return Regex.Replace(Name, @"[\d-]", string.Empty); }
-        }
+        public string GameName => Regex.Replace(Name, @"[\d-]", string.Empty);
 
         public ClientMonsterInfo ClientInformation
         {
             get
             {
-                Stats tooltipStats = new Stats();
-                tooltipStats[Stat.HP] = Stats[Stat.HP];
-                tooltipStats[Stat.MinAC] = Stats[Stat.MinAC];
-                tooltipStats[Stat.MaxAC] = Stats[Stat.MaxAC];
-                tooltipStats[Stat.MinMAC] = Stats[Stat.MinMAC];
-                tooltipStats[Stat.MaxMAC] = Stats[Stat.MaxMAC];
-                tooltipStats[Stat.MinDC] = Stats[Stat.MinDC];
-                tooltipStats[Stat.MaxDC] = Stats[Stat.MaxDC];
-                tooltipStats[Stat.MinMC] = Stats[Stat.MinMC];
-                tooltipStats[Stat.MaxMC] = Stats[Stat.MaxMC];
-                tooltipStats[Stat.MinSC] = Stats[Stat.MinSC];
-                tooltipStats[Stat.MaxSC] = Stats[Stat.MaxSC];
+                Stats tooltipStats = new Stats
+                {
+                    [Stat.HP] = Stats[Stat.HP],
+                    [Stat.MinAC] = Stats[Stat.MinAC],
+                    [Stat.MaxAC] = Stats[Stat.MaxAC],
+                    [Stat.MinMAC] = Stats[Stat.MinMAC],
+                    [Stat.MaxMAC] = Stats[Stat.MaxMAC],
+                    [Stat.MinDC] = Stats[Stat.MinDC],
+                    [Stat.MaxDC] = Stats[Stat.MaxDC],
+                    [Stat.MinMC] = Stats[Stat.MinMC],
+                    [Stat.MaxMC] = Stats[Stat.MaxMC],
+                    [Stat.MinSC] = Stats[Stat.MinSC],
+                    [Stat.MaxSC] = Stats[Stat.MaxSC]
+                };
 
                 return new ClientMonsterInfo
                 {
@@ -227,13 +215,12 @@ namespace Server.MirDatabase
 
         public static void FromText(string text)
         {
-            string[] data = text.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] data = text.Split([','], StringSplitOptions.RemoveEmptyEntries);
 
             if (data.Length < 28) return; //28
 
             MonsterInfo info = new MonsterInfo {Name = data[0]};
-            ushort image;
-            if (!ushort.TryParse(data[1], out image)) return;
+            if (!ushort.TryParse(data[1], out ushort image)) return;
             info.Image = (Monster) image;
 
             if (!byte.TryParse(data[2], out info.AI)) return;
@@ -288,14 +275,14 @@ namespace Server.MirDatabase
 
         public override string ToString()
         {
-            return string.Format("{0}: {1}", Index, Name);
+            return $"{Index}: {Name}";
             //return string.Format("{0}", Name);
         }
     }
 
     public class DropRewardInfo
     {
-        public List<ItemInfo> Items;
+        public List<ItemInfo>? Items;
         public uint Gold;
     }
 
@@ -307,27 +294,21 @@ namespace Server.MirDatabase
 
     public class DropInfo
     {
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
 
-        protected static MessageQueue MessageQueue
-        {
-            get { return MessageQueue.Instance; }
-        }
+        protected static MessageQueue MessageQueue => MessageQueue.Instance;
 
         public int Chance;
-        public ItemInfo Item;
+        public ItemInfo? Item;
         public uint Gold;
-        public GroupDropInfo GroupedDrop;
+        public GroupDropInfo? GroupedDrop;
 
         public byte Type;
         public bool QuestRequired;
 
-        public static DropInfo FromLine(string s)
+        public static DropInfo? FromLine(string s)
         {
-            string[] parts = s.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = s.Split([' '], StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length < 2)
             {
@@ -336,19 +317,19 @@ namespace Server.MirDatabase
 
             DropInfo info = new DropInfo();
 
-            if (!int.TryParse(parts[0].Substring(2), out info.Chance)) return null;
+            if (!int.TryParse(parts[0].AsSpan(2), out info.Chance)) return null;
 
             if (string.Compare(parts[1], "Gold", StringComparison.OrdinalIgnoreCase) == 0)
             {
                 if (parts.Length < 3) return null;
                 if (!uint.TryParse(parts[2], out info.Gold) || info.Gold == 0) return null;
             }
-            else if (parts[1].ToUpper().StartsWith("GROUP"))
+            else if (parts[1].StartsWith("GROUP", StringComparison.CurrentCultureIgnoreCase))
             {
                 info.GroupedDrop = new GroupDropInfo
                 {
-                    Random = parts[1].EndsWith("*"),
-                    First = parts[1].EndsWith("^")
+                    Random = parts[1].EndsWith('*'),
+                    First = parts[1].EndsWith('^')
                 };
             }
             else
@@ -359,7 +340,7 @@ namespace Server.MirDatabase
                 if (parts.Length > 2)
                 {
                     string dropRequirement = parts[2];
-                    if (dropRequirement.ToUpper() == "Q")
+                    if (dropRequirement.Equals("Q", StringComparison.CurrentCultureIgnoreCase))
                     {
                         info.QuestRequired = true;
                     }
@@ -375,8 +356,8 @@ namespace Server.MirDatabase
             {
                 if (createIfNotExists)
                 {
-                    string[] contents = new[]
-                        {
+                    string[] contents =
+                    [
                         ";Pots + Other", string.Empty, string.Empty,
                         ";Weapons", string.Empty, string.Empty,
                         ";Armour", string.Empty, string.Empty,
@@ -386,8 +367,8 @@ namespace Server.MirDatabase
                         ";Rings", string.Empty, string.Empty,
                         ";Shoes", string.Empty, string.Empty,
                         ";Belts", string.Empty, string.Empty,
-                        ";Stone",
-                    };
+                        ";Stone"
+                    ];
 
                     File.WriteAllLines(path, contents);
                 }
@@ -401,9 +382,9 @@ namespace Server.MirDatabase
 
             for (int i = 0; i < lines.Count; i++)
             {
-                if (lines[i].StartsWith(";") || string.IsNullOrWhiteSpace(lines[i])) continue;
+                if (lines[i].StartsWith(';') || string.IsNullOrWhiteSpace(lines[i])) continue;
 
-                DropInfo drop = DropInfo.FromLine(lines[i]);
+                DropInfo? drop = DropInfo.FromLine(lines[i]);
 
                 if (drop == null)
                 {
@@ -425,6 +406,7 @@ namespace Server.MirDatabase
             {
                 if (drop1.Gold > 0 && drop2.Gold == 0)
                     return 1;
+                
                 if (drop1.Gold == 0 && drop2.Gold > 0)
                     return -1;
 
@@ -445,19 +427,19 @@ namespace Server.MirDatabase
                 var line = lines[j].Trim();
                 lines[j] = "";
 
-                if (line.Trim() == ("{"))
+                if (line == "{")
                 {
                     start = true;
                     continue;
                 }
 
-                if (line.Trim() == ("}"))
+                if (line == "}")
                 {
                     finish = true;
                     break;
                 }
 
-                if (line.StartsWith(";") || string.IsNullOrWhiteSpace(line)) continue;
+                if (line.StartsWith(';') || string.IsNullOrWhiteSpace(line)) continue;
 
                 var drop = DropInfo.FromLine(line);
 
@@ -477,16 +459,13 @@ namespace Server.MirDatabase
 
             if (start && finish)
             {
-                parentDrop.GroupedDrop.AddRange(drops);
+                parentDrop.GroupedDrop?.AddRange(drops);
             }
         }
 
         private static List<string> ParseInsert(List<string> lines)
         {
-            Regex regex = new Regex($"#INSERT \\[(.*?)\\]", RegexOptions.IgnoreCase);
-
-            List<string> newLines = new List<string>();
-
+            Regex regex = new Regex($@"#INSERT \[(.*?)\]", RegexOptions.IgnoreCase);
             for (int i = 0; i < lines.Count; i++)
             {
                 var match = regex.Match(lines[i]);
@@ -496,18 +475,15 @@ namespace Server.MirDatabase
                 var subPath = match.Groups[1].Value;
 
                 string path = Path.Combine(Settings.DropPath, subPath);
-
-                newLines = File.ReadAllLines(path).ToList();
-
-                lines.AddRange(newLines);
+                lines.AddRange([.. File.ReadAllLines(path)]);
             }
 
-            lines.RemoveAll(str => str.ToUpper().StartsWith("#INSERT"));
+            lines.RemoveAll(str => str.StartsWith("#INSERT", StringComparison.CurrentCultureIgnoreCase));
 
             return lines;
         }
 
-        public DropRewardInfo AttemptDrop(int itemDropRatePercentOffset = 0, int goldDropRatePercentOffset = 0)
+        public DropRewardInfo? AttemptDrop(int itemDropRatePercentOffset = 0, int goldDropRatePercentOffset = 0)
         {
             int rate = (int)(Chance / (Settings.DropRate));
 
@@ -556,7 +532,10 @@ namespace Server.MirDatabase
                     {
                         gold += reward.Gold;
 
-                        tempItems.AddRange(reward.Items);
+                        if (reward.Items != null)
+                        {
+                            tempItems.AddRange(reward.Items);
+                        }
 
                         if (GroupedDrop.First)
                         {

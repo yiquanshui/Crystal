@@ -33,7 +33,7 @@ namespace Server.MirObjects.Monsters
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                 if (damage == 0) return;
 
-                FullmoonAttack(damage);
+                FullMoonAttack(damage);
             }
 
             ShockTime = 0;

@@ -1551,9 +1551,9 @@ namespace Server.MirNetwork
                 actor = Player.Hero;
             }
 
-            for (int i = 0; i < actor.Info.Magics.Count; i++)
+            for (int i = 0; i < actor.CharacterInfo.Magics.Count; i++)
             {
-                UserMagic magic = actor.Info.Magics[i];
+                UserMagic magic = actor.CharacterInfo.Magics[i];
                 if (magic.Spell != p.Spell)
                 {
                     if (magic.Key == p.Key)
@@ -1794,7 +1794,7 @@ namespace Server.MirNetwork
         {
             if (Stage != GameStage.Game) return;
 
-            if (Player.Info.Married == 0)
+            if (Player.CharacterInfo.Married == 0)
             {
                 Player.AllowMarriage = !Player.AllowMarriage;
                 if (Player.AllowMarriage)
@@ -2083,20 +2083,20 @@ namespace Server.MirNetwork
             else
             {
                 //Update the creature info
-                for (int i = 0; i < Player.Info.IntelligentCreatures.Count; i++)
+                for (int i = 0; i < Player.CharacterInfo.IntelligentCreatures.Count; i++)
                 {
-                    if (Player.Info.IntelligentCreatures[i].PetType == petUpdate.PetType)
+                    if (Player.CharacterInfo.IntelligentCreatures[i].PetType == petUpdate.PetType)
                     {
                         var reg = new Regex(@"^[A-Za-z0-9]{" + Globals.MinCharacterNameLength + "," + Globals.MaxCharacterNameLength + "}$");
 
                         if (reg.IsMatch(petUpdate.CustomName))
                         {
-                            Player.Info.IntelligentCreatures[i].CustomName = petUpdate.CustomName;
+                            Player.CharacterInfo.IntelligentCreatures[i].CustomName = petUpdate.CustomName;
                         }
 
-                        Player.Info.IntelligentCreatures[i].SlotIndex = petUpdate.SlotIndex;
-                        Player.Info.IntelligentCreatures[i].Filter = petUpdate.Filter;
-                        Player.Info.IntelligentCreatures[i].petMode = petUpdate.petMode;
+                        Player.CharacterInfo.IntelligentCreatures[i].SlotIndex = petUpdate.SlotIndex;
+                        Player.CharacterInfo.IntelligentCreatures[i].Filter = petUpdate.Filter;
+                        Player.CharacterInfo.IntelligentCreatures[i].petMode = petUpdate.petMode;
                     }
                     else continue;
                 }

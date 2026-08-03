@@ -186,7 +186,7 @@ namespace Server
 
                 for (int i = PlayersOnlineListView.Items.Count; i < Env.Players.Count; i++)
                 {
-                    CharacterInfo character = Env.Players[i].Info;
+                    CharacterInfo character = Env.Players[i].CharacterInfo;
 
                     ListViewItem tempItem = CreateListView(character);
 

@@ -7,10 +7,7 @@ namespace Server.MirDatabase
 {
     public class CharacterInfo
     {
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
 
         public int Index;
         public string Name;
@@ -73,23 +70,23 @@ namespace Server.MirDatabase
         public byte MentalStateLvl;
 
         public UserItem?[] Inventory = new UserItem[46], Equipment = new UserItem[14], Trade = new UserItem[10], QuestInventory = new UserItem[40], Refine = new UserItem[16];
-        public List<ItemRentalInformation> RentedItems = new List<ItemRentalInformation>();
-        public List<ItemRentalInformation> RentedItemsToRemove = new List<ItemRentalInformation>();
+        public List<ItemRentalInformation> RentedItems = [];
+        public List<ItemRentalInformation> RentedItemsToRemove = [];
         public bool HasRentedItem;
-        public UserItem CurrentRefine = null;
+        public UserItem? CurrentRefine = null;
         public long CollectTime = 0, RefineTimeRemaining = 0;
-        public List<UserMagic> Magics = new List<UserMagic>();
-        public List<PetInfo> Pets = new List<PetInfo>();
-        public List<Buff> Buffs = new List<Buff>();
-        public List<Poison> Poisons = new List<Poison>();
-        public List<MailInfo> Mail = new List<MailInfo>();
-        public List<FriendInfo> Friends = new List<FriendInfo>();
+        public List<UserMagic> Magics = [];
+        public List<PetInfo> Pets = [];
+        public List<Buff> Buffs = [];
+        public List<Poison> Poisons = [];
+        public List<MailInfo> Mail = [];
+        public List<FriendInfo> Friends = [];
 
-        public List<UserIntelligentCreature> IntelligentCreatures = new List<UserIntelligentCreature>();
+        public List<UserIntelligentCreature> IntelligentCreatures = [];
         public int PearlCount;
 
-        public List<QuestProgressInfo> CurrentQuests = new List<QuestProgressInfo>();
-        public List<int> CompletedQuests = new List<int>();
+        public List<QuestProgressInfo> CurrentQuests = [];
+        public List<int> CompletedQuests = [];
 
         public bool[] Flags = new bool[Globals.FlagIndexCount];
 
@@ -98,7 +95,7 @@ namespace Server.MirDatabase
         public MountInfo Mount;
 
         public Dictionary<int, int> GSpurchases = new Dictionary<int, int>();
-        public int[] Rank = new int[2];//dont save this in db!(and dont send it to clients :p)
+        public int[] Rank = new int[2];//don't save this in db!(and don't send it to clients :p)
         
         public int MaximumHeroCount = 1;
         public HeroInfo[] Heroes;
@@ -688,7 +685,7 @@ namespace Server.MirDatabase
 
         public bool HasMount
         {
-            get { return Player.Info.Equipment[(int)EquipmentSlot.Mount] != null; }
+            get { return Player.CharacterInfo.Equipment[(int)EquipmentSlot.Mount] != null; }
         }
 
         private bool RidingMount
@@ -699,7 +696,7 @@ namespace Server.MirDatabase
 
         public UserItem[] Slots
         {
-            get { return Player.Info.Equipment[(int)EquipmentSlot.Mount].Slots; }
+            get { return Player.CharacterInfo.Equipment[(int)EquipmentSlot.Mount].Slots; }
         }
 
 

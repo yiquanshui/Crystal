@@ -165,7 +165,7 @@ namespace Server.MirEnv
         public List<string> CustomCommands = new List<string>();
 
         public Dragon? DragonSystem;
-        public NPCScript DefaultNPC, MonsterNPC, RobotNPC;
+        public NPCScript? DefaultNPC, MonsterNPC, RobotNPC;
 
         public List<DropInfo> FishingDrops = [];
         public List<DropInfo> AwakeningDrops = [];
@@ -4649,7 +4649,7 @@ namespace Server.MirEnv
         
         public PlayerObject? GetPlayer(uint PlayerId)
         {
-            return Players.FirstOrDefault(t => t.Info.Index == PlayerId);
+            return Players.FirstOrDefault(t => t.CharacterInfo.Index == PlayerId);
         }
         
         
@@ -4936,7 +4936,7 @@ namespace Server.MirEnv
 
             if (player == null) return;
             
-            Inspect(con, player.Info.Index);
+            Inspect(con, player.CharacterInfo.Index);
         }
 
         public void Inspect(MirConnection con, int id)
@@ -5011,7 +5011,7 @@ namespace Server.MirEnv
                 return;
             }
 
-            HeroInfo? heroInfo = GetHeroInfo(heroObject.Info.Index);
+            HeroInfo? heroInfo = GetHeroInfo(heroObject.CharacterInfo.Index);
 
             if (heroInfo == null)
             {
@@ -5069,9 +5069,9 @@ namespace Server.MirEnv
             if (con.Player != null)
             {
                 if (RankType == 0)
-                    p.MyRank = con.Player.Info.Rank[0];
+                    p.MyRank = con.Player.CharacterInfo.Rank[0];
                 else
-                    p.MyRank = (byte)con.Player.Class == (RankType - 1) ? con.Player.Info.Rank[1] : 0;
+                    p.MyRank = (byte)con.Player.Class == (RankType - 1) ? con.Player.CharacterInfo.Rank[1] : 0;
             }
 
             int c = 0;

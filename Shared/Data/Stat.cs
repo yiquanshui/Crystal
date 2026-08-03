@@ -1,27 +1,23 @@
 ﻿public sealed class Stats : IEquatable<Stats>
 {
-    public SortedDictionary<Stat, int> Values { get; set; } = new SortedDictionary<Stat, int>();
+    public SortedDictionary<Stat, int> Values { get; set; } = new();
+    
     public int Count => Values.Sum(pair => Math.Abs(pair.Value));
 
     public int this[Stat stat]
     {
-        get
-        {
-            return !Values.TryGetValue(stat, out int result) ? 0 : result;
-        }
+        get => Values.GetValueOrDefault(stat, 0);
         set
         {
             if (value == 0)
             {
-                if (Values.ContainsKey(stat))
-                {
-                    Values.Remove(stat);
-                }
-
-                return;
+                Values.Remove(stat);
+            }
+            else
+            {
+                Values[stat] = value;
             }
 
-            Values[stat] = value;
         }
     }
 
@@ -63,14 +59,11 @@
         Values.Clear();
     }
 
-    public bool Equals(Stats other)
+    public bool Equals(Stats? other)
     {
-        if (Values.Count != other.Values.Count) return false;
-
-        foreach (KeyValuePair<Stat, int> value in Values)
-            if (other[value.Key] != value.Value) return false;
-
-        return true;
+        if (other == null) return false;
+        
+        return Values.Count == other.Values.Count && Values.All(value => other[value.Key] == value.Value);
     }
 }
 

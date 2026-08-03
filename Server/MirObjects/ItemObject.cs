@@ -7,10 +7,7 @@ namespace Server.MirObjects
 {
     public sealed class ItemObject : MapObject
     {
-        public override ObjectType Race
-        {
-            get { return ObjectType.Item; }
-        }
+        public override ObjectType Race => ObjectType.Item;
 
         public override string Name
         {
@@ -18,7 +15,7 @@ namespace Server.MirObjects
             set { throw new NotSupportedException(); }
         }
 
-        public override int CurrentMapIndex { get; set; }
+        public override int CurrentMapIndex { get; protected set; }
         public override Point CurrentLocation { get; set; }
         public override MirDirection Direction
         {
@@ -31,24 +28,16 @@ namespace Server.MirObjects
             set { throw new NotSupportedException(); }
         }
 
-        public override bool Blocking
-        {
-            get { return false; }
-        }
+        public override bool Blocking => false;
 
         public uint Gold;
         public UserItem Item;
 
 
-        public override int Health
-        {
-            get { throw new NotSupportedException(); }
-        }
+        public override int Health => throw new NotSupportedException();
 
-        public override int MaxHealth
-        {
-            get { throw new NotSupportedException(); }
-        }
+        public override int MaxHealth => throw new NotSupportedException();
+
 
         public ItemObject(MapObject dropper, UserItem item, bool deathDrop = false)
         {
@@ -60,53 +49,52 @@ namespace Server.MirObjects
             Item = item;
 
             if (Item.IsAdded)
+            {
                 NameColour = Color.Cyan;
-			else
-			{
-				if (item.Info.Grade == ItemGrade.None)
-					NameColour = Color.White;
-				if (item.Info.Grade == ItemGrade.Common)
-					NameColour = Color.White;
-				if (item.Info.Grade == ItemGrade.Rare)
-					NameColour = Color.DeepSkyBlue;
-				if (item.Info.Grade == ItemGrade.Legendary)
-					NameColour = Color.DarkOrange;
-				if (item.Info.Grade == ItemGrade.Mythical)
-					NameColour = Color.Plum;
-                if (item.Info.Grade == ItemGrade.Heroic)
-                    NameColour = Color.Red;
+                
+            }
+            else
+            {
+                NameColour = item.Info.Grade switch
+                {
+                    ItemGrade.None or ItemGrade.Common => Color.White,
+                    ItemGrade.Rare => Color.DeepSkyBlue,
+                    ItemGrade.Legendary => Color.DarkOrange,
+                    ItemGrade.Mythical => Color.Plum,
+                    ItemGrade.Heroic => Color.Red,
+                    _ => Color.White
+                };
             }
 
-			CurrentMap = dropper.CurrentMap;
+            CurrentMap = dropper.CurrentMap;
             CurrentLocation = dropper.CurrentLocation;
         }
+        
         public ItemObject(MapObject dropper, UserItem item, Point manualpoint)
         {
             ExpireTime = Env.Time + Settings.ItemTimeOut * Settings.Minute;
 
             Item = item;
 
-			if (Item.IsAdded)
-				NameColour = Color.Cyan;
-			else
-			{
-				if (item.Info.Grade == ItemGrade.None)
-					NameColour = Color.White;
-				if (item.Info.Grade == ItemGrade.Common)
-					NameColour = Color.White;
-				if (item.Info.Grade == ItemGrade.Rare)
-					NameColour = Color.DeepSkyBlue;
-				if (item.Info.Grade == ItemGrade.Legendary)
-					NameColour = Color.DarkOrange;
-				if (item.Info.Grade == ItemGrade.Mythical)
-					NameColour = Color.Plum;
-                if (item.Info.Grade == ItemGrade.Heroic)
-                    NameColour = Color.Red;
+            if (Item.IsAdded)
+                NameColour = Color.Cyan;
+            else
+            {
+                NameColour = item.Info.Grade switch
+                {
+                    ItemGrade.None or ItemGrade.Common => Color.White,
+                    ItemGrade.Rare => Color.DeepSkyBlue,
+                    ItemGrade.Legendary => Color.DarkOrange,
+                    ItemGrade.Mythical => Color.Plum,
+                    ItemGrade.Heroic => Color.Red,
+                    _ => Color.White
+                };
             }
 
             CurrentMap = dropper.CurrentMap;
             CurrentLocation = manualpoint;
         }
+        
         public ItemObject(MapObject dropper, uint gold)
         {
             ExpireTime = Env.Time + Settings.ItemTimeOut * Settings.Minute;
@@ -116,6 +104,7 @@ namespace Server.MirObjects
             CurrentMap = dropper.CurrentMap;
             CurrentLocation = dropper.CurrentLocation;
         }
+        
         public ItemObject(MapObject dropper, uint gold, Point manualLocation)
         {
             ExpireTime = Env.Time + Settings.ItemTimeOut * Settings.Minute;
@@ -191,7 +180,7 @@ namespace Server.MirObjects
         {
             if (CurrentMap == null) return false;
 
-            Cell best = null;
+            Cell? best = null;
             int bestCount = 0;
             Point bestLocation = Point.Empty;
 
@@ -366,20 +355,20 @@ namespace Server.MirObjects
         {
             if (Item != null)
                 return new S.ObjectItem
-                    {
-                        ObjectID = ObjectID,
-                        Name = Item.Count > 1 ? string.Format("{0} ({1})", Name, Item.Count) : Name,
-                        NameColour = NameColour,
-                        Location = CurrentLocation,
-                        Image = Item.Image
-                    };
+                {
+                    ObjectID = ObjectID,
+                    Name = Item.Count > 1 ? string.Format("{0} ({1})", Name, Item.Count) : Name,
+                    NameColour = NameColour,
+                    Location = CurrentLocation,
+                    Image = Item.Image
+                };
 
             return new S.ObjectGold
-                {
-                    ObjectID =  ObjectID,
-                    Gold = Gold,
-                    Location = CurrentLocation,
-                };
+            {
+                ObjectID =  ObjectID,
+                Gold = Gold,
+                Location = CurrentLocation,
+            };
         }
 
 

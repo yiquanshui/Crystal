@@ -205,7 +205,7 @@ namespace Server.MirDatabase
             {
                 foreach (var flag in RequiredFlag)
                 {
-                     if(!player.Info.Flags[flag])
+                     if(!player.CharacterInfo.Flags[flag])
                         return false;
                 }
             }
@@ -214,7 +214,7 @@ namespace Server.MirDatabase
             {
                 foreach (var quest in RequiredQuest)
                 {
-                    if (!player.Info.CompletedQuests.Contains(quest))
+                    if (!player.CharacterInfo.CompletedQuests.Contains(quest))
                         return false;
                 }
             }

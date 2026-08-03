@@ -158,7 +158,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            if (CanMove && ((!CanCast || NextMagicSpell == Spell.None) && Owner.Info.HeroBehaviour == HeroBehaviour.CounterAttack))
+            if (CanMove && ((!CanCast || NextMagicSpell == Spell.None) && Owner.CharacterInfo.HeroBehaviour == HeroBehaviour.CounterAttack))
             {
                 MoveTo(Owner.Back);
                 return;
@@ -173,7 +173,7 @@ namespace Server.MirObjects
 
             if (Target == null || !CanAttack) return;
 
-            if (CanAttack && (!HasRangedSpell && InAttackRange() || NextMagicSpell == Spell.None && Owner.Info.HeroBehaviour == HeroBehaviour.Attack && TargetDistance == 1))
+            if (CanAttack && (!HasRangedSpell && InAttackRange() || NextMagicSpell == Spell.None && Owner.CharacterInfo.HeroBehaviour == HeroBehaviour.Attack && TargetDistance == 1))
             {
                 Attack();
 
@@ -185,10 +185,10 @@ namespace Server.MirObjects
                 return;
             }
 
-            if (CanMove && (!HasRangedSpell || NextMagicSpell == Spell.None && Owner.Info.HeroBehaviour == HeroBehaviour.Attack && TargetDistance > 1))
+            if (CanMove && (!HasRangedSpell || NextMagicSpell == Spell.None && Owner.CharacterInfo.HeroBehaviour == HeroBehaviour.Attack && TargetDistance > 1))
                 MoveTo(Target.CurrentLocation);
         }
 
-        private bool HasRangedSpell => Info.Magics.Select(x => x.Spell).Intersect(Globals.RangedSpells).Any();
+        private bool HasRangedSpell => CharacterInfo.Magics.Select(x => x.Spell).Intersect(Globals.RangedSpells).Any();
     }
 }

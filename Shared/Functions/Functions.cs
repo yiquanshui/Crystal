@@ -1,10 +1,12 @@
-﻿using System.Drawing;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
+using System.Globalization;
 using System.IO.Compression;
 using System.Runtime.Serialization.Formatters.Binary;
 
 public static class Functions
 {
-    public static bool CompareBytes(byte[] a, byte[] b)
+    public static bool CompareBytes(byte[]? a, byte[]? b)
     {
         if (a == b) return true;
 
@@ -19,13 +21,13 @@ public static class Functions
     {
         string size = "0 Bytes";
         if (byteCount >= 1073741824.0)
-            size = String.Format("{0:##.##}", byteCount / 1073741824.0) + " GB";
+            size = $"{byteCount / 1073741824.0:##.##}" + " GB";
         else if (byteCount >= 1048576.0)
-            size = String.Format("{0:##.##}", byteCount / 1048576.0) + " MB";
+            size = $"{byteCount / 1048576.0:##.##}" + " MB";
         else if (byteCount >= 1024.0)
-            size = String.Format("{0:##.##}", byteCount / 1024.0) + " KB";
-        else if (byteCount > 0 && byteCount < 1024.0)
-            size = byteCount.ToString() + " Bytes";
+            size = $"{byteCount / 1024.0:##.##}" + " KB";
+        else if (byteCount is > 0 and < 1024.0)
+            size = byteCount.ToString(CultureInfo.InvariantCulture) + " Bytes";
 
         return size;
     }
@@ -34,15 +36,15 @@ public static class Functions
     {
         temp = Point.Empty;
 
-        if (String.IsNullOrWhiteSpace(s)) return false;
+        if (string.IsNullOrWhiteSpace(s)) return false;
 
         string[] data = s.Split(',');
         if (data.Length <= 1) return false;
 
-        if (!Int32.TryParse(data[0], out int tempX))
+        if (!int.TryParse(data[0], out int tempX))
             return false;
 
-        if (!Int32.TryParse(data[1], out int tempY))
+        if (!int.TryParse(data[1], out int tempY))
             return false;
 
         temp = new Point(tempX, tempY);
@@ -66,7 +68,7 @@ public static class Functions
     }
     public static string PointToString(Point p)
     {
-        return String.Format("{0}, {1}", p.X, p.Y);
+        return $"{p.X}, {p.Y}";
     }
     public static bool InRange(Point a, Point b, int i)
     {
@@ -75,12 +77,7 @@ public static class Functions
 
     public static bool FacingEachOther(MirDirection dirA, Point pointA, MirDirection dirB, Point pointB)
     {
-        if (dirA == DirectionFromPoint(pointA, pointB) && dirB == DirectionFromPoint(pointB, pointA))
-        {
-            return true;
-        }
-
-        return false;
+        return dirA == DirectionFromPoint(pointA, pointB) && dirB == DirectionFromPoint(pointB, pointA);
     }
 
     public static string PrintTimeSpanFromSeconds(double secs, bool accurate = true)
@@ -89,19 +86,19 @@ public static class Functions
         string answer;
         if (t.TotalMinutes < 1.0)
         {
-            answer = string.Format("{0}s", t.Seconds);
+            answer = $"{t.Seconds}s";
         }
         else if (t.TotalHours < 1.0)
         {
-            answer = accurate ? string.Format("{0}m {1:D2}s", t.Minutes, t.Seconds) : string.Format("{0}m", t.Minutes);
+            answer = accurate ? $"{t.Minutes}m {t.Seconds:D2}s" : $"{t.Minutes}m";
         }
         else if (t.TotalDays < 1.0)
         {
-            answer = accurate ? string.Format("{0}h {1:D2}m {2:D2}s", (int)t.Hours, t.Minutes, t.Seconds) : string.Format("{0}h {1:D2}m", (int)t.TotalHours, t.Minutes);
+            answer = accurate ? $"{t.Hours}h {t.Minutes:D2}m {t.Seconds:D2}s" : $"{(int)t.TotalHours}h {t.Minutes:D2}m";
         }
         else // more than 1 day
         {
-            answer = accurate ? string.Format("{0}d {1:D2}h {2:D2}m {3:D2}s", (int)t.Days, (int)t.Hours, t.Minutes, t.Seconds) : string.Format("{0}d {1}h {2:D2}m", (int)t.TotalDays, (int)t.Hours, t.Minutes);
+            answer = accurate ? $"{t.Days}d {t.Hours:D2}h {t.Minutes:D2}m {t.Seconds:D2}s" : $"{(int)t.TotalDays}d {t.Hours}h {t.Minutes:D2}m";
         }
 
         return answer;
@@ -113,19 +110,19 @@ public static class Functions
         string answer;
         if (t.TotalMinutes < 1.0)
         {
-            answer = string.Format("{0}.{1}s", t.Seconds, (decimal)(t.Milliseconds / 100));
+            answer = $"{t.Seconds}.{(decimal)(t.Milliseconds / 100)}s";
         }
         else if (t.TotalHours < 1.0)
         {
-            answer = string.Format("{0}m {1:D2}s", t.TotalMinutes, t.Seconds);
+            answer = $"{t.TotalMinutes}m {t.Seconds:D2}s";
         }
         else if (t.TotalDays < 1.0)
         {
-            answer = string.Format("{0}h {1:D2}m {2:D2}s", (int)t.TotalHours, t.Minutes, t.Seconds);
+            answer = $"{(int)t.TotalHours}h {t.Minutes:D2}m {t.Seconds:D2}s";
         }
         else
         {
-            answer = string.Format("{0}d {1}h {2:D2}m {3:D2}s", (int)t.Days, (int)t.Hours, t.Minutes, t.Seconds);
+            answer = $"{(int)t.Days}d {(int)t.Hours}h {t.Minutes:D2}m {t.Seconds:D2}s";
         }
 
         return answer;
@@ -339,52 +336,41 @@ public static class Functions
                 return dir;
         }
     }
+    
     public static ItemInfo GetRealItem(ItemInfo Origin, ushort Level, MirClass job, List<ItemInfo> ItemList)
     {
-        if (Origin.ClassBased && Origin.LevelBased)
+        if (Origin is { ClassBased: true, LevelBased: true })
             return GetClassAndLevelBasedItem(Origin, job, Level, ItemList);
         if (Origin.ClassBased)
             return GetClassBasedItem(Origin, job, ItemList);
-        if (Origin.LevelBased)
-            return GetLevelBasedItem(Origin, Level, ItemList);
-        return Origin;
+        return Origin.LevelBased ? GetLevelBasedItem(Origin, Level, ItemList) : Origin;
     }
+    
     public static ItemInfo GetLevelBasedItem(ItemInfo Origin, ushort level, List<ItemInfo> ItemList)
     {
-        ItemInfo output = Origin;
-        for (int i = 0; i < ItemList.Count; i++)
-        {
-            ItemInfo info = ItemList[i];
-            if (info.Name.StartsWith(Origin.Name))
-                if ((info.RequiredType == RequiredType.Level) && (info.RequiredAmount <= level) && (output.RequiredAmount < info.RequiredAmount) && (Origin.RequiredGender == info.RequiredGender))
-                    output = info;
-        }
-        return output;
+        return ItemList.FirstOrDefault(info => 
+            info.Name.StartsWith(Origin.Name) && 
+            info.RequiredType == RequiredType.Level && 
+            info.RequiredAmount <= level && 
+            Origin.RequiredAmount < info.RequiredAmount && 
+            Origin.RequiredGender == info.RequiredGender) ?? Origin;
     }
+    
     public static ItemInfo GetClassBasedItem(ItemInfo Origin, MirClass job, List<ItemInfo> ItemList)
     {
-        for (int i = 0; i < ItemList.Count; i++)
-        {
-            ItemInfo info = ItemList[i];
-            if (info.Name.StartsWith(Origin.Name))
-                if (((byte)info.RequiredClass == (1 << (byte)job)) && (Origin.RequiredGender == info.RequiredGender))
-                    return info;
-        }
-        return Origin;
+        return ItemList.FirstOrDefault(info => info.Name.StartsWith(Origin.Name)
+                                               && (byte)info.RequiredClass == (1 << (byte)job) && Origin.RequiredGender == info.RequiredGender) ?? Origin;
     }
 
     public static ItemInfo GetClassAndLevelBasedItem(ItemInfo Origin, MirClass job, ushort level, List<ItemInfo> ItemList)
     {
-        ItemInfo output = Origin;
-        for (int i = 0; i < ItemList.Count; i++)
-        {
-            ItemInfo info = ItemList[i];
-            if (info.Name.StartsWith(Origin.Name))
-                if ((byte)info.RequiredClass == (1 << (byte)job))
-                    if ((info.RequiredType == RequiredType.Level) && (info.RequiredAmount <= level) && (output.RequiredAmount <= info.RequiredAmount) && (Origin.RequiredGender == info.RequiredGender))
-                        output = info;
-        }
-        return output;
+        return ItemList.FirstOrDefault(info => 
+            info.Name.StartsWith(Origin.Name) &&
+            (byte)info.RequiredClass == 1 << (byte)job &&
+            info.RequiredType == RequiredType.Level && 
+            info.RequiredAmount <= level && 
+            Origin.RequiredAmount <= info.RequiredAmount &&
+            Origin.RequiredGender == info.RequiredGender) ?? Origin;
     }
 
     public static string StringOverLines(string line, int maxWordsPerLine, int maxLettersPerLine)
@@ -436,13 +422,11 @@ public static class Functions
     {
 #pragma warning disable SYSLIB0011
         var formatter = new BinaryFormatter();
-        using (var stream = new MemoryStream())
-        {
-            formatter.Serialize(stream, item);
-            stream.Seek(0, SeekOrigin.Begin);
+        using var stream = new MemoryStream();
+        formatter.Serialize(stream, item);
+        stream.Seek(0, SeekOrigin.Begin);
 #pragma warning restore SYSLIB0011
-            return stream.ToArray();
-        }
+        return stream.ToArray();
     }
     public static object DeserializeFromBytes(byte[] bytes)
     {
@@ -497,14 +481,10 @@ public static class Functions
 
     public static byte[] DecompressBytes(byte[] gzip)
     {
-        using (var stream = new GZipStream(new MemoryStream(gzip), CompressionMode.Decompress))
-        {
-            using (var memory = new MemoryStream())
-            {
-                stream.CopyTo(memory, 4096);
+        using var stream = new GZipStream(new MemoryStream(gzip), CompressionMode.Decompress);
+        using var memory = new MemoryStream();
+        stream.CopyTo(memory, 4096);
 
-                return memory.ToArray();
-            }
-        }
+        return memory.ToArray();
     }
 }

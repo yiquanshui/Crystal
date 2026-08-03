@@ -1,5 +1,5 @@
 using System.Drawing;
-﻿using Server.MirDatabase;
+using Server.MirDatabase;
 using Server.MirEnv;
 using Server.MirNetwork;
 using Server.MirObjects.Monsters;
@@ -10,153 +10,108 @@ namespace Server.MirObjects
 {
     public class HumanObject : MapObject
     {
-        public override ObjectType Race
-        {
-            get { return ObjectType.Player; }
-        }
+        public override ObjectType Race => ObjectType.Player;
 
-        public CharacterInfo Info;
+        public CharacterInfo CharacterInfo;
 
         protected MirConnection connection;
-        public virtual MirConnection Connection
+        public virtual MirConnection? Connection
         {
-            get { return connection; }
-            set { connection = value; }
+            get => connection;
+            set => connection = value;
         }
         public override string Name
         {
-            get { return Info.Name; }
+            get => CharacterInfo.Name;
             set { /*Check if Name exists.*/ }
         }
         public override int CurrentMapIndex
         {
-            get { return Info.CurrentMapIndex; }
-            set { Info.CurrentMapIndex = value; }
+            get => CharacterInfo.CurrentMapIndex;
+            protected set => CharacterInfo.CurrentMapIndex = value;
         }
         public override Point CurrentLocation
         {
-            get { return Info.CurrentLocation; }
-            set { Info.CurrentLocation = value; }
+            get => CharacterInfo.CurrentLocation;
+            set => CharacterInfo.CurrentLocation = value;
         }
         public override MirDirection Direction
         {
-            get { return Info.Direction; }
-            set { Info.Direction = value; }
+            get => CharacterInfo.Direction;
+            set => CharacterInfo.Direction = value;
         }
         public override ushort Level
         {
-            get { return Info.Level; }
-            set { Info.Level = value; }
+            get => CharacterInfo.Level;
+            set => CharacterInfo.Level = value;
         }
-        public override int Health
-        {
-            get { return HP; }
-        }
-        public override int MaxHealth
-        {
-            get { return Stats[Stat.HP]; }
-        }
+        public override int Health => HP;
+
+        public override int MaxHealth => Stats[Stat.HP];
+
         public int HP
         {
-            get { return Info.HP; }
-            set { Info.HP = value; }
+            get => CharacterInfo.HP;
+            set => CharacterInfo.HP = value;
         }
         public int MP
         {
-            get { return Info.MP; }
-            set { Info.MP = value; }
+            get => CharacterInfo.MP;
+            set => CharacterInfo.MP = value;
         }
         public override AttackMode AMode
         {
-            get { return Info.AMode; }
-            set { Info.AMode = value; }
+            get => CharacterInfo.AMode;
+            set => CharacterInfo.AMode = value;
         }
         public override PetMode PMode
         {
-            get { return Info.PMode; }
-            set { Info.PMode = value; }
+            get => CharacterInfo.PMode;
+            set => CharacterInfo.PMode = value;
         }
         public long Experience
         {
-            set { Info.Experience = value; }
-            get { return Info.Experience; }
+            get => CharacterInfo.Experience;
+            set => CharacterInfo.Experience = value;
         }
 
         public long MaxExperience;
         public byte Hair
         {
-            get { return Info.Hair; }
-            set { Info.Hair = value; }
+            get => CharacterInfo.Hair;
+            set => CharacterInfo.Hair = value;
         }
-        public MirClass Class
-        {
-            get { return Info.Class; }
-        }
-        public MirGender Gender
-        {
-            get { return Info.Gender; }
-        }
+        public MirClass Class => CharacterInfo.Class;
+
+        public MirGender Gender => CharacterInfo.Gender;
         public override List<Buff> Buffs
         {
-            get { return Info.Buffs; }
-            set { Info.Buffs = value; }
+            get => CharacterInfo.Buffs;
+            set => CharacterInfo.Buffs = value;
         }
         public override List<Poison> PoisonList
         {
-            get { return Info.Poisons; }
-            set { Info.Poisons = value; }
+            get => CharacterInfo.Poisons;
+            set => CharacterInfo.Poisons = value;
         }
 
         public bool RidingMount;
-        public MountInfo Mount
-        {
-            get { return Info.Mount; }
-        }        
+        public MountInfo Mount => CharacterInfo.Mount;
 
         public Reporting Report;
-        public virtual bool CanMove
-        {
-            get
-            {
-                return !Dead && Env.Time >= ActionTime && !CurrentPoison.HasFlag(PoisonType.Paralysis) && !CurrentPoison.HasFlag(PoisonType.LRParalysis) && !CurrentPoison.HasFlag(PoisonType.Frozen);
-            }
-        }
-        public virtual bool CanWalk
-        {
-            get
-            {
-                return !Dead && Env.Time >= ActionTime && !InTrapRock && !CurrentPoison.HasFlag(PoisonType.Paralysis) && !CurrentPoison.HasFlag(PoisonType.LRParalysis) && !CurrentPoison.HasFlag(PoisonType.Frozen);
-            }
-        }
-        public virtual bool CanRun
-        {
-            get
-            {
-                return !Dead && Env.Time >= ActionTime && (_stepCounter > 0 || FastRun) && (!Sneaking || ActiveSwiftFeet) && CurrentBagWeight <= Stats[Stat.BagWeight] && !CurrentPoison.HasFlag(PoisonType.Paralysis) && !CurrentPoison.HasFlag(PoisonType.LRParalysis) && !CurrentPoison.HasFlag(PoisonType.Frozen);
-            }
-        }
-        public virtual bool CanAttack
-        {
-            get
-            {
-                return !Dead && Env.Time >= ActionTime && Env.Time >= AttackTime && !CurrentPoison.HasFlag(PoisonType.Paralysis) && !CurrentPoison.HasFlag(PoisonType.LRParalysis) && !CurrentPoison.HasFlag(PoisonType.Frozen) && !CurrentPoison.HasFlag(PoisonType.Dazed) && Mount.CanAttack;
-            }
-        }
-        public bool CanRegen
-        {
-            get
-            {
-                return Env.Time >= RegenTime;
-            }
-        }
-        protected virtual bool CanCast
-        {
-            get
-            {
-                return !Dead && Env.Time >= ActionTime && Env.Time >= SpellTime && !CurrentPoison.HasFlag(PoisonType.Stun) && !CurrentPoison.HasFlag(PoisonType.Dazed) &&
-                    !CurrentPoison.HasFlag(PoisonType.Paralysis) && !CurrentPoison.HasFlag(PoisonType.Frozen) && Mount.CanAttack;
-            }
-        }
+        public virtual bool CanMove => !Dead && Env.Time >= ActionTime && !CurrentPoison.HasFlag(PoisonType.Paralysis) && !CurrentPoison.HasFlag(PoisonType.LRParalysis) && !CurrentPoison.HasFlag(PoisonType.Frozen);
+
+        public virtual bool CanWalk => !Dead && Env.Time >= ActionTime && !InTrapRock && !CurrentPoison.HasFlag(PoisonType.Paralysis) && !CurrentPoison.HasFlag(PoisonType.LRParalysis) && !CurrentPoison.HasFlag(PoisonType.Frozen);
+
+        public virtual bool CanRun => !Dead && Env.Time >= ActionTime && (_stepCounter > 0 || FastRun) && (!Sneaking || ActiveSwiftFeet) && CurrentBagWeight <= Stats[Stat.BagWeight] && !CurrentPoison.HasFlag(PoisonType.Paralysis) && !CurrentPoison.HasFlag(PoisonType.LRParalysis) && !CurrentPoison.HasFlag(PoisonType.Frozen);
+
+        public virtual bool CanAttack => !Dead && Env.Time >= ActionTime && Env.Time >= AttackTime && !CurrentPoison.HasFlag(PoisonType.Paralysis) && !CurrentPoison.HasFlag(PoisonType.LRParalysis) && !CurrentPoison.HasFlag(PoisonType.Frozen) && !CurrentPoison.HasFlag(PoisonType.Dazed) && Mount.CanAttack;
+
+        public bool CanRegen => Env.Time >= RegenTime;
+
+        protected virtual bool CanCast =>
+            !Dead && Env.Time >= ActionTime && Env.Time >= SpellTime && !CurrentPoison.HasFlag(PoisonType.Stun) && !CurrentPoison.HasFlag(PoisonType.Dazed) &&
+            !CurrentPoison.HasFlag(PoisonType.Paralysis) && !CurrentPoison.HasFlag(PoisonType.Frozen) && Mount.CanAttack;
 
         protected bool CheckCellTime = true;
 
@@ -188,21 +143,17 @@ namespace Server.MirObjects
 
         protected int _stepCounter, _runCounter;
 
-        private GuildObject myGuild = null;
-        public virtual GuildObject MyGuild
-        {
-            get { return myGuild; }
-            set { myGuild = value; }
-        }
-        public GuildRank MyGuildRank = null;
+        public virtual GuildObject? MyGuild { get; set; } = null;
+
+        public GuildRank? MyGuildRank = null;
 
         public IntelligentCreatureType SummonedCreatureType = IntelligentCreatureType.None;
         public bool CreatureSummoned;
 
         public SpecialItemMode SpecialMode;
 
-        public List<ItemSets> ItemSets = new List<ItemSets>();
-        public List<EquipmentSlot> MirSet = new List<EquipmentSlot>();
+        public List<ItemSets> ItemSets = [];
+        public List<EquipmentSlot> MirSet = [];
 
         public bool FatalSword, Slaying, TwinDrakeBlade, FlamingSword, MPEater, Hemorrhage, CounterAttack;
         public int MPEaterCount, HemorrhageAttackCount;
@@ -254,7 +205,7 @@ namespace Server.MirObjects
         }
         public override void Process()
         {
-            if ((Race == ObjectType.Player && Connection == null) || Node == null || Info == null) return;
+            if ((Race == ObjectType.Player && Connection == null) || Node == null || CharacterInfo == null) return;
 
             if (CellTime + 700 < Env.Time) _stepCounter = 0;
 
@@ -328,14 +279,14 @@ namespace Server.MirObjects
             if (Env.Time > TorchTime)
             {
                 TorchTime = Env.Time + 10000;
-                item = Info.Equipment[(int)EquipmentSlot.Torch];
+                item = CharacterInfo.Equipment[(int)EquipmentSlot.Torch];
                 if (item != null)
                 {
                     DamageItem(item, 5);
 
                     if (item.CurrentDura == 0)
                     {
-                        Info.Equipment[(int)EquipmentSlot.Torch] = null;
+                        CharacterInfo.Equipment[(int)EquipmentSlot.Torch] = null;
                         Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
                         RefreshStats();
                     }
@@ -346,9 +297,9 @@ namespace Server.MirObjects
             {
                 DuraTime = Env.Time + DuraDelay;
 
-                for (int i = 0; i < Info.Equipment.Length; i++)
+                for (int i = 0; i < CharacterInfo.Equipment.Length; i++)
                 {
-                    item = Info.Equipment[i];
+                    item = CharacterInfo.Equipment[i];
                     if (item == null || !item.DuraChanged) continue; // || item.Info.Type == ItemType.Mount
                     item.DuraChanged = false;
                     Enqueue(new S.DuraChanged { UniqueID = item.UniqueID, CurrentDura = item.CurrentDura });
@@ -428,11 +379,11 @@ namespace Server.MirObjects
                     case BuffType.Mentor:
                     case BuffType.Mentee:
                         mentor = true;
-                        if (Info.Mentor == 0) buff.FlagForRemoval = true;
+                        if (CharacterInfo.Mentor == 0) buff.FlagForRemoval = true;
                         break;
                     case BuffType.Lover:
                         lover = true;
-                        if (Info.Married == 0) buff.FlagForRemoval = true;
+                        if (CharacterInfo.Married == 0) buff.FlagForRemoval = true;
                         break;
                 }
 
@@ -508,14 +459,14 @@ namespace Server.MirObjects
                 AddBuff(BuffType.Skill, this, 0, new Stats { [Stat.SkillGainMultiplier] = 3 }, false);
             }
 
-            if (Info.Mentor != 0 && !mentor)
+            if (CharacterInfo.Mentor != 0 && !mentor)
             {
-                CharacterInfo partnerC = Env.GetCharacterInfo(Info.Mentor);
+                CharacterInfo partnerC = Env.GetCharacterInfo(CharacterInfo.Mentor);
                 PlayerObject partnerP = partnerC != null ? Env.GetPlayer(partnerC.Name) : null;
 
                 if (partnerP != null)
                 {
-                    if (Info.IsMentor)
+                    if (CharacterInfo.IsMentor)
                     {
                         AddBuff(BuffType.Mentor, partnerP, 0, new Stats { [Stat.MentorDamageRatePercent] = Settings.MentorDamageBoost });
                     }
@@ -526,9 +477,9 @@ namespace Server.MirObjects
                 }
             }
 
-            if (Info.Married != 0 && !lover)
+            if (CharacterInfo.Married != 0 && !lover)
             {
-                CharacterInfo loverC = Env.GetCharacterInfo(Info.Married);
+                CharacterInfo loverC = Env.GetCharacterInfo(CharacterInfo.Married);
                 PlayerObject loverP = loverC != null ? Env.GetPlayer(loverC.Name) : null;
 
                 if (loverP != null)
@@ -775,15 +726,15 @@ namespace Server.MirObjects
         }
         private void ProcessItems()
         {
-            for (var i = 0; i < Info.Inventory.Length; i++)
+            for (var i = 0; i < CharacterInfo.Inventory.Length; i++)
             {
-                var item = Info.Inventory[i];
+                var item = CharacterInfo.Inventory[i];
 
                 if (item?.ExpireInfo?.ExpiryDate <= Env.Now)
                 {
                     ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ItemHasExpiredFromInventory), item.Info.FriendlyName), ChatType.Hint);
                     Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
-                    Info.Inventory[i] = null;
+                    CharacterInfo.Inventory[i] = null;
                     continue;
                 }
 
@@ -794,15 +745,15 @@ namespace Server.MirObjects
                 }
             }
 
-            for (var i = 0; i < Info.Equipment.Length; i++)
+            for (var i = 0; i < CharacterInfo.Equipment.Length; i++)
             {
-                var item = Info.Equipment[i];
+                var item = CharacterInfo.Equipment[i];
 
                 if (item?.ExpireInfo?.ExpiryDate <= Env.Now)
                 {
                     ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.EquipmentExpired), item.Info.FriendlyName), ChatType.Hint);
                     Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
-                    Info.Equipment[i] = null;
+                    CharacterInfo.Equipment[i] = null;
                     continue;
                 }
 
@@ -813,16 +764,16 @@ namespace Server.MirObjects
                 }
             }
 
-            if (Info.AccountInfo == null) return;
+            if (CharacterInfo.AccountInfo == null) return;
 
-            for (int i = 0; i < Info.AccountInfo.Storage.Length; i++)
+            for (int i = 0; i < CharacterInfo.AccountInfo.Storage.Length; i++)
             {
-                var item = Info.AccountInfo.Storage[i];
+                var item = CharacterInfo.AccountInfo.Storage[i];
                 if (item?.ExpireInfo?.ExpiryDate <= Env.Now)
                 {
                     ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ItemExpiredFromStorage), item.Info.FriendlyName), ChatType.Hint);
                     Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
-                    Info.AccountInfo.Storage[i] = null;
+                    CharacterInfo.AccountInfo.Storage[i] = null;
                     continue;
                 }
             }
@@ -927,7 +878,7 @@ namespace Server.MirObjects
         public void GetMinePayout(MineSet Mine)
         {
             if ((Mine.Drops == null) || (Mine.Drops.Count == 0)) return;
-            if (FreeSpace(Info.Inventory) == 0) return;
+            if (FreeSpace(CharacterInfo.Inventory) == 0) return;
             byte Slot = (byte)RandomProvider.Next(Mine.TotalSlots);
             for (int i = 0; i < Mine.Drops.Count; i++)
             {
@@ -961,7 +912,7 @@ namespace Server.MirObjects
         }
         protected bool TryLuckWeapon()
         {
-            var item = Info.Equipment[(int)EquipmentSlot.Weapon];
+            var item = CharacterInfo.Equipment[(int)EquipmentSlot.Weapon];
 
             if (item == null || item.AddedStats[Stat.Luck] >= 7)
                 return false;
@@ -1235,7 +1186,7 @@ namespace Server.MirObjects
                     break;
 
                 case ItemType.Book:
-                    if (Info.Magics.Any(t => t.Spell == (Spell)item.Info.Shape))
+                    if (CharacterInfo.Magics.Any(t => t.Spell == (Spell)item.Info.Shape))
                     {
                         return false;
                     }
@@ -1245,7 +1196,7 @@ namespace Server.MirObjects
                 case ItemType.Bells:
                 case ItemType.Mask:
                 case ItemType.Reins:
-                    if (Info.Equipment[(int)EquipmentSlot.Mount] == null)
+                    if (CharacterInfo.Equipment[(int)EquipmentSlot.Mount] == null)
                     {
                         ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CanOnlyUseWithMount), ChatType.System);
                         return false;
@@ -1256,7 +1207,7 @@ namespace Server.MirObjects
                 case ItemType.Bait:
                 case ItemType.Finder:
                 case ItemType.Reel:
-                    if (Info.Equipment[(int)EquipmentSlot.Weapon] == null || !Info.Equipment[(int)EquipmentSlot.Weapon].Info.IsFishingRod)
+                    if (CharacterInfo.Equipment[(int)EquipmentSlot.Weapon] == null || !CharacterInfo.Equipment[(int)EquipmentSlot.Weapon].Info.IsFishingRod)
                     {
                         ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CanOnlyUseWithFishingRod), ChatType.System);
                         return false;
@@ -1268,7 +1219,7 @@ namespace Server.MirObjects
                     switch (item.Info.Shape)
                     {
                         case 20://mirror rename creature
-                            if (Info.IntelligentCreatures.Count == 0) return false;
+                            if (CharacterInfo.IntelligentCreatures.Count == 0) return false;
                             break;
                         case 21://creature stone
                             break;
@@ -1350,28 +1301,28 @@ namespace Server.MirObjects
 
             if (item.Count != 0) return;
 
-            for (int i = 0; i < Info.Equipment.Length; i++)
+            for (int i = 0; i < CharacterInfo.Equipment.Length; i++)
             {
-                if (Info.Equipment[i] != null && Info.Equipment[i].Slots.Length > 0)
+                if (CharacterInfo.Equipment[i] != null && CharacterInfo.Equipment[i].Slots.Length > 0)
                 {
-                    for (int j = 0; j < Info.Equipment[i].Slots.Length; j++)
+                    for (int j = 0; j < CharacterInfo.Equipment[i].Slots.Length; j++)
                     {
-                        if (Info.Equipment[i].Slots[j] != item) continue;
-                        Info.Equipment[i].Slots[j] = null;
+                        if (CharacterInfo.Equipment[i].Slots[j] != item) continue;
+                        CharacterInfo.Equipment[i].Slots[j] = null;
                         return;
                     }
                 }
 
-                if (Info.Equipment[i] != item) continue;
-                Info.Equipment[i] = null;
+                if (CharacterInfo.Equipment[i] != item) continue;
+                CharacterInfo.Equipment[i] = null;
 
                 return;
             }
 
-            for (int i = 0; i < Info.Inventory.Length; i++)
+            for (int i = 0; i < CharacterInfo.Inventory.Length; i++)
             {
-                if (Info.Inventory[i] != item) continue;
-                Info.Inventory[i] = null;
+                if (CharacterInfo.Inventory[i] != item) continue;
+                CharacterInfo.Inventory[i] = null;
                 return;
             }
 
@@ -1397,9 +1348,9 @@ namespace Server.MirObjects
 
             if ((killer == null) || ((pkbodydrop) || (killer.Race != ObjectType.Player) || killer.Race != ObjectType.Hero))
             {
-                for (var i = 0; i < Info.Equipment.Length; i++)
+                for (var i = 0; i < CharacterInfo.Equipment.Length; i++)
                 {
-                    var item = Info.Equipment[i];
+                    var item = CharacterInfo.Equipment[i];
 
                     if (item == null)
                         continue;
@@ -1408,7 +1359,7 @@ namespace Server.MirObjects
                         continue;
 
                     // TODO: Check this.
-                    if (item.WeddingRing != -1 && Info.Equipment[(int)EquipmentSlot.RingL].UniqueID == item.UniqueID)
+                    if (item.WeddingRing != -1 && CharacterInfo.Equipment[(int)EquipmentSlot.RingL].UniqueID == item.UniqueID)
                         continue;
 
                     if (item.SealedInfo != null && item.SealedInfo.ExpiryDate > Env.Now)
@@ -1418,7 +1369,7 @@ namespace Server.MirObjects
                     {
                         if (item.Info.Bind.HasFlag(BindMode.BreakOnDeath))
                         {
-                            Info.Equipment[i] = null;
+                            CharacterInfo.Equipment[i] = null;
                             Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
                             ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YourItemShatteredUponDeath), item.FriendlyName), ChatType.System2);
                             Report?.ItemChanged(item, item.Count, 1);
@@ -1428,7 +1379,7 @@ namespace Server.MirObjects
                     {
                         if (item.Info.Set == ItemSet.Spirit)
                         {
-                            Info.Equipment[i] = null;
+                            CharacterInfo.Equipment[i] = null;
                             Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
 
                             Report?.ItemChanged(item, item.Count, 1);
@@ -1450,7 +1401,7 @@ namespace Server.MirObjects
                             continue;
 
                         if (count == item.Count)
-                            Info.Equipment[i] = null;
+                            CharacterInfo.Equipment[i] = null;
 
                         Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = count });
                         item.Count -= count;
@@ -1459,9 +1410,9 @@ namespace Server.MirObjects
                     }
                     else if (RandomProvider.Next(30) == 0)
                     {
-                        if (Env.ReturnRentalItem(item, item.RentalInformation?.OwnerName, Info))
+                        if (Env.ReturnRentalItem(item, item.RentalInformation?.OwnerName, CharacterInfo))
                         {
-                            Info.Equipment[i] = null;
+                            CharacterInfo.Equipment[i] = null;
                             Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
 
                             ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YouDiedItemReturnedOwner), item.Info.FriendlyName), ChatType.Hint);
@@ -1483,7 +1434,7 @@ namespace Server.MirObjects
                             }
                         }
 
-                        Info.Equipment[i] = null;
+                        CharacterInfo.Equipment[i] = null;
                         Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
 
                         Report?.ItemChanged(item, item.Count, 1);
@@ -1492,9 +1443,9 @@ namespace Server.MirObjects
 
             }
 
-            for (var i = 0; i < Info.Inventory.Length; i++)
+            for (var i = 0; i < CharacterInfo.Inventory.Length; i++)
             {
-                var item = Info.Inventory[i];
+                var item = CharacterInfo.Inventory[i];
 
                 if (item == null)
                     continue;
@@ -1527,7 +1478,7 @@ namespace Server.MirObjects
                         continue;
 
                     if (count == item.Count)
-                        Info.Inventory[i] = null;
+                        CharacterInfo.Inventory[i] = null;
 
                     Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = count });
                     item.Count -= count;
@@ -1536,9 +1487,9 @@ namespace Server.MirObjects
                 }
                 else if (RandomProvider.Next(10) == 0)
                 {
-                    if (Env.ReturnRentalItem(item, item.RentalInformation?.OwnerName, Info))
+                    if (Env.ReturnRentalItem(item, item.RentalInformation?.OwnerName, CharacterInfo))
                     {
-                        Info.Inventory[i] = null;
+                        CharacterInfo.Inventory[i] = null;
                         Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
 
                         ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerDiedItemReturnedOwner), item.Info), ChatType.Hint);
@@ -1556,7 +1507,7 @@ namespace Server.MirObjects
                             player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerHasDroppedItem), Name, item.FriendlyName), ChatType.System2);;
                         }
 
-                    Info.Inventory[i] = null;
+                    CharacterInfo.Inventory[i] = null;
                     Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
 
                     Report?.ItemChanged(item, item.Count, 1);
@@ -1578,9 +1529,9 @@ namespace Server.MirObjects
         {
             if (item.Info.StackSize > 1) //Stackable
             {
-                for (int i = 0; i < Info.Inventory.Length; i++)
+                for (int i = 0; i < CharacterInfo.Inventory.Length; i++)
                 {
-                    UserItem temp = Info.Inventory[i];
+                    UserItem temp = CharacterInfo.Inventory[i];
                     if (temp == null || item.Info != temp.Info || temp.Count >= temp.Info.StackSize) continue;
 
                     if (item.Count + temp.Count <= temp.Info.StackSize)
@@ -1597,8 +1548,8 @@ namespace Server.MirObjects
             {
                 for (int i = PotionBeltMinimum; i < PotionBeltMaximum; i++)
                 {
-                    if (Info.Inventory[i] != null) continue;
-                    Info.Inventory[i] = item;
+                    if (CharacterInfo.Inventory[i] != null) continue;
+                    CharacterInfo.Inventory[i] = item;
                     return;
                 }
             }
@@ -1606,25 +1557,25 @@ namespace Server.MirObjects
             {
                 for (int i = AmuletBeltMinimum; i < AmuletBeltMaximum; i++)
                 {
-                    if (Info.Inventory[i] != null) continue;
-                    Info.Inventory[i] = item;
+                    if (CharacterInfo.Inventory[i] != null) continue;
+                    CharacterInfo.Inventory[i] = item;
                     return;
                 }
             }
             else
             {
-                for (int i = BeltSize; i < Info.Inventory.Length; i++)
+                for (int i = BeltSize; i < CharacterInfo.Inventory.Length; i++)
                 {
-                    if (Info.Inventory[i] != null) continue;
-                    Info.Inventory[i] = item;
+                    if (CharacterInfo.Inventory[i] != null) continue;
+                    CharacterInfo.Inventory[i] = item;
                     return;
                 }
             }
 
-            for (int i = 0; i < Info.Inventory.Length; i++)
+            for (int i = 0; i < CharacterInfo.Inventory.Length; i++)
             {
-                if (Info.Inventory[i] != null) continue;
-                Info.Inventory[i] = item;
+                if (CharacterInfo.Inventory[i] != null) continue;
+                CharacterInfo.Inventory[i] = item;
                 return;
             }
         }
@@ -1677,15 +1628,15 @@ namespace Server.MirObjects
         {
             LevelEffects = LevelEffects.None;
 
-            if (Info.Flags[990]) LevelEffects |= LevelEffects.Mist;
-            if (Info.Flags[991]) LevelEffects |= LevelEffects.RedDragon;
-            if (Info.Flags[992]) LevelEffects |= LevelEffects.BlueDragon;
-            if (Info.Flags[993]) LevelEffects |= LevelEffects.Rebirth1;
-            if (Info.Flags[994]) LevelEffects |= LevelEffects.Rebirth2;
-            if (Info.Flags[995]) LevelEffects |= LevelEffects.Rebirth3;
-            if (Info.Flags[996]) LevelEffects |= LevelEffects.NewBlue;
-            if (Info.Flags[997]) LevelEffects |= LevelEffects.YellowDragon;
-            if (Info.Flags[998]) LevelEffects |= LevelEffects.Phoenix;
+            if (CharacterInfo.Flags[990]) LevelEffects |= LevelEffects.Mist;
+            if (CharacterInfo.Flags[991]) LevelEffects |= LevelEffects.RedDragon;
+            if (CharacterInfo.Flags[992]) LevelEffects |= LevelEffects.BlueDragon;
+            if (CharacterInfo.Flags[993]) LevelEffects |= LevelEffects.Rebirth1;
+            if (CharacterInfo.Flags[994]) LevelEffects |= LevelEffects.Rebirth2;
+            if (CharacterInfo.Flags[995]) LevelEffects |= LevelEffects.Rebirth3;
+            if (CharacterInfo.Flags[996]) LevelEffects |= LevelEffects.NewBlue;
+            if (CharacterInfo.Flags[997]) LevelEffects |= LevelEffects.YellowDragon;
+            if (CharacterInfo.Flags[998]) LevelEffects |= LevelEffects.Phoenix;
         }
         public virtual void Revive(int hp, bool effect)
         {
@@ -1783,9 +1734,9 @@ namespace Server.MirObjects
         {
             CurrentBagWeight = 0;
 
-            for (int i = 0; i < Info.Inventory.Length; i++)
+            for (int i = 0; i < CharacterInfo.Inventory.Length; i++)
             {
-                UserItem item = Info.Inventory[i];
+                UserItem item = CharacterInfo.Inventory[i];
                 if (item != null)
                 {
                     CurrentBagWeight += item.Weight;
@@ -1822,11 +1773,11 @@ namespace Server.MirObjects
             ItemSets.Clear();
             MirSet.Clear();
 
-            for (int i = 0; i < Info.Equipment.Length; i++)
+            for (int i = 0; i < CharacterInfo.Equipment.Length; i++)
             {
-                UserItem temp = Info.Equipment[i];
+                UserItem temp = CharacterInfo.Equipment[i];
                 if (temp == null) continue;
-                ItemInfo realItem = Functions.GetRealItem(temp.Info, Info.Level, Info.Class, Env.ItemInfoList);
+                ItemInfo realItem = Functions.GetRealItem(temp.Info, CharacterInfo.Level, CharacterInfo.Class, Env.ItemInfoList);
 
                 if (realItem.Type == ItemType.Weapon || realItem.Type == ItemType.Torch)
                     CurrentHandWeight = (int)Math.Min(int.MaxValue, CurrentHandWeight + temp.Weight);
@@ -1953,7 +1904,7 @@ namespace Server.MirObjects
                 UserItem temp = equipItem.Slots[j];
                 if (temp == null) continue;
 
-                ItemInfo RealItem = Functions.GetRealItem(temp.Info, Info.Level, Info.Class, Env.ItemInfoList);
+                ItemInfo RealItem = Functions.GetRealItem(temp.Info, CharacterInfo.Level, CharacterInfo.Class, Env.ItemInfoList);
 
                 if (RealItem.Type == ItemType.Weapon || RealItem.Type == ItemType.Torch)
                     CurrentHandWeight = (int)Math.Min(int.MaxValue, CurrentHandWeight + temp.Weight);
@@ -2262,13 +2213,13 @@ namespace Server.MirObjects
 
                 if (!Enum.TryParse(skill, out spelltype)) return;
 
-                for (var i = Info.Magics.Count - 1; i >= 0; i--)
-                    if (Info.Magics[i].Spell == spelltype) hasSkill = true;
+                for (var i = CharacterInfo.Magics.Count - 1; i >= 0; i--)
+                    if (CharacterInfo.Magics[i].Spell == spelltype) hasSkill = true;
 
                 if (hasSkill) continue;
 
                 var magic = new UserMagic(spelltype) { IsTempSpell = true };
-                Info.Magics.Add(magic);
+                CharacterInfo.Magics.Add(magic);
                 SendMagicInfo(magic);                
             }
         }
@@ -2282,11 +2233,11 @@ namespace Server.MirObjects
             {
                 if (!Enum.TryParse(skill, out Spell spelltype)) return;
 
-                for (var i = Info.Magics.Count - 1; i >= 0; i--)
+                for (var i = CharacterInfo.Magics.Count - 1; i >= 0; i--)
                 {
-                    if (!Info.Magics[i].IsTempSpell || Info.Magics[i].Spell != spelltype) continue;
+                    if (!CharacterInfo.Magics[i].IsTempSpell || CharacterInfo.Magics[i].Spell != spelltype) continue;
 
-                    Info.Magics.RemoveAt(i);
+                    CharacterInfo.Magics.RemoveAt(i);
                     Enqueue(new S.RemoveMagic { PlaceId = i });
                 }
             }
@@ -2295,9 +2246,9 @@ namespace Server.MirObjects
         {
             int[] spiritSwordLvPlus = { 0, 3, 5, 8 };
             int[] slayingLvPlus = { 5, 6, 7, 8 };
-            for (int i = 0; i < Info.Magics.Count; i++)
+            for (int i = 0; i < CharacterInfo.Magics.Count; i++)
             {
-                UserMagic magic = Info.Magics[i];
+                UserMagic magic = CharacterInfo.Magics[i];
                 switch (magic.Spell)
                 {
                     case Spell.Fencing:
@@ -2434,7 +2385,7 @@ namespace Server.MirObjects
                     if (ob.Race == ObjectType.Merchant && Race == ObjectType.Player)
                     {
                         NPCObject NPC = (NPCObject)ob;
-                        if (!NPC.Visible || !NPC.VisibleLog[Info.Index]) continue;
+                        if (!NPC.Visible || !NPC.VisibleLog[CharacterInfo.Index]) continue;
                     }
                     else
                     {
@@ -2446,7 +2397,7 @@ namespace Server.MirObjects
                 }
             }
 
-            if (HasBuff(BuffType.Concentration, out Buff concentration))
+            if (TryGetBuff(BuffType.Concentration, out Buff concentration))
             {
                 concentration.Set("InterruptTime", Env.Time + (Settings.Second * 3));
 
@@ -2526,7 +2477,7 @@ namespace Server.MirObjects
                 return false;
             }
 
-            if (HasBuff(BuffType.Concentration, out Buff concentration))
+            if (TryGetBuff(BuffType.Concentration, out Buff concentration))
             {
                 concentration.Set("InterruptTime", Env.Time + (Settings.Second * 3));
 
@@ -2572,7 +2523,7 @@ namespace Server.MirObjects
                         if (ob.Race == ObjectType.Merchant && Race == ObjectType.Player)
                         {
                             NPCObject NPC = (NPCObject)ob;
-                            if (!NPC.Visible || !NPC.VisibleLog[Info.Index]) continue;
+                            if (!NPC.Visible || !NPC.VisibleLog[CharacterInfo.Index]) continue;
                         }
                         else
                             if (!ob.Blocking || (CheckCellTime && ob.CellTime >= Env.Time)) continue;
@@ -2687,7 +2638,7 @@ namespace Server.MirObjects
 
             if (result > 0)
             {
-                if (HasBuff(BuffType.Concentration, out Buff concentration))
+                if (TryGetBuff(BuffType.Concentration, out Buff concentration))
                 {
                     concentration.Set("InterruptTime", Env.Time + (Settings.Second * 3));
 
@@ -2746,8 +2697,8 @@ namespace Server.MirObjects
         {
             LogTime = Env.Time + Globals.LogDelay;
 
-            if (Info.Equipment[(int)EquipmentSlot.Weapon] == null) return;
-            ItemInfo RealItem = Functions.GetRealItem(Info.Equipment[(int)EquipmentSlot.Weapon].Info, Info.Level, Info.Class, Env.ItemInfoList);
+            if (CharacterInfo.Equipment[(int)EquipmentSlot.Weapon] == null) return;
+            ItemInfo RealItem = Functions.GetRealItem(CharacterInfo.Equipment[(int)EquipmentSlot.Weapon].Info, CharacterInfo.Level, CharacterInfo.Class, Env.ItemInfoList);
 
             if ((RealItem.Shape / Globals.ClassWeaponCount) != 2) return;
             if (Functions.InRange(CurrentLocation, location, Globals.MaxAttackRange) == false) return;
@@ -2792,7 +2743,7 @@ namespace Server.MirObjects
             Spell spell = Spell.None;
             bool focus = false;
 
-            if (target != null && !CanFly(target.CurrentLocation) && (Info.MentalState != 1))
+            if (target != null && !CanFly(target.CurrentLocation) && (CharacterInfo.MentalState != 1))
             {
                 target = null;
                 targetID = 0;
@@ -3293,9 +3244,9 @@ namespace Server.MirObjects
         Mining:
             if (Mined)
             {
-                if (Info.Equipment[(int)EquipmentSlot.Weapon] == null) return;
-                if (!Info.Equipment[(int)EquipmentSlot.Weapon].Info.CanMine) return;
-                if (Info.Equipment[(int)EquipmentSlot.Weapon].CurrentDura <= 0)//Stop dura 0 working. use below if you wish to break the item.
+                if (CharacterInfo.Equipment[(int)EquipmentSlot.Weapon] == null) return;
+                if (!CharacterInfo.Equipment[(int)EquipmentSlot.Weapon].Info.CanMine) return;
+                if (CharacterInfo.Equipment[(int)EquipmentSlot.Weapon].CurrentDura <= 0)//Stop dura 0 working. use below if you wish to break the item.
                     /*{
                         Enqueue(new S.DeleteItem { UniqueID = Info.Equipment[(int)EquipmentSlot.Weapon].UniqueID, Count = Info.Equipment[(int)EquipmentSlot.Weapon].Count });
                         Info.Equipment[(int)EquipmentSlot.Weapon] = null;
@@ -3308,7 +3259,7 @@ namespace Server.MirObjects
                 if (Mine.StonesLeft > 0)
                 {
                     Mine.StonesLeft--;
-                    if (RandomProvider.Next(100) < (Mine.Mine.HitRate + (Info.Equipment[(int)EquipmentSlot.Weapon].GetTotal(Stat.Accuracy)) * 10))
+                    if (RandomProvider.Next(100) < (Mine.Mine.HitRate + (CharacterInfo.Equipment[(int)EquipmentSlot.Weapon].GetTotal(Stat.Accuracy)) * 10))
                     {
                         //create some rubble on the floor (or increase whats there)
                         SpellObject Rubble = null;
@@ -3350,7 +3301,7 @@ namespace Server.MirObjects
                             GetMinePayout(Mine.Mine);
                         }
 
-                        DamageItem(Info.Equipment[(int)EquipmentSlot.Weapon], 5 + RandomProvider.Next(15));
+                        DamageItem(CharacterInfo.Equipment[(int)EquipmentSlot.Weapon], 5 + RandomProvider.Next(15));
                     }
                 }
                 else
@@ -3804,7 +3755,7 @@ namespace Server.MirObjects
             if (HasElemental)
             {
                 if (target == null || !target.IsAttackTarget(this)) return false;
-                if ((Info.MentalState != 1) && !CanFly(target.CurrentLocation)) return false;
+                if ((CharacterInfo.MentalState != 1) && !CanFly(target.CurrentLocation)) return false;
 
                 int orbPower = GetElementalOrbPower(false);//base power + orbpower
 
@@ -3831,7 +3782,7 @@ namespace Server.MirObjects
             int meditationLvl = magic.Level;
             int concentrateChance = 0;
 
-            if (HasBuff(BuffType.Concentration, out Buff concentration) && !concentration.Get<bool>("Interrupted"))
+            if (TryGetBuff(BuffType.Concentration, out Buff concentration) && !concentration.Get<bool>("Interrupted"))
             {
                 magic = GetMagic(Spell.Concentration);
 
@@ -5353,7 +5304,7 @@ namespace Server.MirObjects
 
             monster.Spawn(CurrentMap, CurrentLocation);
 
-            if (!HasBuff(BuffType.DarkBody, out _))
+            if (!TryGetBuff(BuffType.DarkBody, out _))
             {
                 LevelMagic(magic);
             }
@@ -5511,10 +5462,10 @@ namespace Server.MirObjects
             }
 
             int dmgpenalty = 100;
-            switch (Info.MentalState)
+            switch (CharacterInfo.MentalState)
             {
                 case 1: //trickshot
-                    dmgpenalty = 55 + (Info.MentalStateLvl * 5);
+                    dmgpenalty = 55 + (CharacterInfo.MentalStateLvl * 5);
                     break;
                 case 2: //group attack
                     dmgpenalty = 80;
@@ -5526,7 +5477,7 @@ namespace Server.MirObjects
         private bool StraightShot(MapObject target, UserMagic magic)
         {
             if (target == null || !target.IsAttackTarget(this)) return false;
-            if ((Info.MentalState != 1) && !CanFly(target.CurrentLocation)) return false;
+            if ((CharacterInfo.MentalState != 1) && !CanFly(target.CurrentLocation)) return false;
 
             int distance = Functions.MaxDistance(CurrentLocation, target.CurrentLocation);
             int damage = magic.GetDamage(GetRangeAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC], distance));
@@ -5543,7 +5494,7 @@ namespace Server.MirObjects
         private bool DoubleShot(MapObject target, UserMagic magic)
         {
             if (target == null || !target.IsAttackTarget(this)) return false;
-            if ((Info.MentalState != 1) && !CanFly(target.CurrentLocation)) return false;
+            if ((CharacterInfo.MentalState != 1) && !CanFly(target.CurrentLocation)) return false;
 
             int distance = Functions.MaxDistance(CurrentLocation, target.CurrentLocation);
             int damage = magic.GetDamage(GetRangeAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC], distance));
@@ -5674,7 +5625,7 @@ namespace Server.MirObjects
             cast = false;
 
             if (target == null || !target.IsAttackTarget(this) || !(target is MonsterObject)) return;
-            if ((Info.MentalState != 1) && !CanFly(target.CurrentLocation)) return;
+            if ((CharacterInfo.MentalState != 1) && !CanFly(target.CurrentLocation)) return;
             if (target.Level > Level + 2) return;
             if (((MonsterObject)target).ShockTime >= Env.Time) return;//Already shocked
 
@@ -5691,7 +5642,7 @@ namespace Server.MirObjects
         public void SpecialArrowShot(MapObject target, UserMagic magic)
         {
             if (target == null || !target.IsAttackTarget(this)) return;
-            if ((Info.MentalState != 1) && !CanFly(target.CurrentLocation)) return;
+            if ((CharacterInfo.MentalState != 1) && !CanFly(target.CurrentLocation)) return;
 
             int distance = Functions.MaxDistance(CurrentLocation, target.CurrentLocation);
             int damage = magic.GetDamage(GetRangeAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC], distance));
@@ -5705,7 +5656,7 @@ namespace Server.MirObjects
         public void NapalmShot(MapObject target, UserMagic magic)
         {
             if (target == null || !target.IsAttackTarget(this)) return;
-            if ((Info.MentalState != 1) && !CanFly(target.CurrentLocation)) return;
+            if ((CharacterInfo.MentalState != 1) && !CanFly(target.CurrentLocation)) return;
 
             int distance = Functions.MaxDistance(CurrentLocation, target.CurrentLocation);
             int damage = magic.GetDamage(GetRangeAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC], distance));
@@ -6197,7 +6148,7 @@ namespace Server.MirObjects
 
                 case Spell.MagicShield:
                     {
-                        if (HasBuff(BuffType.MagicShield, out _)) return;
+                        if (TryGetBuff(BuffType.MagicShield, out _)) return;
 
                         LevelMagic(magic);
                         AddBuff(BuffType.MagicShield, this, Settings.Second * (int)data[1], new Stats { [Stat.DamageReductionPercent] = (magic.Level + 2) * 10 });
@@ -6416,7 +6367,7 @@ namespace Server.MirObjects
 
                 case Spell.ElementalBarrier:
                     {
-                        if (HasBuff(BuffType.ElementalBarrier, out _)) return;
+                        if (TryGetBuff(BuffType.ElementalBarrier, out _)) return;
 
                         if (!HasElemental)
                         {
@@ -6561,8 +6512,8 @@ namespace Server.MirObjects
 
                     int buffTime = 5 + (5 * magic.Level);
 
-                    bool hasVampBuff = HasBuff(BuffType.VampireShot, out _);
-                    bool hasPoisonBuff = HasBuff(BuffType.PoisonShot, out _);
+                    bool hasVampBuff = TryGetBuff(BuffType.VampireShot, out _);
+                    bool hasPoisonBuff = TryGetBuff(BuffType.PoisonShot, out _);
 
                     bool doVamp = false, doPoison = false;
                     if (magic.Spell == Spell.VampireShot)
@@ -6813,7 +6764,7 @@ namespace Server.MirObjects
             }
 
             //Level Fencing / SpiritSword
-            foreach (UserMagic magic in Info.Magics)
+            foreach (UserMagic magic in CharacterInfo.Magics)
             {
                 switch (magic.Spell)
                 {
@@ -6858,9 +6809,9 @@ namespace Server.MirObjects
         }
         protected UserItem GetAmulet(int count, int shape = 0)
         {
-            for (int i = 0; i < Info.Equipment.Length; i++)
+            for (int i = 0; i < CharacterInfo.Equipment.Length; i++)
             {
-                UserItem item = Info.Equipment[i];
+                UserItem item = CharacterInfo.Equipment[i];
                 if (item != null && item.Info.Type == ItemType.Amulet && item.Info.Shape == shape && item.Count >= count)
                     return item;
             }
@@ -6869,9 +6820,9 @@ namespace Server.MirObjects
         }
         protected UserItem GetPoison(int count, byte shape = 0)
         {
-            for (int i = 0; i < Info.Equipment.Length; i++)
+            for (int i = 0; i < CharacterInfo.Equipment.Length; i++)
             {
-                UserItem item = Info.Equipment[i];
+                UserItem item = CharacterInfo.Equipment[i];
                 if (item != null && item.Info.Type == ItemType.Amulet && item.Count >= count)
                 {
                     if (shape == 0)
@@ -6891,9 +6842,9 @@ namespace Server.MirObjects
         }
         public UserMagic GetMagic(Spell spell)
         {
-            for (int i = 0; i < Info.Magics.Count; i++)
+            for (int i = 0; i < CharacterInfo.Magics.Count; i++)
             {
-                UserMagic magic = Info.Magics[i];
+                UserMagic magic = CharacterInfo.Magics[i];
                 if (magic.Spell != spell) continue;
                 return magic;
             }
@@ -6904,11 +6855,11 @@ namespace Server.MirObjects
         {
             byte exp = (byte)(RandomProvider.Next(3) + 1);
 
-            if (Settings.MentorSkillBoost && Info.Mentor != 0 && Info.IsMentor)
+            if (Settings.MentorSkillBoost && CharacterInfo.Mentor != 0 && CharacterInfo.IsMentor)
             {
-                if (HasBuff(BuffType.Mentee, out _))
+                if (TryGetBuff(BuffType.Mentee, out _))
                 {
-                    CharacterInfo mentor = Env.GetCharacterInfo(Info.Mentor);
+                    CharacterInfo mentor = Env.GetCharacterInfo(CharacterInfo.Mentor);
                     PlayerObject player = Env.GetPlayer(mentor.Name);
                     if (player.CurrentMap == CurrentMap && Functions.InRange(player.CurrentLocation, CurrentLocation, Globals.DataRange) && !player.Dead)
                     {
@@ -7160,13 +7111,13 @@ namespace Server.MirObjects
                 BroadcastDamageIndicator(DamageType.Critical);
             }
 
-            if (HasBuff(BuffType.MagicShield, out Buff magicShield))
+            if (TryGetBuff(BuffType.MagicShield, out Buff magicShield))
             {
                 var duration = (int)Math.Min(int.MaxValue, magicShield.ExpireTime - ((damage - armour) * 60));
                 AddBuff(BuffType.MagicShield, this, duration, null);
             }
 
-            if (HasBuff(BuffType.ElementalBarrier, out Buff elementalBarrier))
+            if (TryGetBuff(BuffType.ElementalBarrier, out Buff elementalBarrier))
             {
                 var duration = (int)Math.Min(int.MaxValue, elementalBarrier.ExpireTime - ((damage - armour) * 60));
                 AddBuff(BuffType.ElementalBarrier, this, duration, null);
@@ -7270,13 +7221,13 @@ namespace Server.MirObjects
                 }
             }
 
-            if (HasBuff(BuffType.MagicShield, out Buff magicShield))
+            if (TryGetBuff(BuffType.MagicShield, out Buff magicShield))
             {
                 var duration = (int)Math.Min(int.MaxValue, magicShield.ExpireTime - ((damage - armour) * 60));
                 AddBuff(BuffType.MagicShield, this, duration, null);
             }
 
-            if (HasBuff(BuffType.ElementalBarrier, out Buff elementalBarrier))
+            if (TryGetBuff(BuffType.ElementalBarrier, out Buff elementalBarrier))
             {
                 var duration = (int)Math.Min(int.MaxValue, elementalBarrier.ExpireTime - ((damage - armour) * 60));
                 AddBuff(BuffType.ElementalBarrier, this, duration, null);
@@ -7352,13 +7303,13 @@ namespace Server.MirObjects
 
             if (armour >= damage) return 0;
 
-            if (HasBuff(BuffType.MagicShield, out Buff magicShield))
+            if (TryGetBuff(BuffType.MagicShield, out Buff magicShield))
             {
                 var duration = (int)Math.Min(int.MaxValue, magicShield.ExpireTime - ((damage - armour) * 60));
                 AddBuff(BuffType.MagicShield, this, duration, null);
             }
 
-            if (HasBuff(BuffType.ElementalBarrier, out Buff elementalBarrier))
+            if (TryGetBuff(BuffType.ElementalBarrier, out Buff elementalBarrier))
             {
                 var duration = (int)Math.Min(int.MaxValue, elementalBarrier.ExpireTime - ((damage - armour) * 60));
                 AddBuff(BuffType.ElementalBarrier, this, duration, null);
@@ -7585,7 +7536,7 @@ namespace Server.MirObjects
         }
         public bool CanGainItem(UserItem item)
         {
-            if (FreeSpace(Info.Inventory) > 0)
+            if (FreeSpace(CharacterInfo.Inventory) > 0)
             {
                 return true;
             }
@@ -7594,9 +7545,9 @@ namespace Server.MirObjects
             {
                 ushort count = item.Count;
 
-                for (int i = 0; i < Info.Inventory.Length; i++)
+                for (int i = 0; i < CharacterInfo.Inventory.Length; i++)
                 {
-                    UserItem bagItem = Info.Inventory[i];
+                    UserItem bagItem = CharacterInfo.Inventory[i];
 
                     if (bagItem == null || bagItem.Info != item.Info) continue;
 
@@ -7612,9 +7563,9 @@ namespace Server.MirObjects
             {
                 ushort count = item.Count;
 
-                for (int i = 0; i < Info.Inventory.Length; i++)
+                for (int i = 0; i < CharacterInfo.Inventory.Length; i++)
                 {
-                    UserItem bagItem = Info.Inventory[i];
+                    UserItem bagItem = CharacterInfo.Inventory[i];
 
                     if (bagItem.Info != item.Info) continue;
 
@@ -7641,9 +7592,9 @@ namespace Server.MirObjects
                 {
                     ushort count = items[i].Count;
 
-                    for (int u = 0; u < Info.Inventory.Length; u++)
+                    for (int u = 0; u < CharacterInfo.Inventory.Length; u++)
                     {
-                        UserItem bagItem = Info.Inventory[u];
+                        UserItem bagItem = CharacterInfo.Inventory[u];
 
                         if (bagItem == null || bagItem.Info != items[i].Info) continue;
 
@@ -7654,7 +7605,7 @@ namespace Server.MirObjects
                 }
             }
 
-            if (FreeSpace(Info.Inventory) < itemCount + stackOffset) return false;
+            if (FreeSpace(CharacterInfo.Inventory) < itemCount + stackOffset) return false;
 
             return true;
         }
@@ -7807,11 +7758,11 @@ namespace Server.MirObjects
 
             if (item.Info.Type == ItemType.Weapon || item.Info.Type == ItemType.Torch)
             {
-                if (item.Weight - (Info.Equipment[slot] != null ? Info.Equipment[slot].Weight : 0) + CurrentHandWeight > Stats[Stat.HandWeight])
+                if (item.Weight - (CharacterInfo.Equipment[slot] != null ? CharacterInfo.Equipment[slot].Weight : 0) + CurrentHandWeight > Stats[Stat.HandWeight])
                     return false;
             }
             else
-                if (item.Weight - (Info.Equipment[slot] != null ? Info.Equipment[slot].Weight : 0) + CurrentWearWeight > Stats[Stat.WearWeight])
+                if (item.Weight - (CharacterInfo.Equipment[slot] != null ? CharacterInfo.Equipment[slot].Weight : 0) + CurrentWearWeight > Stats[Stat.WearWeight])
                 return false;
 
             if (RidingMount && item.Info.Type != ItemType.Torch)
@@ -7837,19 +7788,19 @@ namespace Server.MirObjects
         private void DamageDura()
         {
             if (!SpecialMode.HasFlag(SpecialItemMode.NoDuraLoss))
-                for (int i = 0; i < Info.Equipment.Length; i++)
+                for (int i = 0; i < CharacterInfo.Equipment.Length; i++)
                     if (i != (int)EquipmentSlot.Weapon)
-                        DamageItem(Info.Equipment[i], RandomProvider.Next(1) + 1);
+                        DamageItem(CharacterInfo.Equipment[i], RandomProvider.Next(1) + 1);
         }
         public void DamageWeapon()
         {
             if (!SpecialMode.HasFlag(SpecialItemMode.NoDuraLoss))
-                DamageItem(Info.Equipment[(int)EquipmentSlot.Weapon], RandomProvider.Next(4) + 1);
+                DamageItem(CharacterInfo.Equipment[(int)EquipmentSlot.Weapon], RandomProvider.Next(4) + 1);
         }
         public void DamageItem(UserItem item, int amount, bool isChanged = false)
         {
             if (item == null || item.CurrentDura == 0 || item.Info.Type == ItemType.Amulet) return;
-            if ((item.WeddingRing == Info.Married) && (Info.Equipment[(int)EquipmentSlot.RingL].UniqueID == item.UniqueID)) return;
+            if ((item.WeddingRing == CharacterInfo.Married) && (CharacterInfo.Equipment[(int)EquipmentSlot.RingL].UniqueID == item.UniqueID)) return;
             if (item.GetTotal(Stat.Strong) > 0) amount = Math.Max(1, amount - item.GetTotal(Stat.Strong));
             item.CurrentDura = (ushort)Math.Max(ushort.MinValue, item.CurrentDura - amount);
             item.DuraChanged = true;
@@ -8474,16 +8425,15 @@ namespace Server.MirObjects
         protected virtual void CleanUp()
         {
             Connection.Player = null;
-            Info.Player = null;
-            Info.Mount = null;
+            CharacterInfo.Player = null;
+            CharacterInfo.Mount = null;
             Connection.CleanObservers();
             Connection = null;
-            Info = null;
+            CharacterInfo = null;
         }
         public virtual void Enqueue(Packet p)
         {
-            if (Connection == null) return;
-            Connection.Enqueue(p);
+            Connection?.Enqueue(p);
 
 			//if (p != null) MessageQueue.EnqueueDebugging(((ServerPacketIds)p.Index).ToString());
 		}
@@ -8512,16 +8462,16 @@ namespace Server.MirObjects
             switch (spell)
             {
                 case Spell.Thrusting:
-                    Info.Thrusting = state == SpellToggleState.None ? !Info.Thrusting : use;
+                    CharacterInfo.Thrusting = state == SpellToggleState.None ? !CharacterInfo.Thrusting : use;
                     break;
                 case Spell.HalfMoon:
-                    Info.HalfMoon = state == SpellToggleState.None ? !Info.HalfMoon : use;
+                    CharacterInfo.HalfMoon = state == SpellToggleState.None ? !CharacterInfo.HalfMoon : use;
                     break;
                 case Spell.CrossHalfMoon:
-                    Info.CrossHalfMoon = state == SpellToggleState.None ? !Info.CrossHalfMoon : use;
+                    CharacterInfo.CrossHalfMoon = state == SpellToggleState.None ? !CharacterInfo.CrossHalfMoon : use;
                     break;
                 case Spell.DoubleSlash:
-                    Info.DoubleSlash = state == SpellToggleState.None ? !Info.DoubleSlash : use;
+                    CharacterInfo.DoubleSlash = state == SpellToggleState.None ? !CharacterInfo.DoubleSlash : use;
                     break;
                 case Spell.TwinDrakeBlade:
                     if (TwinDrakeBlade) return;
@@ -8569,7 +8519,7 @@ namespace Server.MirObjects
                     ChangeMP(-cost);
                     break;
                 case Spell.MentalState:
-                    Info.MentalState = (byte)((Info.MentalState + 1) % 3);
+                    CharacterInfo.MentalState = (byte)((CharacterInfo.MentalState + 1) % 3);
 
                     ShowMentalState();
                     break;
@@ -8578,7 +8528,7 @@ namespace Server.MirObjects
 
         private void ShowMentalState()
         {
-            switch (Info.MentalState)
+            switch (CharacterInfo.MentalState)
             {
                 case 0:
                     ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.MentalstateAgressive), ChatType.Hint);
@@ -8591,7 +8541,7 @@ namespace Server.MirObjects
                     break;
             }
 
-            AddBuff(BuffType.MentalState, this, 0, new Stats(), false, values: Info.MentalState);
+            AddBuff(BuffType.MentalState, this, 0, new Stats(), false, values: CharacterInfo.MentalState);
         }
 
         #region Mounts
@@ -8633,7 +8583,7 @@ namespace Server.MirObjects
         }
         public void IncreaseMountLoyalty(int amount)
         {
-            UserItem item = Info.Equipment[(int)EquipmentSlot.Mount];
+            UserItem item = CharacterInfo.Equipment[(int)EquipmentSlot.Mount];
             if (item != null && item.CurrentDura < item.MaxDura)
             {
                 item.CurrentDura = (ushort)Math.Min(item.MaxDura, item.CurrentDura + amount);
@@ -8646,7 +8596,7 @@ namespace Server.MirObjects
             if (Env.Time > DecreaseLoyaltyTime)
             {
                 DecreaseLoyaltyTime = Env.Time + (Mount.SlowLoyalty ? (LoyaltyDelay * 2) : LoyaltyDelay);
-                UserItem item = Info.Equipment[(int)EquipmentSlot.Mount];
+                UserItem item = CharacterInfo.Equipment[(int)EquipmentSlot.Mount];
                 if (item != null && item.CurrentDura > 0)
                 {
                     DamageItem(item, amount);

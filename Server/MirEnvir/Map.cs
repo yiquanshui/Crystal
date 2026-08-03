@@ -859,7 +859,7 @@ namespace Server.MirEnv
             HumanObject player = (HumanObject)data[0];
             UserMagic magic = (UserMagic)data[1];
 
-            if (player == null || player.Info == null || player.Node == null) return;
+            if (player == null || player.CharacterInfo == null || player.Node == null) return;
 
             int value, value2;
             Point location;
@@ -2383,15 +2383,9 @@ namespace Server.MirEnv
         }
 
 
-        public SafeZoneInfo GetSafeZone(Point location)
+        public SafeZoneInfo? GetSafeZone(Point location)
         {
-            for (int i = 0; i < Info.SafeZones.Count; i++)
-            {
-                SafeZoneInfo szi = Info.SafeZones[i];
-                if (Functions.InRange(szi.Location, location, szi.Size))
-                    return szi;
-            }
-            return null;
+            return Info.SafeZones.FirstOrDefault(szi => Functions.InRange(szi.Location, location, szi.Size));
         }
 
         public List<SpellObject> GetSpellObjects(Spell spell ,MapObject caster)
@@ -2482,7 +2476,7 @@ namespace Server.MirEnv
             get { return Attribute == CellAttribute.Walk; }
         }
 
-        public List<MapObject> Objects = new List<MapObject>();
+        public List<MapObject> Objects = [];
         public CellAttribute Attribute;
         public sbyte FishingAttribute = -1;
 
@@ -2529,23 +2523,22 @@ namespace Server.MirEnv
             }
         }
     }
+    
+    
     public class MapRespawn
     {
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
 
-        public RespawnInfo Info;
-        public MonsterInfo Monster;
-        public Map Map;
+        public readonly RespawnInfo Info;
+        public readonly MonsterInfo? Monster;
+        public Map? Map;
         public int Count;
         public long RespawnTime;
         public ulong NextSpawnTick;
         public byte ErrorCount = 0;
 
         public List<RouteInfo> Route;
-        public List<Point> WalkableCells;
+        public List<Point>? WalkableCells;
 
         public MapRespawn(RespawnInfo info)
         {
@@ -2556,8 +2549,9 @@ namespace Server.MirEnv
         }
         public bool Spawn()
         {
+            if (Monster == null) return true;
+            
             MonsterObject ob = MonsterObject.GetMonster(Monster);
-            if (ob == null) return true;
 
             MonsterType type = Settings.MonsterRarityEnabled
                 ? MonsterRarityData.Roll(RandomProvider.GetThreadRandom())
@@ -2569,7 +2563,7 @@ namespace Server.MirEnv
 
         public void LoadRoutes()
         {
-            Route = new List<RouteInfo>();
+            Route = [];
 
             if (string.IsNullOrEmpty(Info.RoutePath)) return;
 
@@ -2577,15 +2571,12 @@ namespace Server.MirEnv
 
             if (!File.Exists(fileName)) return;
 
-            List<string> lines = File.ReadAllLines(fileName).ToList();
-
-            foreach (string line in lines)
+            foreach (string line in File.ReadLines(fileName))
             {
-                RouteInfo info = RouteInfo.FromText(line);
-
-                if (info == null) continue;
-
-                Route.Add(info);
+                if (RouteInfo.FromText(line) is { } info)
+                {
+                    Route.Add(info);
+                }
             }
         }
     }

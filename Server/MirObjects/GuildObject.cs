@@ -165,7 +165,7 @@ namespace Server.MirObjects
             {
                 for (int j = 0; j < Ranks[i].Members.Count; j++)
                 {
-                    if (Ranks[i].Members[j].Id == member.Info.Index)
+                    if (Ranks[i].Members[j].Id == member.CharacterInfo.Index)
                     {
                         if (online)
                         {
@@ -227,7 +227,7 @@ namespace Server.MirObjects
             }
 
             GuildRank lowestRank = Ranks[Ranks.Count - 1];
-            GuildMember member = new GuildMember() { Name = newMember.Info.Name, Player = newMember, Id = newMember.Info.Index, LastLogin = Env.Now, Online = true };
+            GuildMember member = new GuildMember() { Name = newMember.CharacterInfo.Name, Player = newMember, Id = newMember.CharacterInfo.Index, LastLogin = Env.Now, Online = true };
             lowestRank.Members.Add(member);
 
             PlayerLogged(newMember, true, true);
@@ -316,7 +316,7 @@ namespace Server.MirObjects
             if (player != null)
             {
                 player.MyGuildRank = Ranks[rankIndex];
-                player.Enqueue(new ServerPackets.GuildMemberChange() { Name = self.Info.Name, Status = (byte)8, Ranks = NewRankList });
+                player.Enqueue(new ServerPackets.GuildMemberChange() { Name = self.CharacterInfo.Name, Status = (byte)8, Ranks = NewRankList });
                 player.BroadcastInfo();
             }
 
@@ -416,7 +416,7 @@ namespace Server.MirObjects
                     PlayerObject player = (PlayerObject)Ranks[i].Members[j].Player;
                     if (player != null)
                     {
-                        player.Enqueue(new ServerPackets.GuildMemberChange() { Name = Self.Info.Name, Status = (byte)7, Ranks = NewRankList });
+                        player.Enqueue(new ServerPackets.GuildMemberChange() { Name = Self.CharacterInfo.Name, Status = (byte)7, Ranks = NewRankList });
                         player.GuildMembersChanged = true;
                         if (i == RankIndex)
                         {
@@ -454,7 +454,7 @@ namespace Server.MirObjects
 
         Found:
             if (Member == null) return false;
-            if ((Kicker.MyGuildRank.Index >= MemberRank.Index) && (Kicker.MyGuildRank.Index != 0) && (Kicker.Info.Name != membername))
+            if ((Kicker.MyGuildRank.Index >= MemberRank.Index) && (Kicker.MyGuildRank.Index != 0) && (Kicker.CharacterInfo.Name != membername))
             {
                 Kicker.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.YourRankNotAdequate), ChatType.System);
                 return false;
@@ -476,7 +476,7 @@ namespace Server.MirObjects
             }
 
         AllOk:
-            MemberDeleted(membername, (PlayerObject)Member.Player, Member.Name == Kicker.Info.Name);
+            MemberDeleted(membername, (PlayerObject)Member.Player, Member.Name == Kicker.CharacterInfo.Name);
 
             if (Member.Player != null)
             {
@@ -492,7 +492,7 @@ namespace Server.MirObjects
             return true;
 
         LeaderOk:
-            MemberDeleted(membername, (PlayerObject)Member.Player, Member.Name == Kicker.Info.Name);
+            MemberDeleted(membername, (PlayerObject)Member.Player, Member.Name == Kicker.CharacterInfo.Name);
 
             if (Member.Player != null)
             {
@@ -553,7 +553,7 @@ namespace Server.MirObjects
 
             if (formerMember != null)
             {
-                formerMember.Info.GuildIndex = -1;
+                formerMember.CharacterInfo.GuildIndex = -1;
                 formerMember.MyGuild = null;
                 formerMember.MyGuildRank = null;
                 formerMember.ReceiveChat(kickSelf ? GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.YouHaveLeftGuild) : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.YouRemovedFromGuild), ChatType.Guild);

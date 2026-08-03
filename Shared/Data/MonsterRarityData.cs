@@ -83,8 +83,6 @@ public static class MonsterRarityData
 
     public static void ConfigureProfiles(IDictionary<MonsterType, MonsterRarityProfile> overrides)
     {
-        if (overrides == null) return;
-
         foreach (var pair in overrides)
             Profiles[pair.Key] = pair.Value;
     }
@@ -99,12 +97,12 @@ public static class MonsterRarityData
         return Profiles.TryGetValue(type, out var profile) ? profile : Profiles[MonsterType.Normal];
     }
 
-    public static MonsterType Roll(Random random)
+    public static MonsterType Roll(Random? random)
     {
         if (!Enabled)
             return MonsterType.Normal;
 
-        if (random == null) random = new Random();
+        random ??= new Random();
 
         int roll = random.Next(10000);
         int eliteChanceBp = PercentToBasisPoints(EliteChancePercent);

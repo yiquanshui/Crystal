@@ -1496,56 +1496,56 @@ namespace Server.MirObjects
                     newValue = player.Account.Credit.ToString(CultureInfo.InvariantCulture);
                     break;
                 case "ARMOUR":
-                    newValue = player.Info.Equipment[(int)EquipmentSlot.Armour] != null ?
-                        player.Info.Equipment[(int)EquipmentSlot.Armour].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoArmour);
+                    newValue = player.CharacterInfo.Equipment[(int)EquipmentSlot.Armour] != null ?
+                        player.CharacterInfo.Equipment[(int)EquipmentSlot.Armour].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoArmour);
                     break;
                 case "WEAPON":
-                    newValue = player.Info.Equipment[(int)EquipmentSlot.Weapon] != null ?
-                        player.Info.Equipment[(int)EquipmentSlot.Weapon].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoWeapon);
+                    newValue = player.CharacterInfo.Equipment[(int)EquipmentSlot.Weapon] != null ?
+                        player.CharacterInfo.Equipment[(int)EquipmentSlot.Weapon].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoWeapon);
                     break;
                 case "RING_L":
-                    newValue = player.Info.Equipment[(int)EquipmentSlot.RingL] != null ?
-                        player.Info.Equipment[(int)EquipmentSlot.RingL].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoRing);
+                    newValue = player.CharacterInfo.Equipment[(int)EquipmentSlot.RingL] != null ?
+                        player.CharacterInfo.Equipment[(int)EquipmentSlot.RingL].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoRing);
                     break;
                 case "RING_R":
-                    newValue = player.Info.Equipment[(int)EquipmentSlot.RingR] != null ?
-                        player.Info.Equipment[(int)EquipmentSlot.RingR].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoRing);
+                    newValue = player.CharacterInfo.Equipment[(int)EquipmentSlot.RingR] != null ?
+                        player.CharacterInfo.Equipment[(int)EquipmentSlot.RingR].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoRing);
                     break;
                 case "BRACELET_L":
-                    newValue = player.Info.Equipment[(int)EquipmentSlot.BraceletL] != null ?
-                        player.Info.Equipment[(int)EquipmentSlot.BraceletL].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoBracelet);
+                    newValue = player.CharacterInfo.Equipment[(int)EquipmentSlot.BraceletL] != null ?
+                        player.CharacterInfo.Equipment[(int)EquipmentSlot.BraceletL].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoBracelet);
                     break;
                 case "BRACELET_R":
-                    newValue = player.Info.Equipment[(int)EquipmentSlot.BraceletR] != null ?
-                        player.Info.Equipment[(int)EquipmentSlot.BraceletR].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoBracelet);
+                    newValue = player.CharacterInfo.Equipment[(int)EquipmentSlot.BraceletR] != null ?
+                        player.CharacterInfo.Equipment[(int)EquipmentSlot.BraceletR].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoBracelet);
                     break;
                 case "NECKLACE":
-                    newValue = player.Info.Equipment[(int)EquipmentSlot.Necklace] != null ?
-                        player.Info.Equipment[(int)EquipmentSlot.Necklace].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoNecklace);
+                    newValue = player.CharacterInfo.Equipment[(int)EquipmentSlot.Necklace] != null ?
+                        player.CharacterInfo.Equipment[(int)EquipmentSlot.Necklace].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoNecklace);
                     break;
                 case "BELT":
-                    newValue = player.Info.Equipment[(int)EquipmentSlot.Belt] != null ?
-                        player.Info.Equipment[(int)EquipmentSlot.Belt].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoBelt);
+                    newValue = player.CharacterInfo.Equipment[(int)EquipmentSlot.Belt] != null ?
+                        player.CharacterInfo.Equipment[(int)EquipmentSlot.Belt].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoBelt);
                     break;
                 case "BOOTS":
-                    newValue = player.Info.Equipment[(int)EquipmentSlot.Boots] != null ?
-                        player.Info.Equipment[(int)EquipmentSlot.Boots].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoBoots);
+                    newValue = player.CharacterInfo.Equipment[(int)EquipmentSlot.Boots] != null ?
+                        player.CharacterInfo.Equipment[(int)EquipmentSlot.Boots].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoBoots);
                     break;
                 case "HELMET":
-                    newValue = player.Info.Equipment[(int)EquipmentSlot.Helmet] != null ?
-                        player.Info.Equipment[(int)EquipmentSlot.Helmet].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoHelmet);
+                    newValue = player.CharacterInfo.Equipment[(int)EquipmentSlot.Helmet] != null ?
+                        player.CharacterInfo.Equipment[(int)EquipmentSlot.Helmet].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoHelmet);
                     break;
                 case "AMULET":
-                    newValue = player.Info.Equipment[(int)EquipmentSlot.Amulet] != null ?
-                        player.Info.Equipment[(int)EquipmentSlot.Amulet].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoAmulet);
+                    newValue = player.CharacterInfo.Equipment[(int)EquipmentSlot.Amulet] != null ?
+                        player.CharacterInfo.Equipment[(int)EquipmentSlot.Amulet].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoAmulet);
                     break;
                 case "STONE":
-                    newValue = player.Info.Equipment[(int)EquipmentSlot.Stone] != null ?
-                        player.Info.Equipment[(int)EquipmentSlot.Stone].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoStone);
+                    newValue = player.CharacterInfo.Equipment[(int)EquipmentSlot.Stone] != null ?
+                        player.CharacterInfo.Equipment[(int)EquipmentSlot.Stone].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoStone);
                     break;
                 case "TORCH":
-                    newValue = player.Info.Equipment[(int)EquipmentSlot.Torch] != null ?
-                        player.Info.Equipment[(int)EquipmentSlot.Torch].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoTorch);
+                    newValue = player.CharacterInfo.Equipment[(int)EquipmentSlot.Torch] != null ?
+                        player.CharacterInfo.Equipment[(int)EquipmentSlot.Torch].FriendlyName : GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoTorch);
                     break;
 
                 case "DATE":
@@ -1584,13 +1584,13 @@ namespace Server.MirObjects
                     }
                     else
                     {
-                        newValue = $"{player.Info.Equipment[(int)EquipmentSlot.Mount].CurrentDura} ({player.Info.Equipment[(int)EquipmentSlot.Mount].MaxDura})";
+                        newValue = $"{player.CharacterInfo.Equipment[(int)EquipmentSlot.Mount].CurrentDura} ({player.CharacterInfo.Equipment[(int)EquipmentSlot.Mount].MaxDura})";
                     }
                     break;
                 case "MOUNT":
                     if (player.Mount.HasMount)
                     {
-                        newValue = player.Info.Equipment[(int)EquipmentSlot.Mount].FriendlyName;
+                        newValue = player.CharacterInfo.Equipment[(int)EquipmentSlot.Mount].FriendlyName;
                     }
                     else
                     {
@@ -2187,7 +2187,7 @@ namespace Server.MirObjects
 
                         var info = Env.GetItemInfo(param[0]);
 
-                        foreach (var item in player.Info.Inventory.Where(item => item != null && item.Info == info))
+                        foreach (var item in player.CharacterInfo.Inventory.Where(item => item != null && item.Info == info))
                         {
                             if (checkDura)
                                 if (item.CurrentDura < (dura * 1000)) continue;
@@ -2342,7 +2342,7 @@ namespace Server.MirObjects
 
                         bool tempBool = Convert.ToBoolean(onCheck);
 
-                        bool flag = player.Info.Flags[tempUint];
+                        bool flag = player.CharacterInfo.Flags[tempUint];
 
                         failed = flag != tempBool;
                         break;
@@ -2534,7 +2534,7 @@ namespace Server.MirObjects
                         }
                         break;
                     case CheckType.CheckRelationship:
-                        if (player.Info.Married == 0)
+                        if (player.CharacterInfo.Married == 0)
                         {
                             failed = true;
                         }
@@ -2564,13 +2564,13 @@ namespace Server.MirObjects
 
                         int slotCount = 0;
 
-                        for (int k = 0; k < player.Info.Inventory.Length; k++)
-                            if (player.Info.Inventory[k] == null) slotCount++;
+                        for (int k = 0; k < player.CharacterInfo.Inventory.Length; k++)
+                            if (player.CharacterInfo.Inventory[k] == null) slotCount++;
 
                         failed = !Compare(param[0], slotCount, tempInt);
                         break;
                     case CheckType.IsNewHuman:
-                        failed = player.Info.AccountInfo.Characters.Count > 1;
+                        failed = player.CharacterInfo.AccountInfo.Characters.Count > 1;
                         break;
 
                     case CheckType.CheckConquest:
@@ -3309,8 +3309,8 @@ namespace Server.MirObjects
                         {
                             if (!uint.TryParse(param[0], out uint pearls)) return;
 
-                            if (pearls + player.Info.PearlCount >= int.MaxValue)
-                                pearls = (uint)(int.MaxValue - player.Info.PearlCount);
+                            if (pearls + player.CharacterInfo.PearlCount >= int.MaxValue)
+                                pearls = (uint)(int.MaxValue - player.CharacterInfo.PearlCount);
 
                             player.IntelligentCreatureGainPearls((int)pearls);
                         }
@@ -3320,7 +3320,7 @@ namespace Server.MirObjects
                         {
                             if (!uint.TryParse(param[0], out uint pearls)) return;
 
-                            if (pearls >= player.Info.PearlCount) pearls = (uint)player.Info.PearlCount;
+                            if (pearls >= player.CharacterInfo.PearlCount) pearls = (uint)player.CharacterInfo.PearlCount;
 
                             player.IntelligentCreatureLosePearls((int)pearls);
                         }
@@ -3379,9 +3379,9 @@ namespace Server.MirObjects
                                 break;
                             }
 
-                            for (int j = 0; j < player.Info.Inventory.Length; j++)
+                            for (int j = 0; j < player.CharacterInfo.Inventory.Length; j++)
                             {
-                                UserItem item = player.Info.Inventory[j];
+                                UserItem item = player.CharacterInfo.Inventory[j];
                                 if (item == null) continue;
                                 if (item.Info != info) continue;
 
@@ -3393,7 +3393,7 @@ namespace Server.MirObjects
                                 if (count > item.Count)
                                 {
                                     player.Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
-                                    player.Info.Inventory[j] = null;
+                                    player.CharacterInfo.Inventory[j] = null;
 
                                     count -= item.Count;
                                     continue;
@@ -3401,7 +3401,7 @@ namespace Server.MirObjects
 
                                 player.Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = count });
                                 if (count == item.Count)
-                                    player.Info.Inventory[j] = null;
+                                    player.CharacterInfo.Inventory[j] = null;
                                 else
                                     item.Count -= count;
                                 break;
@@ -3572,13 +3572,13 @@ namespace Server.MirObjects
 
                     case ActionType.ChangeGender:
                         {
-                            switch (player.Info.Gender)
+                            switch (player.CharacterInfo.Gender)
                             {
                                 case MirGender.Male:
-                                    player.Info.Gender = MirGender.Female;
+                                    player.CharacterInfo.Gender = MirGender.Female;
                                     break;
                                 case MirGender.Female:
-                                    player.Info.Gender = MirGender.Male;
+                                    player.CharacterInfo.Gender = MirGender.Male;
                                     break;
                             }
                         }
@@ -3588,7 +3588,7 @@ namespace Server.MirObjects
                         {
                             if (param.Count < 1)
                             {
-                                player.Info.Hair = (byte)RandomProvider.Next(0, 9);
+                                player.CharacterInfo.Hair = (byte)RandomProvider.Next(0, 9);
                             }
                             else
                             {
@@ -3596,7 +3596,7 @@ namespace Server.MirObjects
 
                                 if (tempByte >= 0 && tempByte <= 9)
                                 {
-                                    player.Info.Hair = tempByte;
+                                    player.CharacterInfo.Hair = tempByte;
                                 }
                             }
                         }
@@ -3609,19 +3609,19 @@ namespace Server.MirObjects
                             switch (mirClass)
                             {
                                 case MirClass.Warrior:
-                                    player.Info.Class = MirClass.Warrior;
+                                    player.CharacterInfo.Class = MirClass.Warrior;
                                     break;
                                 case MirClass.Taoist:
-                                    player.Info.Class = MirClass.Taoist;
+                                    player.CharacterInfo.Class = MirClass.Taoist;
                                     break;
                                 case MirClass.Wizard:
-                                    player.Info.Class = MirClass.Wizard;
+                                    player.CharacterInfo.Class = MirClass.Wizard;
                                     break;
                                 case MirClass.Assassin:
-                                    player.Info.Class = MirClass.Assassin;
+                                    player.CharacterInfo.Class = MirClass.Assassin;
                                     break;
                                 case MirClass.Archer:
-                                    player.Info.Class = MirClass.Archer;
+                                    player.CharacterInfo.Class = MirClass.Archer;
                                     break;
                             }
                         }
@@ -3651,7 +3651,7 @@ namespace Server.MirObjects
                             Spell skill;
                             if (!Enum.TryParse(param[0], true, out skill)) return;
 
-                            if (player.Info.Magics.Any(e => e.Spell == skill)) break;
+                            if (player.CharacterInfo.Magics.Any(e => e.Spell == skill)) break;
 
                             if (param.Count > 1)
                                 spellLevel = byte.TryParse(param[1], out spellLevel) ? Math.Min((byte)3, spellLevel) : (byte)0;
@@ -3660,7 +3660,7 @@ namespace Server.MirObjects
 
                             if (magic.Info == null) return;
 
-                            player.Info.Magics.Add(magic);
+                            player.CharacterInfo.Magics.Add(magic);
                             player.SendMagicInfo(magic);
                         }
                         break;
@@ -3669,13 +3669,13 @@ namespace Server.MirObjects
                         {
                             if (!Enum.TryParse(param[0], true, out Spell skill)) return;
 
-                            if (!player.Info.Magics.Any(e => e.Spell == skill)) break;
+                            if (!player.CharacterInfo.Magics.Any(e => e.Spell == skill)) break;
 
-                            for (var j = player.Info.Magics.Count - 1; j >= 0; j--)
+                            for (var j = player.CharacterInfo.Magics.Count - 1; j >= 0; j--)
                             {
-                                if (player.Info.Magics[j].Spell != skill) continue;
+                                if (player.CharacterInfo.Magics[j].Spell != skill) continue;
 
-                                player.Info.Magics.RemoveAt(j);
+                                player.CharacterInfo.Magics.RemoveAt(j);
                                 player.Enqueue(new S.RemoveMagic { PlaceId = j });
                             }
                         }
@@ -3713,7 +3713,7 @@ namespace Server.MirObjects
                             if (flagIndex < 0 || flagIndex >= Globals.FlagIndexCount) return;
                             var flagIsOn = Convert.ToBoolean(onCheck);
 
-                            player.Info.Flags[flagIndex] = flagIsOn;
+                            player.CharacterInfo.Flags[flagIndex] = flagIsOn;
 
                             for (int f = player.CurrentMap.NPCs.Count - 1; f >= 0; f--)
                             {
@@ -3984,7 +3984,7 @@ namespace Server.MirObjects
 
                     case ActionType.ComposeMail:
                         {
-                            mailInfo = new MailInfo(player.Info.Index, false)
+                            mailInfo = new MailInfo(player.CharacterInfo.Index, false)
                             {
                                 Sender = param[1],
                                 Message = param[0]
@@ -4386,9 +4386,9 @@ namespace Server.MirObjects
                         {
                             var slot = param[0];
 
-                            for (int e = 0; e < player.Info.Equipment.Length; e++)
+                            for (int e = 0; e < player.CharacterInfo.Equipment.Length; e++)
                             {
-                                var item = player.Info.Equipment[e];
+                                var item = player.CharacterInfo.Equipment[e];
 
                                 if (item == null) continue;
 
@@ -4398,14 +4398,14 @@ namespace Server.MirObjects
 
                                 if (!player.CanRemoveItem(MirGridType.Inventory, item) || item.Cursed || item.WeddingRing != -1) continue;
 
-                                for (int k = 0; k < player.Info.Inventory.Length; k++)
+                                for (int k = 0; k < player.CharacterInfo.Inventory.Length; k++)
                                 {
-                                    var freeSlot = player.Info.Inventory[k];
+                                    var freeSlot = player.CharacterInfo.Inventory[k];
 
                                     if (freeSlot != null) continue;
 
-                                    player.Info.Equipment[e] = null;
-                                    player.Info.Inventory[k] = item;
+                                    player.CharacterInfo.Equipment[e] = null;
+                                    player.CharacterInfo.Inventory[k] = item;
 
                                     player.Report.ItemMoved(item, MirGridType.Equipment, MirGridType.Inventory, e, k);
 
@@ -4415,12 +4415,12 @@ namespace Server.MirObjects
 
                             S.UserSlotsRefresh packet = new S.UserSlotsRefresh
                             {
-                                Inventory = new UserItem[player.Info.Inventory.Length],
-                                Equipment = new UserItem[player.Info.Equipment.Length],
+                                Inventory = new UserItem[player.CharacterInfo.Inventory.Length],
+                                Equipment = new UserItem[player.CharacterInfo.Equipment.Length],
                             };
 
-                            player.Info.Inventory.CopyTo(packet.Inventory, 0);
-                            player.Info.Equipment.CopyTo(packet.Equipment, 0);
+                            player.CharacterInfo.Inventory.CopyTo(packet.Inventory, 0);
+                            player.CharacterInfo.Equipment.CopyTo(packet.Equipment, 0);
 
                             player.Enqueue(packet);
 
@@ -4633,14 +4633,14 @@ namespace Server.MirObjects
                         break;
                     case ActionType.HeroGiveSkill:
                         {
-                            if (player.Hero == null || player.Hero.Info == null) return;
+                            if (player.Hero == null || player.Hero.CharacterInfo == null) return;
 
                             byte spellLevel = 0;
 
                             Spell skill;
                             if (!Enum.TryParse(param[0], true, out skill)) return;
 
-                            if (player.Hero.Info.Magics.Any(e => e.Spell == skill)) break;
+                            if (player.Hero.CharacterInfo.Magics.Any(e => e.Spell == skill)) break;
 
                             if (param.Count > 1)
                                 spellLevel = byte.TryParse(param[1], out spellLevel) ? Math.Min((byte)3, spellLevel) : (byte)0;
@@ -4649,23 +4649,23 @@ namespace Server.MirObjects
 
                             if (magic.Info == null) return;
 
-                            player.Hero.Info.Magics.Add(magic);
+                            player.Hero.CharacterInfo.Magics.Add(magic);
                             player.Hero.SendMagicInfo(magic);
                         }
                         break;
                     case ActionType.HeroRemoveSkill:
                         {
-                            if (player.Hero == null || player.Hero.Info == null) return;
+                            if (player.Hero == null || player.Hero.CharacterInfo == null) return;
 
                             if (!Enum.TryParse(param[0], true, out Spell skill)) return;
 
-                            if (!player.Hero.Info.Magics.Any(e => e.Spell == skill)) break;
+                            if (!player.Hero.CharacterInfo.Magics.Any(e => e.Spell == skill)) break;
 
-                            for (var j = player.Hero.Info.Magics.Count - 1; j >= 0; j--)
+                            for (var j = player.Hero.CharacterInfo.Magics.Count - 1; j >= 0; j--)
                             {
-                                if (player.Hero.Info.Magics[j].Spell != skill) continue;
+                                if (player.Hero.CharacterInfo.Magics[j].Spell != skill) continue;
 
-                                player.Hero.Info.Magics.RemoveAt(j);
+                                player.Hero.CharacterInfo.Magics.RemoveAt(j);
                                 player.Hero.Enqueue(new S.RemoveMagic { PlaceId = j });
                             }
                         }
@@ -4683,7 +4683,7 @@ namespace Server.MirObjects
                             var conquest = Env.Conquests.FirstOrDefault(z => z.Info.Index == tempInt);
                             if (conquest == null) return;
 
-                            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ConquestRepairAllInvokedByGM), player.Name, player.Info.AccountInfo.Index));
+                            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ConquestRepairAllInvokedByGM), player.Name, player.CharacterInfo.AccountInfo.Index));
                             MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.Conquest), conquest.Info.Name));
 
                             if (conquest.Guild != null)

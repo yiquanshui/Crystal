@@ -12,7 +12,7 @@ namespace Server.MirObjects
             base.Load(info, connection);
 
             if (HasMagic(Spell.DoubleSlash))
-                Info.DoubleSlash = true;
+                CharacterInfo.DoubleSlash = true;
         }
         protected override bool InAttackRange()
         {
@@ -77,7 +77,7 @@ namespace Server.MirObjects
             {
                 Spell spell = Spell.None;
 
-                if (Info.DoubleSlash)
+                if (CharacterInfo.DoubleSlash)
                     spell = Spell.DoubleSlash;
 
                 Attack(Direction, spell);

@@ -423,45 +423,45 @@ namespace Server.MirObjects
 
         public void CheckVisible(PlayerObject Player, bool Force = false)
         {
-            VisibleLog.TryGetValue(Player.Info.Index, out bool canSee);
+            VisibleLog.TryGetValue(Player.CharacterInfo.Index, out bool canSee);
 
             if (Conq != null &&
                 Conq.WarIsOn &&
                 !Info.ConquestVisible)
             {
                 if (canSee) CurrentMap.Broadcast(new S.ObjectRemove { ObjectID = ObjectID }, CurrentLocation, Player);
-                VisibleLog[Player.Info.Index] = false;
+                VisibleLog[Player.CharacterInfo.Index] = false;
                 return;
             }
 
-            if (Info.FlagNeeded != 0 && !Player.Info.Flags[Info.FlagNeeded])
+            if (Info.FlagNeeded != 0 && !Player.CharacterInfo.Flags[Info.FlagNeeded])
             {
                 if (canSee) CurrentMap.Broadcast(new S.ObjectRemove { ObjectID = ObjectID }, CurrentLocation, Player);
-                VisibleLog[Player.Info.Index] = false;
+                VisibleLog[Player.CharacterInfo.Index] = false;
                 return;
             }
 
             if (Info.MinLev != 0 && Player.Level < Info.MinLev || Info.MaxLev != 0 && Player.Level > Info.MaxLev)
             {
                 if (canSee) CurrentMap.Broadcast(new S.ObjectRemove { ObjectID = ObjectID }, CurrentLocation, Player);
-                VisibleLog[Player.Info.Index] = false;
+                VisibleLog[Player.CharacterInfo.Index] = false;
                 return;
             }
 
             if (Info.ClassRequired != "" && Player.Class.ToString() != Info.ClassRequired)
             {
                 if (canSee) CurrentMap.Broadcast(new S.ObjectRemove { ObjectID = ObjectID }, CurrentLocation, Player);
-                VisibleLog[Player.Info.Index] = false;
+                VisibleLog[Player.CharacterInfo.Index] = false;
                 return;
             }
 
             if (Visible && !canSee) CurrentMap.Broadcast(GetInfo(), CurrentLocation, Player);
             else if (Force && Visible) CurrentMap.Broadcast(GetInfo(), CurrentLocation, Player);
 
-            VisibleLog[Player.Info.Index] = true;
+            VisibleLog[Player.CharacterInfo.Index] = true;
         }
 
-        public override int CurrentMapIndex { get; set; }
+        public override int CurrentMapIndex { get; protected set; }
 
         public override Point CurrentLocation
         {

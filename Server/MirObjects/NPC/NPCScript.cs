@@ -981,7 +981,7 @@ namespace Server.MirObjects
                     player.SendNPCGoods((from x in CraftGoods where x.CanCraft(player) select x.Item).ToList(), PriceRate(player), PanelType.Craft);
                     break;
                 case RefineKey:
-                    if (player.Info.CurrentRefine != null)
+                    if (player.CharacterInfo.CurrentRefine != null)
                     {
                         player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.YouAreRefiningItem), ChatType.System);
                         player.Enqueue(new S.NPCRefine { Rate = (Settings.RefineCost), Refining = true });
@@ -1048,7 +1048,7 @@ namespace Server.MirObjects
                     player.GetMarket(string.Empty, ItemType.Nothing);
                     break;
                 case GuildCreateKey:
-                    if (player.Info.Level < Settings.Guild_RequiredLevel)
+                    if (player.CharacterInfo.Level < Settings.Guild_RequiredLevel)
                     {
                         player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YouNeedLevelToCreateGuild), Settings.Guild_RequiredLevel), ChatType.System);
                     }
@@ -1088,7 +1088,7 @@ namespace Server.MirObjects
                     }
                     else
                     {
-                        foreach (var mail in player.Info.Mail)
+                        foreach (var mail in player.CharacterInfo.Mail)
                         {
                             if (mail.Parcel) mail.Collected = true;
                         }
@@ -1115,7 +1115,7 @@ namespace Server.MirObjects
                     player.Enqueue(new S.NPCPearlGoods { List = Goods, Rate = PriceRate(player), Type = PanelType.Buy });
                     break;
                 case HeroCreateKey:
-                    if (player.Info.Level < Settings.Hero_RequiredLevel)
+                    if (player.CharacterInfo.Level < Settings.Hero_RequiredLevel)
                     {
                         player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YouMustBeLevelToCreateHero), Settings.Hero_RequiredLevel), ChatType.System);
                         break;
@@ -1190,7 +1190,7 @@ namespace Server.MirObjects
 
             if (player.NPCPage.Key.ToUpper() == PearlBuyKey)//pearl currency
             {
-                if (cost > player.Info.PearlCount) return;
+                if (cost > player.CharacterInfo.PearlCount) return;
             }
             else if (cost > player.Account.Gold) return;
 
@@ -1279,9 +1279,9 @@ namespace Server.MirObjects
 
                     if (usedSlots.Contains(slot)) continue;
 
-                    if (slot < 0 || slot > player.Info.Inventory.Length) continue;
+                    if (slot < 0 || slot > player.CharacterInfo.Inventory.Length) continue;
 
-                    UserItem item = player.Info.Inventory[slot];
+                    UserItem item = player.CharacterInfo.Inventory[slot];
 
                     if (item == null || item.Info != tool.Info) continue;
 
@@ -1317,9 +1317,9 @@ namespace Server.MirObjects
 
                     if (usedSlots.Contains(slot)) continue;
 
-                    if (slot < 0 || slot > player.Info.Inventory.Length) continue;
+                    if (slot < 0 || slot > player.CharacterInfo.Inventory.Length) continue;
 
-                    UserItem item = player.Info.Inventory[slot];
+                    UserItem item = player.CharacterInfo.Inventory[slot];
 
                     if (item == null || item.Info != ingredient.Info) continue;
 
@@ -1380,9 +1380,9 @@ namespace Server.MirObjects
 
                     if (usedSlots2.Contains(slot)) continue;
 
-                    if (slot < 0 || slot > player.Info.Inventory.Length) continue;
+                    if (slot < 0 || slot > player.CharacterInfo.Inventory.Length) continue;
 
-                    UserItem item = player.Info.Inventory[slot];
+                    UserItem item = player.CharacterInfo.Inventory[slot];
 
                     if (item == null || item.Info != tool.Info) continue;
 
@@ -1405,9 +1405,9 @@ namespace Server.MirObjects
 
                     if (usedSlots2.Contains(slot)) continue;
 
-                    if (slot < 0 || slot > player.Info.Inventory.Length) continue;
+                    if (slot < 0 || slot > player.CharacterInfo.Inventory.Length) continue;
 
-                    UserItem item = player.Info.Inventory[slot];
+                    UserItem item = player.CharacterInfo.Inventory[slot];
 
                     if (item == null || item.Info != ingredient.Info) continue;
 
@@ -1416,14 +1416,14 @@ namespace Server.MirObjects
                     if (item.Count > amount)
                     {
                         player.Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = amount });
-                        player.Info.Inventory[slot].Count -= amount;
+                        player.CharacterInfo.Inventory[slot].Count -= amount;
                         break;
                     }
                     else
                     {
                         player.Enqueue(new S.DeleteItem { UniqueID = item.UniqueID, Count = item.Count });
                         amount -= item.Count;
-                        player.Info.Inventory[slot] = null;
+                        player.CharacterInfo.Inventory[slot] = null;
                     }
 
                     break;

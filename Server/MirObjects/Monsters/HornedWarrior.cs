@@ -41,7 +41,7 @@ namespace Server.MirObjects.Monsters
             AttackTime = Env.Time + AttackSpeed;
             ShockTime = 0;
 
-            if (HasBuff(BuffType.HornedWarriorShield, out _))
+            if (TryGetBuff(BuffType.HornedWarriorShield, out _))
             {
                 return;
             }
@@ -87,7 +87,7 @@ namespace Server.MirObjects.Monsters
         {
             if (Target == null || !CanAttack) return;
 
-            var buff = HasBuff(BuffType.HornedWarriorShield, out _);
+            var buff = TryGetBuff(BuffType.HornedWarriorShield, out _);
 
             if (InAttackRange() && !buff)
             {

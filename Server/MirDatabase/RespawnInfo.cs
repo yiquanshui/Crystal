@@ -1,5 +1,6 @@
 using System.Drawing;
 using Server.MirEnv;
+using static System.Int32;
 
 namespace Server.MirDatabase
 {
@@ -61,9 +62,9 @@ namespace Server.MirDatabase
 
             int x,y ;
 
-            if (!int.TryParse(data[0], out info.MonsterIndex)) return null;
-            if (!int.TryParse(data[1], out x)) return null;
-            if (!int.TryParse(data[2], out y)) return null;
+            if (!TryParse(data[0], out info.MonsterIndex)) return null;
+            if (!TryParse(data[1], out x)) return null;
+            if (!TryParse(data[2], out y)) return null;
 
             info.Location = new Point(x, y);
 
@@ -72,7 +73,7 @@ namespace Server.MirDatabase
             if (!ushort.TryParse(data[5], out info.Delay)) return null;
             if (!byte.TryParse(data[6], out info.Direction)) return null;
             if (!ushort.TryParse(data[7], out info.RandomDelay)) return null;
-            if (!int.TryParse(data[8], out info.RespawnIndex)) return null;
+            if (!TryParse(data[8], out info.RespawnIndex)) return null;
             if (!bool.TryParse(data[9], out info.SaveRespawnTime)) return null;
             if (!ushort.TryParse(data[10], out info.RespawnTicks)) return null;
 
@@ -122,24 +123,21 @@ namespace Server.MirDatabase
         public Point Location;
         public int Delay;
 
-        public static RouteInfo FromText(string text)
+        public static RouteInfo? FromText(string text)
         {
-            string[] data = text.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] data = text.Split([','], StringSplitOptions.RemoveEmptyEntries);
 
             if (data.Length < 2) return null;
 
             RouteInfo info = new RouteInfo();
 
-            int x, y;
-
-            if (!int.TryParse(data[0], out x)) return null;
-            if (!int.TryParse(data[1], out y)) return null;
+            if (!TryParse(data[0], out int x) || !TryParse(data[1], out int y)) return null;
 
             info.Location = new Point(x, y);
-
             if (data.Length <= 2) return info;
 
-            return !int.TryParse(data[2], out info.Delay) ? info : info;
+            _ = TryParse(data[2], out info.Delay);
+            return info;
         }
     }
 }

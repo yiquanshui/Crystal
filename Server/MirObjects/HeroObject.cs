@@ -141,7 +141,7 @@ namespace Server.MirObjects
         {
             info.Mount = new MountInfo(this);
 
-            Info = info;
+            CharacterInfo = info;
             HInfo = (HeroInfo)info;
 
             Stats = new Stats();            
@@ -243,7 +243,7 @@ namespace Server.MirObjects
         protected override void CleanUp()
         {
             Owner = null;
-            Info = null;
+            CharacterInfo = null;
         }
 
         public override void Spawned()
@@ -272,17 +272,17 @@ namespace Server.MirObjects
         protected virtual void GetItemInfo()
         {
             UserItem item;
-            for (int i = 0; i < Info.Inventory.Length; i++)
+            for (int i = 0; i < CharacterInfo.Inventory.Length; i++)
             {
-                item = Info.Inventory[i];
+                item = CharacterInfo.Inventory[i];
                 if (item == null) continue;
 
                 Owner.CheckItem(item);
             }
 
-            for (int i = 0; i < Info.Equipment.Length; i++)
+            for (int i = 0; i < CharacterInfo.Equipment.Length; i++)
             {
-                item = Info.Equipment[i];
+                item = CharacterInfo.Equipment[i];
 
                 if (item == null) continue;
 
@@ -306,7 +306,7 @@ namespace Server.MirObjects
 
             return true;
         }
-        protected bool HasMagic(Spell spell) => Info.Magics.Any(x => x.Spell == spell);
+        protected bool HasMagic(Spell spell) => CharacterInfo.Magics.Any(x => x.Spell == spell);
         public override bool TryMagic()
         {
             return true;
@@ -328,9 +328,9 @@ namespace Server.MirObjects
 
             if (Owner.Hero != null && Owner.Hero.Dead) return;
 
-            for (int i = 0; i < Info.Inventory.Length; i++)
+            for (int i = 0; i < CharacterInfo.Inventory.Length; i++)
             {
-                item = Info.Inventory[i];
+                item = CharacterInfo.Inventory[i];
                 if (item == null || item.UniqueID != id) continue;
                 index = i;
                 break;
@@ -429,7 +429,7 @@ namespace Server.MirObjects
                             }
                             break;
                         case 4: //RepairOil
-                            temp = Info.Equipment[(int)EquipmentSlot.Weapon];
+                            temp = CharacterInfo.Equipment[(int)EquipmentSlot.Weapon];
                             if (temp == null || temp.MaxDura == temp.CurrentDura)
                             {
                                 Owner.Enqueue(p);
@@ -449,7 +449,7 @@ namespace Server.MirObjects
                             Owner.Enqueue(new S.ItemRepaired { UniqueID = temp.UniqueID, MaxDura = temp.MaxDura, CurrentDura = temp.CurrentDura });
                             break;
                         case 5: //WarGodOil
-                            temp = Info.Equipment[(int)EquipmentSlot.Weapon];
+                            temp = CharacterInfo.Equipment[(int)EquipmentSlot.Weapon];
                             if (temp == null || temp.MaxDura == temp.CurrentDura)
                             {
                                 Owner.Enqueue(p);
@@ -480,14 +480,14 @@ namespace Server.MirObjects
                             }
                             break;
                         case 15: //Increase Hero inventory
-                            if (Info.Inventory.Length >= 42)
+                            if (CharacterInfo.Inventory.Length >= 42)
                             {
                                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.HeroInventoryMax)
                                     , ChatType.System);
                                 Owner.Enqueue(p);
                                 return;
                             }
-                            Enqueue(new S.ResizeInventory { Size = Info.ResizeInventory() });
+                            Enqueue(new S.ResizeInventory { Size = CharacterInfo.ResizeInventory() });
                             ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.HeroInventoryIncreased), ChatType.System);
                             Owner.Enqueue(p);
                             break;
@@ -502,12 +502,12 @@ namespace Server.MirObjects
                         return;
                     }
 
-                    Info.Magics.Add(magic);
+                    CharacterInfo.Magics.Add(magic);
                     SendMagicInfo(magic);
                     RefreshStats();
                     break;
                 case ItemType.Food:
-                    temp = Info.Equipment[(int)EquipmentSlot.Mount];
+                    temp = CharacterInfo.Equipment[(int)EquipmentSlot.Mount];
                     if (temp == null || temp.MaxDura == temp.CurrentDura)
                     {
                         Owner.Enqueue(p);
@@ -604,7 +604,7 @@ namespace Server.MirObjects
             }
 
             if (item.Count > 1) item.Count--;
-            else Info.Inventory[index] = null;
+            else CharacterInfo.Inventory[index] = null;
             RefreshBagWeight();
 
             Report?.ItemChanged(item, 1, 1);
@@ -620,7 +620,7 @@ namespace Server.MirObjects
 
                 for (var i = (int)EquipmentSlot.RingL; i <= (int)EquipmentSlot.RingR; i++)
                 {
-                    var item = Info.Equipment[i];
+                    var item = CharacterInfo.Equipment[i];
 
                     if (item == null) continue;
                     if (!(item.Info.Unique.HasFlag(SpecialItemMode.Revival)) || item.CurrentDura < 1000) continue;
@@ -767,7 +767,7 @@ namespace Server.MirObjects
         public override void Process()
         {
 
-            if (Node == null || Info == null) return;
+            if (Node == null || CharacterInfo == null) return;
             
             if (Owner != null && Owner.CurrentMap != null && Owner.CurrentMap.Info.NoHero)
             {
@@ -814,9 +814,9 @@ namespace Server.MirObjects
 
         protected void TryAutoPot(int ItemIndex)
         {
-            for (int i = 0; i < Info.Inventory.Length; i++)
+            for (int i = 0; i < CharacterInfo.Inventory.Length; i++)
             {
-                UserItem item = Info.Inventory[i];
+                UserItem item = CharacterInfo.Inventory[i];
                 if (item == null) continue;
                 if (item.Info.Index != ItemIndex) continue;
 
@@ -874,7 +874,7 @@ namespace Server.MirObjects
         protected virtual void ProcessSearch()
         {
             if (Env.Time < SearchTime) return;
-            if (Owner.Info.HeroBehaviour == HeroBehaviour.Follow || !Mount.CanAttack) return;
+            if (Owner.CharacterInfo.HeroBehaviour == HeroBehaviour.Follow || !Mount.CanAttack) return;
 
             SearchTime = Env.Time + SearchDelay;
 
@@ -1087,7 +1087,7 @@ namespace Server.MirObjects
                                     if (!ob.IsAttackTarget(Owner)) continue;
                                     if (ob.Hidden && (!CoolEye || Level < ob.Level)) continue;
                                     if (ob.Master != null && Target != ob) continue;
-                                    if (Owner.Info.HeroBehaviour == HeroBehaviour.CounterAttack && ob.Target != this && ob.Target != Owner) continue;
+                                    if (Owner.CharacterInfo.HeroBehaviour == HeroBehaviour.CounterAttack && ob.Target != this && ob.Target != Owner) continue;
 
                                     Target = ob;
                                     return;
@@ -1212,8 +1212,8 @@ namespace Server.MirObjects
                 Experience = Experience,
                 MaxExperience = MaxExperience,
 
-                Inventory = new UserItem[Info.Inventory.Length],
-                Equipment = new UserItem[Info.Equipment.Length],
+                Inventory = new UserItem[CharacterInfo.Inventory.Length],
+                Equipment = new UserItem[CharacterInfo.Equipment.Length],
 
                 AutoPot = AutoPot,
                 AutoHPPercent = AutoHPPercent,
@@ -1222,11 +1222,11 @@ namespace Server.MirObjects
                 MPItemIndex = MPItemIndex
             };
 
-            for (int i = 0; i < Info.Magics.Count; i++)
-                packet.Magics.Add(Info.Magics[i].CreateClientMagic());
+            for (int i = 0; i < CharacterInfo.Magics.Count; i++)
+                packet.Magics.Add(CharacterInfo.Magics[i].CreateClientMagic());
 
-            Info.Inventory.CopyTo(packet.Inventory, 0);
-            Info.Equipment.CopyTo(packet.Equipment, 0);
+            CharacterInfo.Inventory.CopyTo(packet.Inventory, 0);
+            CharacterInfo.Equipment.CopyTo(packet.Equipment, 0);
 
             Owner.Enqueue(packet);
 
@@ -1298,7 +1298,7 @@ namespace Server.MirObjects
                 Poison = CurrentPoison,
                 Dead = Dead,
                 Hidden = Hidden,
-                Effect = HasBuff(BuffType.MagicShield, out _) ? SpellEffect.MagicShieldUp : HasBuff(BuffType.ElementalBarrier, out _) ? SpellEffect.ElementalBarrierUp : SpellEffect.None,
+                Effect = TryGetBuff(BuffType.MagicShield, out _) ? SpellEffect.MagicShieldUp : TryGetBuff(BuffType.ElementalBarrier, out _) ? SpellEffect.ElementalBarrierUp : SpellEffect.None,
                 WingEffect = Looks_Wings,
                 MountType = Mount.MountType,
                 RidingMount = RidingMount,

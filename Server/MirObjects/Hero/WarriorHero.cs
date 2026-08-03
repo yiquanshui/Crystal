@@ -10,7 +10,7 @@ namespace Server.MirObjects
         {
             if (Target.CurrentMap != CurrentMap) return false;
 
-            if (Info.Thrusting)
+            if (CharacterInfo.Thrusting)
             {
                 int x = Math.Abs(Target.CurrentLocation.X - CurrentLocation.X);
                 int y = Math.Abs(Target.CurrentLocation.Y - CurrentLocation.Y);
@@ -70,7 +70,7 @@ namespace Server.MirObjects
 
                 Spell spell = Spell.None;
 
-                if (Info.Thrusting && ((TargetDistance == 2) || (TargetDistance == 1 && ThrustObject == true)))
+                if (CharacterInfo.Thrusting && ((TargetDistance == 2) || (TargetDistance == 1 && ThrustObject == true)))
                 {
                     spell = Spell.Thrusting;
                 }
@@ -80,10 +80,10 @@ namespace Server.MirObjects
 
                 if (spell == Spell.None)
                 {
-                    if (Info.HalfMoon)
+                    if (CharacterInfo.HalfMoon)
                         spell = Spell.HalfMoon;
 
-                    if (Info.CrossHalfMoon)
+                    if (CharacterInfo.CrossHalfMoon)
                         spell = Spell.CrossHalfMoon;
 
                     if (TwinDrakeBlade)

@@ -114,7 +114,7 @@ namespace Server.MirObjects.Monsters
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                 if (damage == 0) return;
 
-                FullmoonAttack(damage, 500, DefenceType.ACAgility, MirEnv.RandomProvider.Next(1, 3));
+                FullMoonAttack(damage, 500, DefenceType.ACAgility, MirEnv.RandomProvider.Next(1, 3));
             }
         }
 
