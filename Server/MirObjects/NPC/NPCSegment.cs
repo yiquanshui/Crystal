@@ -8,6 +8,8 @@ using S = ServerPackets;
 using Timer = Server.MirEnv.Timer;
 using Server.MirNetwork;
 using Server.Library.MirDatabase;
+using Server.Library.MirDatabase.Conquest;
+using Server.MirDatabase.Conquest;
 
 namespace Server.MirObjects
 {
@@ -1270,10 +1272,10 @@ namespace Server.MirObjects
             var oneValRegex = new Regex(@"(.*?)\(((.*?))\)");
             var twoValRegex = new Regex(@"(.*?)\(((.*?),(.*?))\)");
             ConquestObject Conquest;
-            ConquestGuildArcherInfo Archer;
-            ConquestGuildGateInfo Gate;
-            ConquestGuildWallInfo Wall;
-            ConquestGuildSiegeInfo Siege;
+            GuildArcherInfo Archer;
+            GuildGateInfo Gate;
+            GuildWallInfo guildWall;
+            GuildSiegeInfo guildSiege;
 
             var match = regex.Match(param);
 
@@ -1358,18 +1360,18 @@ namespace Server.MirObjects
                         Conquest = Env.Conquests.FirstOrDefault(x => x.Info.Index == intVal1);
                         if (Conquest == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NotFound);
 
-                        Wall = Conquest.WallList.FirstOrDefault(x => x.Index == intVal2);
-                        if (Wall == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NotFound);
+                        guildWall = Conquest.WallList.FirstOrDefault(x => x.Index == intVal2);
+                        if (guildWall == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NotFound);
 
-                        if (Wall.Info.Name == "" || Wall.Info.Name == null)
+                        if (guildWall.Info.Name == "" || guildWall.Info.Name == null)
                             newValue = GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.ConquestWall);
                         else
-                            newValue = Wall.Info.Name;
+                            newValue = guildWall.Info.Name;
 
-                        if (Wall.GetRepairCost() == 0)
+                        if (guildWall.GetRepairCost() == 0)
                             newValue += GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NoRepairRequired);
                         else
-                            newValue += GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.GoldCost), Wall.GetRepairCost().ToString("#,##0"));
+                            newValue += GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.GoldCost), guildWall.GetRepairCost().ToString("#,##0"));
                     }
                     break;
                 case "CONQUESTSIEGE()":
@@ -1381,18 +1383,18 @@ namespace Server.MirObjects
                         Conquest = Env.Conquests.FirstOrDefault(x => x.Info.Index == intVal1);
                         if (Conquest == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NotFound);
 
-                        Siege = Conquest.SiegeList.FirstOrDefault(x => x.Index == intVal2);
-                        if (Siege == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NotFound);
+                        guildSiege = Conquest.SiegeList.FirstOrDefault(x => x.Index == intVal2);
+                        if (guildSiege == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NotFound);
 
-                        if (Siege.Info.Name == "" || Siege.Info.Name == null)
+                        if (guildSiege.Info.Name == "" || guildSiege.Info.Name == null)
                             newValue = GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.ConquestSiege);
                         else
-                            newValue = Siege.Info.Name;
+                            newValue = guildSiege.Info.Name;
 
-                        if (Siege.GetRepairCost() == 0)
+                        if (guildSiege.GetRepairCost() == 0)
                             newValue += GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.StillAlive);
                         else
-                            newValue += GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.GoldCost), Siege.GetRepairCost().ToString("#,##0"));
+                            newValue += GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.GoldCost), guildSiege.GetRepairCost().ToString("#,##0"));
                     }
                     break;
                 case "CONQUESTOWNER()":
@@ -2612,7 +2614,7 @@ namespace Server.MirObjects
                                 break;
                             }
 
-                            ConquestGuildArcherInfo Archer = Conquest.ArcherList.FirstOrDefault(g => g.Info.Index == tempInt2);
+                            GuildArcherInfo Archer = Conquest.ArcherList.FirstOrDefault(g => g.Info.Index == tempInt2);
                             if (Archer == null || Archer.GetRepairCost() == 0)
                             {
                                 failed = true;
@@ -2645,7 +2647,7 @@ namespace Server.MirObjects
                                 break;
                             }
 
-                            ConquestGuildGateInfo Gate = Conquest.GateList.FirstOrDefault(f => f.Info.Index == tempInt2);
+                            GuildGateInfo Gate = Conquest.GateList.FirstOrDefault(f => f.Info.Index == tempInt2);
                             if (Gate == null || Gate.GetRepairCost() == 0)
                             {
                                 failed = true;
@@ -2678,14 +2680,14 @@ namespace Server.MirObjects
                                 break;
                             }
 
-                            ConquestGuildWallInfo Wall = Conquest.WallList.FirstOrDefault(h => h.Info.Index == tempInt2);
-                            if (Wall == null || Wall.GetRepairCost() == 0)
+                            GuildWallInfo guildWall = Conquest.WallList.FirstOrDefault(h => h.Info.Index == tempInt2);
+                            if (guildWall == null || guildWall.GetRepairCost() == 0)
                             {
                                 failed = true;
                                 break;
                             }
                             if (player.MyGuild != null)
-                                failed = (player.MyGuild.Gold < Wall.GetRepairCost());
+                                failed = (player.MyGuild.Gold < guildWall.GetRepairCost());
                             else
                                 failed = true;
                         }
@@ -2711,7 +2713,7 @@ namespace Server.MirObjects
                                 break;
                             }
 
-                            ConquestGuildGateInfo Gate = Conquest.GateList.FirstOrDefault(f => f.Info.Index == tempInt2);
+                            GuildGateInfo Gate = Conquest.GateList.FirstOrDefault(f => f.Info.Index == tempInt2);
                             if (Gate == null || Gate.GetRepairCost() == 0)
                             {
                                 failed = true;
@@ -4118,7 +4120,7 @@ namespace Server.MirObjects
                             if (conquest == null) return;
 
                             if (!int.TryParse(param[1], out tempInt)) return;
-                            ConquestGuildArcherInfo conquestArcher = conquest.ArcherList.FirstOrDefault(z => z.Index == tempInt);
+                            GuildArcherInfo conquestArcher = conquest.ArcherList.FirstOrDefault(z => z.Index == tempInt);
                             if (conquestArcher == null) return;
 
                             if (conquestArcher.ArcherMonster != null)
@@ -4146,21 +4148,21 @@ namespace Server.MirObjects
                             if (conquest == null) return;
 
                             if (!int.TryParse(param[1], out tempInt)) return;
-                            ConquestGuildGateInfo conquestGate = conquest.GateList.FirstOrDefault(z => z.Index == tempInt);
-                            if (conquestGate == null) return;
+                            GuildGateInfo gate = conquest.GateList.FirstOrDefault(z => z.Index == tempInt);
+                            if (gate == null) return;
 
                             if (player.IsGM)
                             {
-                                conquestGate.Repair();
+                                gate.Repair();
                             }
                             else
                             {
-                                if (player.MyGuild == null || player.MyGuild.Gold < conquestGate.GetRepairCost()) return;
+                                if (player.MyGuild == null || player.MyGuild.Gold < gate.GetRepairCost()) return;
 
-                                player.MyGuild.Gold -= (uint)conquestGate.GetRepairCost();
-                                player.MyGuild.SendServerPacket(new S.GuildStorageGoldChange() { Type = 2, Amount = (uint)conquestGate.GetRepairCost() });
+                                player.MyGuild.Gold -= (uint)gate.GetRepairCost();
+                                player.MyGuild.SendServerPacket(new S.GuildStorageGoldChange() { Type = 2, Amount = (uint)gate.GetRepairCost() });
 
-                                conquestGate.Repair();
+                                gate.Repair();
                             }
                         }
                         break;
@@ -4171,22 +4173,22 @@ namespace Server.MirObjects
                             if (conquest == null) return;
 
                             if (!int.TryParse(param[1], out tempInt)) return;
-                            ConquestGuildWallInfo conquestWall = conquest.WallList.FirstOrDefault(z => z.Index == tempInt);
+                            GuildWallInfo conquestGuildWall = conquest.WallList.FirstOrDefault(z => z.Index == tempInt);
 
-                            if (conquestWall == null) return;
+                            if (conquestGuildWall == null) return;
 
                             if (player.IsGM)
                             {
-                                conquestWall.Repair();
+                                conquestGuildWall.Repair();
                             }
                             else
                             {
-                                if (player.MyGuild == null || player.MyGuild.Gold < conquestWall.GetRepairCost()) return;
+                                if (player.MyGuild == null || player.MyGuild.Gold < conquestGuildWall.GetRepairCost()) return;
 
-                                player.MyGuild.Gold -= (uint)conquestWall.GetRepairCost();
-                                player.MyGuild.SendServerPacket(new S.GuildStorageGoldChange() { Type = 2, Amount = (uint)conquestWall.GetRepairCost() });
+                                player.MyGuild.Gold -= (uint)conquestGuildWall.GetRepairCost();
+                                player.MyGuild.SendServerPacket(new S.GuildStorageGoldChange() { Type = 2, Amount = (uint)conquestGuildWall.GetRepairCost() });
 
-                                conquestWall.Repair();
+                                conquestGuildWall.Repair();
                             }
                         }
                         break;
@@ -4197,26 +4199,26 @@ namespace Server.MirObjects
                             if (conquest == null) return;
 
                             if (!int.TryParse(param[1], out tempInt)) return;
-                            ConquestGuildSiegeInfo conquestSiege = conquest.SiegeList.FirstOrDefault(z => z.Index == tempInt);
-                            if (conquestSiege == null) return;
+                            GuildSiegeInfo conquestGuildSiege = conquest.SiegeList.FirstOrDefault(z => z.Index == tempInt);
+                            if (conquestGuildSiege == null) return;
 
-                            if (conquestSiege.Gate != null)
+                            if (conquestGuildSiege.Gate != null)
                             {
-                                if (!conquestSiege.Gate.Dead) return;
+                                if (!conquestGuildSiege.Gate.Dead) return;
                             }
 
                             if (player.IsGM)
                             {
-                                conquestSiege.Repair();
+                                conquestGuildSiege.Repair();
                             }
                             else
                             {
-                                if (player.MyGuild == null || player.MyGuild.Gold < conquestSiege.GetRepairCost()) return;
+                                if (player.MyGuild == null || player.MyGuild.Gold < conquestGuildSiege.GetRepairCost()) return;
 
-                                player.MyGuild.Gold -= (uint)conquestSiege.GetRepairCost();
-                                player.MyGuild.SendServerPacket(new S.GuildStorageGoldChange() { Type = 2, Amount = (uint)conquestSiege.GetRepairCost() });
+                                player.MyGuild.Gold -= (uint)conquestGuildSiege.GetRepairCost();
+                                player.MyGuild.SendServerPacket(new S.GuildStorageGoldChange() { Type = 2, Amount = (uint)conquestGuildSiege.GetRepairCost() });
 
-                                conquestSiege.Repair();
+                                conquestGuildSiege.Repair();
                             }
                         }
                         break;
@@ -4303,7 +4305,7 @@ namespace Server.MirObjects
                             if (Conquest == null) return;
 
                             if (!int.TryParse(param[1], out tempInt)) return;
-                            ConquestGuildGateInfo OpenGate = Conquest.GateList.FirstOrDefault(z => z.Index == tempInt);
+                            GuildGateInfo OpenGate = Conquest.GateList.FirstOrDefault(z => z.Index == tempInt);
                             if (OpenGate == null) return;
                             if (OpenGate.Gate == null) return;
                             OpenGate.Gate.OpenDoor();
@@ -4316,7 +4318,7 @@ namespace Server.MirObjects
                             if (conquest == null) return;
 
                             if (!int.TryParse(param[1], out tempInt)) return;
-                            ConquestGuildGateInfo CloseGate = conquest.GateList.FirstOrDefault(z => z.Index == tempInt);
+                            GuildGateInfo CloseGate = conquest.GateList.FirstOrDefault(z => z.Index == tempInt);
                             if (CloseGate == null) return;
                             if (CloseGate.Gate == null) return;
                             CloseGate.Gate.CloseDoor();
@@ -4696,7 +4698,7 @@ namespace Server.MirObjects
                             }
 
                             int _fixed = 0;
-                            foreach (ConquestGuildArcherInfo archer in conquest.ArcherList)
+                            foreach (GuildArcherInfo archer in conquest.ArcherList)
                             {
                                 if (archer.ArcherMonster != null &&
                                     archer.ArcherMonster.Dead)
@@ -4709,7 +4711,7 @@ namespace Server.MirObjects
                             MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ArchersRepaired), _fixed, conquest.ArcherList.Count));
 
                             _fixed = 0;
-                            foreach (ConquestGuildGateInfo conquestGate in conquest.GateList)
+                            foreach (GuildGateInfo conquestGate in conquest.GateList)
                             {
                                 if (conquestGate != null)
                                 {
@@ -4721,7 +4723,7 @@ namespace Server.MirObjects
                             MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.GatesRepaired), _fixed, conquest.GateList.Count));
 
                             _fixed = 0;
-                            foreach (ConquestGuildWallInfo conquestWall in conquest.WallList)
+                            foreach (GuildWallInfo conquestWall in conquest.WallList)
                             {
                                 if (conquestWall != null)
                                 {
@@ -4733,7 +4735,7 @@ namespace Server.MirObjects
                             MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.WallsRepaired), _fixed, conquest.WallList.Count));
 
                             _fixed = 0;
-                            foreach (ConquestGuildSiegeInfo conquestSiege in conquest.SiegeList)
+                            foreach (GuildSiegeInfo conquestSiege in conquest.SiegeList)
                             {
                                 if (conquestSiege != null)
                                 {

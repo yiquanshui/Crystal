@@ -11,7 +11,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
 using System.Text.RegularExpressions;
+using Server.Library.MirDatabase.Conquest;
 using static System.Int32;
+using GuildInfo = Server.Library.MirDatabase.Conquest.GuildInfo;
 using S = ServerPackets;
 
 namespace Server.MirEnv
@@ -130,9 +132,9 @@ namespace Server.MirEnv
         public ulong NextUserItemID, NextAuctionID, NextMailID, NextRecipeID;
         public List<AccountInfo> AccountList = [];
         public List<CharacterInfo> CharacterList = [];
-        public List<GuildInfo> GuildList = [];
+        public List<MirDatabase.GuildInfo> GuildList = [];
         public LinkedList<AuctionInfo> Auctions = new();
-        public List<ConquestGuildInfo> ConquestList = [];
+        public List<GuildInfo> ConquestList = [];
         public Dictionary<int, int> GameshopLog = new();
         public List<HeroInfo> HeroList = [];
 
@@ -2800,7 +2802,7 @@ namespace Server.MirEnv
         private void SaveConquests(bool forced = false)
         {
             if (!Directory.Exists(Settings.ConquestsPath)) Directory.CreateDirectory(Settings.ConquestsPath);
-            foreach (ConquestGuildInfo conquest in ConquestList.Where(conquest => conquest.NeedSave || forced))
+            foreach (GuildInfo conquest in ConquestList.Where(conquest => conquest.NeedSave || forced))
             {
                 conquest.NeedSave = false;
                 MemoryStream memoryStream = new();
@@ -3172,7 +3174,7 @@ namespace Server.MirEnv
 
                     using var stream = File.OpenRead(Path.Combine(Settings.GuildPath, i + ".mgd"));
                     using var reader = new BinaryReader(stream);
-                    GuildInfo guildInfo = new(reader);
+                    MirDatabase.GuildInfo guildInfo = new(reader);
                     GuildList.Add(guildInfo);
                     GuildObject guildObject = new GuildObject(guildInfo);
                     count++;
@@ -3192,7 +3194,7 @@ namespace Server.MirEnv
                 foreach (ConquestInfo conquest in ConquestInfoList)
                 {
                     ConquestObject newConquest;
-                    ConquestGuildInfo conquestGuildInfo;
+                    GuildInfo guildInfo;
                     Map? tempMap = GetMap(conquest.MapIndex);
 
                     if (tempMap == null) continue;
@@ -3202,15 +3204,15 @@ namespace Server.MirEnv
                         using (var stream = File.OpenRead(Path.Combine(Settings.ConquestsPath, conquest.Index + ".mcd")))
                         {
                             using var reader = new BinaryReader(stream);
-                            conquestGuildInfo = new ConquestGuildInfo(reader) { Info = conquest };
+                            guildInfo = new GuildInfo(reader) { Info = conquest };
                         }
 
-                        newConquest = new ConquestObject(conquestGuildInfo)
+                        newConquest = new ConquestObject(guildInfo)
                         {
                             ConquestMap = tempMap
                         };
 
-                        foreach (var guild in Guilds.Where(guild => conquestGuildInfo.Owner == guild.Guildindex))
+                        foreach (var guild in Guilds.Where(guild => guildInfo.Owner == guild.Guildindex))
                         {
                             newConquest.Guild = guild;
                             guild.Conquest = newConquest;
@@ -3218,14 +3220,14 @@ namespace Server.MirEnv
                     }
                     else
                     {
-                        conquestGuildInfo = new ConquestGuildInfo { Info = conquest, NeedSave = true };
-                        newConquest = new ConquestObject(conquestGuildInfo)
+                        guildInfo = new GuildInfo { Info = conquest, NeedSave = true };
+                        newConquest = new ConquestObject(guildInfo)
                         {
                             ConquestMap = tempMap
                         };
                     }
 
-                    ConquestList.Add(conquestGuildInfo);
+                    ConquestList.Add(guildInfo);
                     Conquests.Add(newConquest);
                     tempMap.Conquest.Add(newConquest);
 
@@ -3238,7 +3240,7 @@ namespace Server.MirEnv
         {
             foreach (var gt in GTMapList)
             {
-                GuildInfo? guild = GuildList.FirstOrDefault(x => x.GTIndex == gt.Index);
+                MirDatabase.GuildInfo? guild = GuildList.FirstOrDefault(x => x.GTIndex == gt.Index);
                 if (guild == null)
                 {
                     continue;

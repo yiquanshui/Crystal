@@ -1,6 +1,9 @@
 using System.Drawing;
+using Server.Library.MirDatabase.Conquest;
 ﻿using Server.MirEnv;
 using Server.MirDatabase;
+using Server.MirDatabase.Conquest;
+using GuildInfo = Server.Library.MirDatabase.Conquest.GuildInfo;
 
 namespace Server.MirObjects
 {
@@ -11,7 +14,7 @@ namespace Server.MirObjects
             get { return Env.Main; }
         }
 
-        public ConquestGuildInfo GuildInfo;
+        public GuildInfo GuildInfo;
 
         public ConquestInfo Info
         {
@@ -19,37 +22,37 @@ namespace Server.MirObjects
             set { GuildInfo.Info = value; }
         }
 
-        public List<ConquestGuildArcherInfo> ArcherList
+        public List<GuildArcherInfo> ArcherList
         {
             get { return GuildInfo.ArcherList; }
             set { GuildInfo.ArcherList = value; }
         }
 
-        public List<ConquestGuildGateInfo> GateList
+        public List<GuildGateInfo> GateList
         {
             get { return GuildInfo.GateList; }
             set { GuildInfo.GateList = value; }
         }
 
-        public List<ConquestGuildWallInfo> WallList
+        public List<GuildWallInfo> WallList
         {
             get { return GuildInfo.WallList; }
             set { GuildInfo.WallList = value; }
         }
 
-        public List<ConquestGuildSiegeInfo> SiegeList
+        public List<GuildSiegeInfo> SiegeList
         {
             get { return GuildInfo.SiegeList; }
             set { GuildInfo.SiegeList = value; }
         }
 
-        public List<ConquestGuildFlagInfo> FlagList
+        public List<GuildFlagInfo> FlagList
         {
             get { return GuildInfo.FlagList; }
             set { GuildInfo.FlagList = value; }
         }
 
-        public Dictionary<ConquestGuildFlagInfo, Dictionary<GuildObject, int>> ControlPoints
+        public Dictionary<GuildFlagInfo, Dictionary<GuildObject, int>> ControlPoints
         {
             get { return GuildInfo.ControlPoints; }
             set { GuildInfo.ControlPoints = value; }
@@ -79,7 +82,7 @@ namespace Server.MirObjects
         public List<SpellObject> WarEffects = new List<SpellObject>();
         public List<NPCObject> ConquestNPCs = new List<NPCObject>();
 
-        public ConquestObject(ConquestGuildInfo guildInfo)
+        public ConquestObject(GuildInfo guildInfo)
         {
             GuildInfo = guildInfo;
         }
@@ -98,7 +101,7 @@ namespace Server.MirObjects
                 }
                 else
                 {
-                    GuildInfo.ArcherList.Add(new ConquestGuildArcherInfo { Info = Info.ConquestGuards[j], Alive = true, Index = Info.ConquestGuards[j].Index, Conquest = this });
+                    GuildInfo.ArcherList.Add(new GuildArcherInfo { Info = Info.ConquestGuards[j], Alive = true, Index = Info.ConquestGuards[j].Index, Conquest = this });
                 }
             }
 
@@ -123,14 +126,14 @@ namespace Server.MirObjects
                 }
                 else
                 {
-                    GuildInfo.GateList.Add(new ConquestGuildGateInfo { Info = Info.ConquestGates[j], Health = int.MaxValue, Index = Info.ConquestGates[j].Index, Conquest = this });
+                    GuildInfo.GateList.Add(new GuildGateInfo { Info = Info.ConquestGates[j], Health = int.MaxValue, Index = Info.ConquestGates[j].Index, Conquest = this });
                 }
             }
 
             //Bind Info to Saved Flag objects or create new objects
             for (var j = 0; j < Info.ConquestFlags.Count; j++)
             {
-                GuildInfo.FlagList.Add(new ConquestGuildFlagInfo { Info = Info.ConquestFlags[j], Index = Info.ConquestFlags[j].Index, Conquest = this });
+                GuildInfo.FlagList.Add(new GuildFlagInfo { Info = Info.ConquestFlags[j], Index = Info.ConquestFlags[j].Index, Conquest = this });
             }
 
             //Remove Gates that have been removed from DB
@@ -154,7 +157,7 @@ namespace Server.MirObjects
                 }
                 else
                 {
-                    GuildInfo.WallList.Add(new ConquestGuildWallInfo { Info = Info.ConquestWalls[j], Index = Info.ConquestWalls[j].Index, Health = int.MaxValue, Conquest = this });
+                    GuildInfo.WallList.Add(new GuildWallInfo { Info = Info.ConquestWalls[j], Index = Info.ConquestWalls[j].Index, Health = int.MaxValue, Conquest = this });
                 }
             }
 
@@ -180,7 +183,7 @@ namespace Server.MirObjects
                 }
                 else
                 {
-                    GuildInfo.SiegeList.Add(new ConquestGuildSiegeInfo { Info = Info.ConquestSieges[j], Index = Info.ConquestSieges[j].Index, Health = int.MaxValue, Conquest = this });
+                    GuildInfo.SiegeList.Add(new GuildSiegeInfo { Info = Info.ConquestSieges[j], Index = Info.ConquestSieges[j].Index, Health = int.MaxValue, Conquest = this });
                 }
             }
 
@@ -196,8 +199,8 @@ namespace Server.MirObjects
             //Bind Info to Saved Flag objects or create new objects
             for (var j = 0; j < Info.ControlPoints.Count; j++)
             {
-                ConquestGuildFlagInfo cp;
-                GuildInfo.ControlPoints.Add(cp = new ConquestGuildFlagInfo { Info = Info.ControlPoints[j], Index = Info.ControlPoints[j].Index, Conquest = this }, new Dictionary<GuildObject, int>());
+                GuildFlagInfo cp;
+                GuildInfo.ControlPoints.Add(cp = new GuildFlagInfo { Info = Info.ControlPoints[j], Index = Info.ControlPoints[j].Index, Conquest = this }, new Dictionary<GuildObject, int>());
             }
 
             LoadArchers();
@@ -601,8 +604,8 @@ namespace Server.MirObjects
                     Guild = winningGuild;
                     Guild.Conquest = this;
 
-                    List<ConquestGuildFlagInfo> keys = new List<ConquestGuildFlagInfo>(ControlPoints.Keys);
-                    foreach (ConquestGuildFlagInfo key in keys)
+                    List<GuildFlagInfo> keys = new List<GuildFlagInfo>(ControlPoints.Keys);
+                    foreach (GuildFlagInfo key in keys)
                     {
                         key.ChangeOwner(Guild);
                         ControlPoints[key] = new Dictionary<GuildObject, int>();
@@ -723,33 +726,33 @@ namespace Server.MirObjects
                     {
                         int points;
 
-                        foreach (KeyValuePair<ConquestGuildFlagInfo, Dictionary<GuildObject, int>> item in ControlPoints)
+                        foreach (KeyValuePair<GuildFlagInfo, Dictionary<GuildObject, int>> item in ControlPoints)
                         {
                             pointsChanged = false;
 
-                            ConquestGuildFlagInfo controlFlag = null;
+                            GuildFlagInfo controlGuildFlag = null;
                             Dictionary<GuildObject, int> controlFlagPoints = null;
 
                             for (int i = 0; i < ConquestMap.Players.Count; i++)
                             {
                                 if (!ConquestMap.Players[i].WarZone || ConquestMap.Players[i].MyGuild == null || ConquestMap.Players[i].Dead) continue;
 
-                                controlFlag = item.Key;
+                                controlGuildFlag = item.Key;
                                 controlFlagPoints = item.Value;
 
-                                if (!Functions.InRange(controlFlag.Info.Location, ConquestMap.Players[i].CurrentLocation, 3)) continue;
+                                if (!Functions.InRange(controlGuildFlag.Info.Location, ConquestMap.Players[i].CurrentLocation, 3)) continue;
 
                                 controlFlagPoints.TryGetValue(ConquestMap.Players[i].MyGuild, out points);
 
                                 if (points == 0)
                                 {
                                     controlFlagPoints[ConquestMap.Players[i].MyGuild] = 1;
-                                    ConquestMap.Players[i].MyGuild.SendOutputMessage(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.GainingControlOf), ((double)controlFlagPoints[ConquestMap.Players[i].MyGuild] / MAX_CONTROL_POINTS), controlFlag.Info.Name));
+                                    ConquestMap.Players[i].MyGuild.SendOutputMessage(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.GainingControlOf), ((double)controlFlagPoints[ConquestMap.Players[i].MyGuild] / MAX_CONTROL_POINTS), controlGuildFlag.Info.Name));
                                 }
                                 else if (points < MAX_CONTROL_POINTS)
                                 {
                                     controlFlagPoints[ConquestMap.Players[i].MyGuild] += 1;
-                                    ConquestMap.Players[i].MyGuild.SendOutputMessage(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.GainingControlOf), ((double)controlFlagPoints[ConquestMap.Players[i].MyGuild] / MAX_CONTROL_POINTS), controlFlag.Info.Name));
+                                    ConquestMap.Players[i].MyGuild.SendOutputMessage(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.GainingControlOf), ((double)controlFlagPoints[ConquestMap.Players[i].MyGuild] / MAX_CONTROL_POINTS), controlGuildFlag.Info.Name));
                                 }
 
                                 List<GuildObject> guilds = controlFlagPoints.Keys.ToList();
@@ -785,13 +788,13 @@ namespace Server.MirObjects
                                     }
                                 }
 
-                                if (tempWinning != controlFlag.Guild)
+                                if (tempWinning != controlGuildFlag.Guild)
                                 {
-                                    controlFlag.ChangeOwner(tempWinning);
+                                    controlGuildFlag.ChangeOwner(tempWinning);
 
                                     for (int j = 0; j < ConquestMap.Players.Count; j++)
                                     {
-                                        ConquestMap.Players[j].ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerCapturedFlagAtLocation), tempWinning.Name, controlFlag.Info.Name, Info.Name), ChatType.System);
+                                        ConquestMap.Players[j].ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerCapturedFlagAtLocation), tempWinning.Name, controlGuildFlag.Info.Name, Info.Name), ChatType.System);
                                     }
                                 }
                             }
@@ -922,7 +925,7 @@ namespace Server.MirObjects
                     Dictionary<GuildObject, int> controlledPoints = new Dictionary<GuildObject, int>();
                     int count = 0;
 
-                    foreach (KeyValuePair<ConquestGuildFlagInfo, Dictionary<GuildObject, int>> item in ControlPoints)
+                    foreach (KeyValuePair<GuildFlagInfo, Dictionary<GuildObject, int>> item in ControlPoints)
                     {
                         controlledPoints.TryGetValue(item.Key.Guild, out count);
 
