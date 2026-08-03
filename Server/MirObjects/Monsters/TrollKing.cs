@@ -32,7 +32,7 @@ namespace Server.MirObjects.Monsters
 
             if (Functions.InRange(CurrentLocation, Target.CurrentLocation, 3))
             {
-                if (Env.Random.Next(2) == 0 || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 2))
+                if (MirEnv.RandomProvider.Next(2) == 0 || !Functions.InRange(CurrentLocation, Target.CurrentLocation, 2))
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
@@ -101,7 +101,7 @@ namespace Server.MirObjects.Monsters
 
             if (target.Attacked(this, damage, DefenceType.MACAgility) <= 0) return;
 
-            PoisonTarget(target, 1, Env.Random.Next(Stats[Stat.MaxMC]), PoisonType.Dazed, 1000);
+            PoisonTarget(target, 1, MirEnv.RandomProvider.Next(Stats[Stat.MaxMC]), PoisonType.Dazed, 1000);
         }
 
         protected override void ProcessTarget()
@@ -140,7 +140,7 @@ namespace Server.MirObjects.Monsters
 
             if (Walk(dir)) return;
 
-            switch (Env.Random.Next(2)) //No favour
+            switch (MirEnv.RandomProvider.Next(2)) //No favour
             {
                 case 0:
                     for (int i = 0; i < 7; i++)

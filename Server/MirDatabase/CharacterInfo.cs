@@ -94,7 +94,7 @@ namespace Server.MirDatabase
         public bool[] Flags = new bool[Globals.FlagIndexCount];
 
         public AccountInfo AccountInfo;
-        public PlayerObject Player;
+        public PlayerObject? Player;
         public MountInfo Mount;
 
         public Dictionary<int, int> GSpurchases = new Dictionary<int, int>();

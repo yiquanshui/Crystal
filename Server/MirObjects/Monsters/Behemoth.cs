@@ -32,7 +32,7 @@ namespace Server.MirObjects.Monsters
 
             if (!ranged)
             {
-                switch (Env.Random.Next(5))
+                switch (RandomProvider.Next(5))
                 {
                     case 0:
                     case 1:
@@ -64,13 +64,13 @@ namespace Server.MirObjects.Monsters
             }
             else
             {
-                if (Env.Random.Next(2) == 0)
+                if (RandomProvider.Next(2) == 0)
                 {
                     MoveTo(Target.CurrentLocation);
                 }
                 else
                 {
-                    switch (Env.Random.Next(2))
+                    switch (RandomProvider.Next(2))
                     {
                         case 0:
                             Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
@@ -177,7 +177,7 @@ namespace Server.MirObjects.Monsters
             for (int i = 0; i < count; i++)
             {
                 MonsterObject mob = null;
-                switch (Env.Random.Next(4))
+                switch (RandomProvider.Next(4))
                 {
                     case 0:
                         mob = GetMonster(Env.GetMonsterInfo(Settings.BehemothMonster1));
@@ -195,7 +195,7 @@ namespace Server.MirObjects.Monsters
                 if (!mob.Spawn(CurrentMap, Front))
                     mob.Spawn(CurrentMap, CurrentLocation);
                 
-                mob.Target = targets[Env.Random.Next(targets.Count)];
+                mob.Target = targets[RandomProvider.Next(targets.Count)];
                 mob.ActionTime = Env.Time + 2000;
                 SlaveList.Add(mob);
             }

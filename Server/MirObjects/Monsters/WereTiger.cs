@@ -30,7 +30,7 @@ namespace Server.MirObjects.Monsters
             ActionTime = Env.Time + 300;
             AttackTime = Env.Time + AttackSpeed;
 
-            if (Env.Random.Next(6) != 0)
+            if (RandomProvider.Next(6) != 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 

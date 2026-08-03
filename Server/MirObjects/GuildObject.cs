@@ -563,20 +563,9 @@ namespace Server.MirObjects
             }
         }
 
-        public GuildRank FindRank(string name)
+        public GuildRank? FindRank(string name)
         {
-            for (int i = 0; i < Ranks.Count; i++)
-            {
-                for (int j = 0; j < Ranks[i].Members.Count; j++)
-                {
-                    if (Ranks[i].Members[j].Name == name)
-                    {
-                        return Ranks[i];
-                    }
-                }
-            }
-
-            return null;
+            return Ranks.FirstOrDefault(rank => rank.Members.Any(t => t.Name == name));
         }
 
         public void NewNotice(List<string> notice)

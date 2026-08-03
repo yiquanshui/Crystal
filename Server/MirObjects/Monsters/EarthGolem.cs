@@ -62,7 +62,7 @@ namespace Server.MirObjects.Monsters
             ActionTime = Env.Time + 300;
             AttackTime = Env.Time + AttackSpeed;
 
-            if (!ranged && Env.Random.Next(3) > 0)
+            if (!ranged && RandomProvider.Next(3) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 
@@ -146,7 +146,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Env.Random.Next(2)) //No favour
+                switch (RandomProvider.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)

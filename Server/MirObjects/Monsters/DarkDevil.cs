@@ -34,7 +34,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            _areaTime = Env.Time + 2000 + Env.Random.Next(3)*1000;
+            _areaTime = Env.Time + 2000 + RandomProvider.Next(3)*1000;
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });

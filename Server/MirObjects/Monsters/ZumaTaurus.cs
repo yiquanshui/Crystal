@@ -59,7 +59,7 @@ namespace Server.MirObjects.Monsters
             for (int i = 0; i < count; i++)
             {
                 MonsterObject mob = null;
-                switch (Env.Random.Next(7))
+                switch (MirEnv.RandomProvider.Next(7))
                 {
                     case 0:
                         mob = GetMonster(Env.GetMonsterInfo(Settings.Zuma1));

@@ -57,8 +57,8 @@ namespace Server.MirObjects.Monsters
                 {
                     for (int i = 0; i < attempts; i++)
                     {
-                        var location = new Point(CurrentLocation.X + Env.Random.Next(-distance, distance + 1),
-                                             CurrentLocation.Y + Env.Random.Next(-distance, distance + 1));
+                        var location = new Point(CurrentLocation.X + RandomProvider.Next(-distance, distance + 1),
+                                             CurrentLocation.Y + RandomProvider.Next(-distance, distance + 1));
 
                         if (location == CurrentLocation || location == Target.CurrentLocation) continue;
 
@@ -69,7 +69,7 @@ namespace Server.MirObjects.Monsters
 
             if (Env.Time > _MassThunderTime)
             {
-                _MassThunderTime = Env.Time + 10000 + Env.Random.Next(0, 5000);
+                _MassThunderTime = Env.Time + 10000 + RandomProvider.Next(0, 5000);
 
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 3 });
 
@@ -86,7 +86,7 @@ namespace Server.MirObjects.Monsters
 
             if (!ranged)
             {
-                if (Env.Random.Next(4) > 0)
+                if (RandomProvider.Next(4) > 0)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
@@ -133,7 +133,7 @@ namespace Server.MirObjects.Monsters
             }
             else
             {
-                if (Env.Random.Next(3) == 0)
+                if (RandomProvider.Next(3) == 0)
                 {
                     Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID, Type = 0 });
 

@@ -612,7 +612,7 @@ namespace Server.MirObjects
                     hitter.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.MurderPlayer), Name), ChatType.System);
                     ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.MurderedByPlayer), LastHitter.Name), ChatType.System);
 
-                    if (weapon != null && weapon.AddedStats[Stat.Luck] > (Settings.MaxLuck * -1) && Env.Random.Next(4) == 0)
+                    if (weapon != null && weapon.AddedStats[Stat.Luck] > (Settings.MaxLuck * -1) && RandomProvider.Next(4) == 0)
                     {
                         weapon.AddedStats[Stat.Luck]--;
                         hitter.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.WeaponHasBeenCursed), ChatType.System);
@@ -716,7 +716,7 @@ namespace Server.MirObjects
 
                         Report.ItemChanged(item, count, 1, "RedDeathDrop");
                     }
-                    else if (Env.Random.Next(10) == 0)
+                    else if (RandomProvider.Next(10) == 0)
                     {
                         if (Env.ReturnRentalItem(item, item.RentalInformation?.OwnerName, Info))
                         {
@@ -1056,7 +1056,7 @@ namespace Server.MirObjects
         }
         private void SetBind()
         {
-            SafeZoneInfo szi = Env.StartPoints[Env.Random.Next(Env.StartPoints.Count)];
+            SafeZoneInfo szi = Env.StartPoints[RandomProvider.Next(Env.StartPoints.Count)];
 
             BindMapIndex = szi.Info.Index;
             BindLocation = szi.Location;
@@ -2670,7 +2670,7 @@ namespace Server.MirObjects
                         break;
 
                     case "ROLL":
-                        int diceNum = Env.Random.Next(5) + 1;
+                        int diceNum = RandomProvider.Next(5) + 1;
 
                         if (GroupMembers == null) { return; }
 
@@ -2982,7 +2982,7 @@ namespace Server.MirObjects
                                 monster.Spawn(CurrentMap, Front);
                             else
                                 for (int _ = 0; _ < 20; _++)
-                                    if (monster.Spawn(CurrentMap, CurrentLocation.Add(Env.Random.Next(-spread, spread + 1), Env.Random.Next(-spread, spread + 1))))
+                                    if (monster.Spawn(CurrentMap, CurrentLocation.Add(RandomProvider.Next(-spread, spread + 1), RandomProvider.Next(-spread, spread + 1))))
                                         break;
                         }
 
@@ -3460,7 +3460,7 @@ namespace Server.MirObjects
 
                         if (parts.Length < 2)
                         {
-                            Info.Hair = (byte)Env.Random.Next(0, 9);
+                            Info.Hair = (byte)RandomProvider.Next(0, 9);
                         }
                         else
                         {
@@ -4008,7 +4008,7 @@ namespace Server.MirObjects
                             return;
                         }
 
-                        ushort flag = (ushort)Env.Random.Next(12);
+                        ushort flag = (ushort)RandomProvider.Next(12);
 
                         if (parts.Length > 1)
                         {
@@ -4033,9 +4033,9 @@ namespace Server.MirObjects
                                 return;
                             }
 
-                            byte r1 = (byte)Env.Random.Next(255);
-                            byte g1 = (byte)Env.Random.Next(255);
-                            byte b1 = (byte)Env.Random.Next(255);
+                            byte r1 = (byte)RandomProvider.Next(255);
+                            byte g1 = (byte)RandomProvider.Next(255);
+                            byte b1 = (byte)RandomProvider.Next(255);
 
                             if (parts.Length > 3)
                             {
@@ -4622,8 +4622,8 @@ namespace Server.MirObjects
 
             for (int i = 0; i < attempts; i++)
             {
-                Point location = new Point(BindLocation.X + Env.Random.Next(-100, 100),
-                                           BindLocation.Y + Env.Random.Next(-100, 100));
+                Point location = new Point(BindLocation.X + RandomProvider.Next(-100, 100),
+                                           BindLocation.Y + RandomProvider.Next(-100, 100));
 
                 if (Teleport(temp, location)) return true;
             }
@@ -4638,8 +4638,8 @@ namespace Server.MirObjects
 
             for (int i = 0; i < 200; i++)
             {
-                Point location = new Point(BindLocation.X + Env.Random.Next(-mapSizeX, mapSizeX),
-                                     BindLocation.Y + Env.Random.Next(-mapSizeY, mapSizeY));
+                Point location = new Point(BindLocation.X + RandomProvider.Next(-mapSizeX, mapSizeX),
+                                     BindLocation.Y + RandomProvider.Next(-mapSizeY, mapSizeY));
 
                 if (Teleport(temp, location)) return true;
             }
@@ -6013,32 +6013,32 @@ namespace Server.MirObjects
                             }
                             break;
                         case 12://LotteryTicket                                                                                    
-                            if (Env.Random.Next(item.Info.Effect * 32) == 1) // 1st prize : 1,000,000
+                            if (RandomProvider.Next(item.Info.Effect * 32) == 1) // 1st prize : 1,000,000
                             {
                                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.FirstPrizeGoldReward), ChatType.Hint);
                                 GainGold(1000000);
                             }
-                            else if (Env.Random.Next(item.Info.Effect * 16) == 1)  // 2nd prize : 200,000
+                            else if (RandomProvider.Next(item.Info.Effect * 16) == 1)  // 2nd prize : 200,000
                             {
                                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.WonSecondPrizeGold), ChatType.Hint);
                                 GainGold(200000);
                             }
-                            else if (Env.Random.Next(item.Info.Effect * 8) == 1)  // 3rd prize : 100,000
+                            else if (RandomProvider.Next(item.Info.Effect * 8) == 1)  // 3rd prize : 100,000
                             {
                                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.WonThirdPrizeGold), ChatType.Hint);
                                 GainGold(100000);
                             }
-                            else if (Env.Random.Next(item.Info.Effect * 4) == 1) // 4th prize : 10,000
+                            else if (RandomProvider.Next(item.Info.Effect * 4) == 1) // 4th prize : 10,000
                             {
                                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.WonFourthPrizeGold), ChatType.Hint);
                                 GainGold(10000);
                             }
-                            else if (Env.Random.Next(item.Info.Effect * 2) == 1)  // 5th prize : 1,000
+                            else if (RandomProvider.Next(item.Info.Effect * 2) == 1)  // 5th prize : 1,000
                             {
                                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.WonFifthPrizeGold), ChatType.Hint);
                                 GainGold(1000);
                             }
-                            else if (Env.Random.Next(item.Info.Effect) == 1)  // 6th prize 500
+                            else if (RandomProvider.Next(item.Info.Effect) == 1)  // 6th prize 500
                             {
                                 ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.WonSixthPrizeGold), ChatType.Hint);
                                 GainGold(500);
@@ -6999,7 +6999,7 @@ namespace Server.MirObjects
                     successchance = successchance >= tempFrom.Info.Stats[Stat.CriticalRate] ? 0 : (tempFrom.Info.Stats[Stat.CriticalRate] - successchance) + Stats[Stat.GemRatePercent];
 
                     //check if combine will succeed
-                    bool succeeded = Env.Random.Next(100) < successchance;
+                    bool succeeded = RandomProvider.Next(100) < successchance;
                     canUpgrade = true;
 
                     byte itemType = (byte)tempTo.Info.Type;
@@ -7088,7 +7088,7 @@ namespace Server.MirObjects
 
                     if (!succeeded)
                     {
-                        if ((tempFrom.Info.Shape == 3) && (Env.Random.Next(15) < 3))
+                        if ((tempFrom.Info.Shape == 3) && (RandomProvider.Next(15) < 3))
                         {
                             //item destroyed
                             ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.ItemHasBeenDestroyed), ChatType.Hint);
@@ -7129,7 +7129,7 @@ namespace Server.MirObjects
                     case 1:
                     case 2:
                         {
-                            tempTo.MaxDura = (ushort)Math.Max(0, Math.Min(tempTo.MaxDura, tempTo.MaxDura - 100 * Env.Random.Next(10)));
+                            tempTo.MaxDura = (ushort)Math.Max(0, Math.Min(tempTo.MaxDura, tempTo.MaxDura - 100 * RandomProvider.Next(10)));
                         }
                         break;
                     default:
@@ -8907,7 +8907,7 @@ namespace Server.MirObjects
                                     ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.RemoveFailedLevel0), item.FriendlyName), ChatType.System);
                                     break;
                                 case 1:
-                                    ushort maxDura = (Env.Random.Next(20) == 0) ? (ushort)(item.MaxDura - 1000) : item.MaxDura;
+                                    ushort maxDura = (RandomProvider.Next(20) == 0) ? (ushort)(item.MaxDura - 1000) : item.MaxDura;
                                     if (maxDura < 1000) maxDura = 1000;
 
                                     Info.Inventory[i].CurrentDura = (Info.Inventory[i].CurrentDura >= maxDura) ? maxDura : Info.Inventory[i].CurrentDura;
@@ -8956,7 +8956,7 @@ namespace Server.MirObjects
                         if (drop.Item.Grade == item.Info.Grade - 1 ||
                             drop.Item.Grade == item.Info.Grade + 1)
                         {
-                            if (Env.Random.Next((drop.Chance <= 0) ? 1 : drop.Chance) == 0)
+                            if (RandomProvider.Next((drop.Chance <= 0) ? 1 : drop.Chance) == 0)
                             {
                                 dropList.Add(drop.Item);
                             }
@@ -8970,9 +8970,9 @@ namespace Server.MirObjects
 
                     if (dropList.Count == 0) continue;
 
-                    UserItem gainItem = Env.CreateDropItem(dropList[Env.Random.Next(dropList.Count)]);
+                    UserItem gainItem = Env.CreateDropItem(dropList[RandomProvider.Next(dropList.Count)]);
                     if (gainItem == null) continue;
-                    gainItem.Count = (ushort)Env.Random.Next(Math.Min(ushort.MaxValue, (int)((((byte)item.Info.Grade * item.Info.RequiredAmount) / 10) + item.Quality())));
+                    gainItem.Count = (ushort)RandomProvider.Next(Math.Min(ushort.MaxValue, (int)((((byte)item.Info.Grade * item.Info.RequiredAmount) / 10) + item.Quality())));
                     if (gainItem.Count < 1) gainItem.Count = 1;
 
                     GainItem(gainItem);
@@ -9011,7 +9011,7 @@ namespace Server.MirObjects
 
                             UserItem newItem = new UserItem(item.Info);
 
-                            ushort maxDura = (Env.Random.Next(20) == 0) ? (ushort)(item.MaxDura - 1000) : item.MaxDura;
+                            ushort maxDura = (RandomProvider.Next(20) == 0) ? (ushort)(item.MaxDura - 1000) : item.MaxDura;
                             if (maxDura < 1000) maxDura = 1000;
 
                             newItem.UniqueID = item.UniqueID;
@@ -10512,7 +10512,7 @@ namespace Server.MirObjects
             MyGuild.GTIndex = gt.Index;
             MyGuild.GTRent = DateTime.Now.AddDays(Settings.GTDays + 1);
             MyGuild.GTBegin = DateTime.Now.AddDays(1);
-            MyGuild.GTKey = Env.Random.Next(100, int.MaxValue - 100);
+            MyGuild.GTKey = RandomProvider.Next(100, int.MaxValue - 100);
             MyGuild.GTPrice = 0;
             gt.Owner = MyGuild.Name;
             gt.Leader = MyGuild.Ranks[0].Members[0].Name;
@@ -11054,9 +11054,9 @@ namespace Server.MirObjects
                 }
             }
 
-            FishingNibbleChance = 5 + Env.Random.Next(nibbleMin, nibbleMax);
+            FishingNibbleChance = 5 + RandomProvider.Next(nibbleMin, nibbleMax);
 
-            if (cast) FishingChance = Settings.FishingSuccessStart + (int)successStat + (FishingChanceCounter != 0 ? Env.Random.Next(failedAddSuccessMin, failedAddSuccessMax) : 0) + (FishingChanceCounter * Settings.FishingSuccessMultiplier); //10 //10
+            if (cast) FishingChance = Settings.FishingSuccessStart + (int)successStat + (FishingChanceCounter != 0 ? RandomProvider.Next(failedAddSuccessMin, failedAddSuccessMax) : 0) + (FishingChanceCounter * Settings.FishingSuccessMultiplier); //10 //10
             if (FishingChanceCounter != 0) DamagedFishingItem(FishingSlot.Finder, 1);
             FishingChance += Stats[Stat.FishRatePercent];
 
@@ -11101,10 +11101,10 @@ namespace Server.MirObjects
 
                 if (FishFound)
                 {
-                    int getChance = FishingChance + Env.Random.Next(10, 24) + (FishingProgress > 50 ? flexibilityStat / 2 : 0);
+                    int getChance = FishingChance + RandomProvider.Next(10, 24) + (FishingProgress > 50 ? flexibilityStat / 2 : 0);
                     getChance = Math.Min(100, Math.Max(0, getChance));
 
-                    if (Env.Random.Next(0, 100) <= getChance)
+                    if (RandomProvider.Next(0, 100) <= getChance)
                     {
                         FishingChanceCounter = 0;
 
@@ -11140,7 +11140,7 @@ namespace Server.MirObjects
                             Report.ItemChanged(dropItem, dropItem.Count, 2);
                         }
 
-                        if (Env.Random.Next(100 - Settings.FishingMobSpawnChance) == 0)
+                        if (RandomProvider.Next(100 - Settings.FishingMobSpawnChance) == 0)
                         {
                             MonsterObject mob = MonsterObject.GetMonster(Env.GetMonsterInfo(Settings.FishingMonster));
 
@@ -11200,7 +11200,7 @@ namespace Server.MirObjects
         {
             if (FishFound != true && FishFirstFound != true)
             {
-                FishFound = Env.Random.Next(0, 100) <= FishingNibbleChance;
+                FishFound = RandomProvider.Next(0, 100) <= FishingNibbleChance;
                 FishingFoundTime = FishFound ? Env.Time + 3000 : Env.Time;
 
                 if (FishFound)
@@ -11211,7 +11211,7 @@ namespace Server.MirObjects
             }
             else
             {
-                if (FishingAutoReelChance != 0 && Env.Random.Next(0, 100) <= FishingAutoReelChance)
+                if (FishingAutoReelChance != 0 && RandomProvider.Next(0, 100) <= FishingAutoReelChance)
                 {
                     FishingCast(false);
                 }
@@ -12288,7 +12288,7 @@ namespace Server.MirObjects
 
             foreach (DropInfo drop in Env.StrongboxDrops)
             {
-                int rate = (int)(Env.Random.Next(0, drop.Chance) / Settings.DropRate);
+                int rate = (int)(RandomProvider.Next(0, drop.Chance) / Settings.DropRate);
                 if (rate < 1) rate = 1;
 
                 if (highRate > rate)
@@ -12326,7 +12326,7 @@ namespace Server.MirObjects
             UserItem dropItem = null;
             foreach (DropInfo drop in Env.BlackstoneDrops)
             {
-                int rate = (int)(Env.Random.Next(0, drop.Chance) / Settings.DropRate); if (rate < 1) rate = 1;
+                int rate = (int)(RandomProvider.Next(0, drop.Chance) / Settings.DropRate); if (rate < 1) rate = 1;
 
                 if (highRate > rate)
                 {
@@ -12922,12 +12922,12 @@ namespace Server.MirObjects
                 return;
             }
 
-            if (Env.Random.Next(1, 100) > Info.Inventory[index].RefineSuccessChance)
+            if (RandomProvider.Next(1, 100) > Info.Inventory[index].RefineSuccessChance)
             {
                 Info.Inventory[index].RefinedValue = RefinedValue.None;
             }
 
-            if (Env.Random.Next(1, 100) < Settings.RefineCritChance)
+            if (RandomProvider.Next(1, 100) < Settings.RefineCritChance)
             {
                 Info.Inventory[index].RefineAdded = (byte)(Info.Inventory[index].RefineAdded * Settings.RefineCritIncrease);
             }

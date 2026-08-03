@@ -42,7 +42,7 @@ namespace Server.MirObjects.Monsters
 
             if (!ranged)
             {
-                if (Env.Random.Next(5) > 0)
+                if (RandomProvider.Next(5) > 0)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 
@@ -61,7 +61,7 @@ namespace Server.MirObjects.Monsters
             }
             else
             {
-                if (Env.Random.Next(10) > 0)
+                if (RandomProvider.Next(10) > 0)
                 {
                     Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID });
 

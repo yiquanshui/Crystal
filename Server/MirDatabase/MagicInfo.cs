@@ -196,7 +196,7 @@ namespace Server.MirDatabase
         {
             if (Info.MPowerBonus > 0)
             {
-                return Env.Random.Next(Info.MPowerBase, Info.MPowerBonus + Info.MPowerBase);
+                return RandomProvider.Next(Info.MPowerBase, Info.MPowerBonus + Info.MPowerBase);
             }
             else
                 return Info.MPowerBase;
@@ -205,7 +205,7 @@ namespace Server.MirDatabase
         {
             if (Info.PowerBonus > 0)
             {
-                return Env.Random.Next(Info.PowerBase, Info.PowerBonus + Info.PowerBase);
+                return RandomProvider.Next(Info.PowerBase, Info.PowerBonus + Info.PowerBase);
             }
             else
                 return Info.PowerBase;

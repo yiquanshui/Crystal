@@ -41,7 +41,7 @@ namespace Server.MirObjects.Monsters
 
                 if (targets.Count > 0)
                 {
-                    Target = targets[Env.Random.Next(targets.Count)];
+                    Target = targets[RandomProvider.Next(targets.Count)];
                 }
             }
             else if (Info.Effect == 1 || Info.Effect == 2)
@@ -52,7 +52,7 @@ namespace Server.MirObjects.Monsters
 
                     if (friends.Count > 0)
                     {
-                        Target = friends[Env.Random.Next(friends.Count)];
+                        Target = friends[RandomProvider.Next(friends.Count)];
                     }
                 }
                 else
@@ -155,7 +155,7 @@ namespace Server.MirObjects.Monsters
 
             if (beads.Count > 0)
             {
-                var randomBead = beads[Env.Random.Next(beads.Count)];
+                var randomBead = beads[RandomProvider.Next(beads.Count)];
 
                 var mob = GetMonster(Env.GetMonsterInfo(randomBead.Name));
 

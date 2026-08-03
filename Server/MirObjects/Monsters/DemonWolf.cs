@@ -57,7 +57,7 @@ namespace Server.MirObjects.Monsters
 
             if (Info.Effect == 1)
             {
-                if (!ranged && Env.Random.Next(4) > 0)
+                if (!ranged && RandomProvider.Next(4) > 0)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 

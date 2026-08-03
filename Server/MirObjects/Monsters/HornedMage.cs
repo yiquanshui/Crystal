@@ -40,7 +40,7 @@ namespace Server.MirObjects.Monsters
             }
             else
             {
-                if (Env.Random.Next(5) > 0)
+                if (RandomProvider.Next(5) > 0)
                 {
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                     if (damage == 0) return;
@@ -71,10 +71,10 @@ namespace Server.MirObjects.Monsters
                 Point location;
 
                 if (distance <= 0)
-                    location = new Point(Env.Random.Next(CurrentMap.Width), Env.Random.Next(CurrentMap.Height));
+                    location = new Point(RandomProvider.Next(CurrentMap.Width), RandomProvider.Next(CurrentMap.Height));
                 else
-                    location = new Point(CurrentLocation.X + Env.Random.Next(-distance, distance + 1),
-                                         CurrentLocation.Y + Env.Random.Next(-distance, distance + 1));
+                    location = new Point(CurrentLocation.X + RandomProvider.Next(-distance, distance + 1),
+                                         CurrentLocation.Y + RandomProvider.Next(-distance, distance + 1));
 
                 if (Target.Teleport(CurrentMap, location, true, Info.Effect)) return true;
             }

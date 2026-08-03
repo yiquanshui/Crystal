@@ -234,7 +234,7 @@ namespace Server.MirObjects
         protected virtual void NewCharacter()
         {
             Level = 1;
-            Hair = (byte)Env.Random.Next(0, 9);
+            Hair = (byte)RandomProvider.Next(0, 9);
 
             for (int i = 0; i < Env.StartItems.Count; i++)
             {
@@ -928,7 +928,7 @@ namespace Server.MirObjects
         {
             if ((Mine.Drops == null) || (Mine.Drops.Count == 0)) return;
             if (FreeSpace(Info.Inventory) == 0) return;
-            byte Slot = (byte)Env.Random.Next(Mine.TotalSlots);
+            byte Slot = (byte)RandomProvider.Next(Mine.TotalSlots);
             for (int i = 0; i < Mine.Drops.Count; i++)
             {
                 MineDrop Drop = Mine.Drops[i];
@@ -939,9 +939,9 @@ namespace Server.MirObjects
                     UserItem item = Env.CreateDropItem(info);
                     if (item.Info.Type == ItemType.Ore)
                     {
-                        item.CurrentDura = (ushort)Math.Min(ushort.MaxValue, (Drop.MinDura + Env.Random.Next(Math.Max(0, Drop.MaxDura - Drop.MinDura))) * 1000);
-                        if ((Drop.BonusChance > 0) && (Env.Random.Next(100) <= Drop.BonusChance))
-                            item.CurrentDura = (ushort)Math.Min(ushort.MaxValue, item.CurrentDura + (Env.Random.Next(Drop.MaxBonusDura) * 1000));
+                        item.CurrentDura = (ushort)Math.Min(ushort.MaxValue, (Drop.MinDura + RandomProvider.Next(Math.Max(0, Drop.MaxDura - Drop.MinDura))) * 1000);
+                        if ((Drop.BonusChance > 0) && (RandomProvider.Next(100) <= Drop.BonusChance))
+                            item.CurrentDura = (ushort)Math.Min(ushort.MaxValue, item.CurrentDura + (RandomProvider.Next(Drop.MaxBonusDura) * 1000));
                     }
 
                     if (CheckGroupQuestItem(item)) continue;
@@ -975,7 +975,7 @@ namespace Server.MirObjects
             string message = String.Empty;
             ChatType chatType;
 
-            if (item.AddedStats[Stat.Luck] > (Settings.MaxLuck * -1) && Env.Random.Next(20) == 0)
+            if (item.AddedStats[Stat.Luck] > (Settings.MaxLuck * -1) && RandomProvider.Next(20) == 0)
             {
                 Stats[Stat.Luck]--;
                 item.AddedStats[Stat.Luck]--;
@@ -985,7 +985,7 @@ namespace Server.MirObjects
                 chatType = ChatType.System;
                 
             }
-            else if (item.AddedStats[Stat.Luck] <= 0 || Env.Random.Next(10 * item.GetTotal(Stat.Luck)) == 0)
+            else if (item.AddedStats[Stat.Luck] <= 0 || RandomProvider.Next(10 * item.GetTotal(Stat.Luck)) == 0)
             {
                 Stats[Stat.Luck]++;
                 item.AddedStats[Stat.Luck]++;
@@ -1457,7 +1457,7 @@ namespace Server.MirObjects
 
                         Report?.ItemChanged(item, count, 1);
                     }
-                    else if (Env.Random.Next(30) == 0)
+                    else if (RandomProvider.Next(30) == 0)
                     {
                         if (Env.ReturnRentalItem(item, item.RentalInformation?.OwnerName, Info))
                         {
@@ -1534,7 +1534,7 @@ namespace Server.MirObjects
 
                     Report?.ItemChanged(item, count, 1);
                 }
-                else if (Env.Random.Next(10) == 0)
+                else if (RandomProvider.Next(10) == 0)
                 {
                     if (Env.ReturnRentalItem(item, item.RentalInformation?.OwnerName, Info))
                     {
@@ -2802,7 +2802,7 @@ namespace Server.MirObjects
             {
                 magic = GetMagic(Spell.Focus);
 
-                if (magic != null && Env.Random.Next(5) <= magic.Level)
+                if (magic != null && RandomProvider.Next(5) <= magic.Level)
                 {
                     focus = true;
                     LevelMagic(magic);
@@ -2821,7 +2821,7 @@ namespace Server.MirObjects
 
                 int delay = Functions.MaxDistance(CurrentLocation, target.CurrentLocation) * 50 + 500 + 50; //50 MS per Step
 
-                if (Env.Random.Next(100) < chanceToHit)
+                if (RandomProvider.Next(100) < chanceToHit)
                 {
                     if (target.CurrentLocation != location)
                         location = target.CurrentLocation;
@@ -2957,7 +2957,7 @@ namespace Server.MirObjects
             {
                 magic = GetMagic(Spell.Slaying);
 
-                if (magic != null && Env.Random.Next(12) <= magic.Level)
+                if (magic != null && RandomProvider.Next(12) <= magic.Level)
                 {
                     Slaying = true;
                     Enqueue(new S.SpellToggle { ObjectID = ObjectID, Spell = Spell.Slaying, CanUse = Slaying });
@@ -3067,7 +3067,7 @@ namespace Server.MirObjects
 
                 if (magic != null)
                 {
-                    if (!FatalSword && Env.Random.Next(10) == 0)
+                    if (!FatalSword && RandomProvider.Next(10) == 0)
                         FatalSword = true;
 
                     if (FatalSword)
@@ -3082,7 +3082,7 @@ namespace Server.MirObjects
                 {
                     int baseCount = 1 + Stats[Stat.Accuracy] / 2;
                     int maxCount = baseCount + magic.Level * 5;
-                    MPEaterCount += Env.Random.Next(baseCount, maxCount);
+                    MPEaterCount += RandomProvider.Next(baseCount, maxCount);
                     if (MPEater)
                     {
                         LevelMagic(magic);
@@ -3112,7 +3112,7 @@ namespace Server.MirObjects
 
                 if (magic != null)
                 {
-                    HemorrhageAttackCount += Env.Random.Next(1, 1 + magic.Level * 2);
+                    HemorrhageAttackCount += RandomProvider.Next(1, 1 + magic.Level * 2);
                     if (Hemorrhage)
                     {
                         damageFinal = magic.GetDamage(damageBase);
@@ -3308,7 +3308,7 @@ namespace Server.MirObjects
                 if (Mine.StonesLeft > 0)
                 {
                     Mine.StonesLeft--;
-                    if (Env.Random.Next(100) < (Mine.Mine.HitRate + (Info.Equipment[(int)EquipmentSlot.Weapon].GetTotal(Stat.Accuracy)) * 10))
+                    if (RandomProvider.Next(100) < (Mine.Mine.HitRate + (Info.Equipment[(int)EquipmentSlot.Weapon].GetTotal(Stat.Accuracy)) * 10))
                     {
                         //create some rubble on the floor (or increase whats there)
                         SpellObject Rubble = null;
@@ -3345,12 +3345,12 @@ namespace Server.MirObjects
                         }
 
                         //check if we get a payout
-                        if (Env.Random.Next(100) < (Mine.Mine.DropRate + Stats[Stat.MineRatePercent]))
+                        if (RandomProvider.Next(100) < (Mine.Mine.DropRate + Stats[Stat.MineRatePercent]))
                         {
                             GetMinePayout(Mine.Mine);
                         }
 
-                        DamageItem(Info.Equipment[(int)EquipmentSlot.Weapon], 5 + Env.Random.Next(15));
+                        DamageItem(Info.Equipment[(int)EquipmentSlot.Weapon], 5 + RandomProvider.Next(15));
                     }
                 }
                 else
@@ -3358,7 +3358,7 @@ namespace Server.MirObjects
                     if (Env.Time > Mine.LastRegenTick)
                     {
                         Mine.LastRegenTick = Env.Time + Mine.Mine.SpotRegenRate * 60 * 1000;
-                        Mine.StonesLeft = (byte)Env.Random.Next(Mine.Mine.MaxStones);
+                        Mine.StonesLeft = (byte)RandomProvider.Next(Mine.Mine.MaxStones);
                     }
                 }
             }
@@ -3843,7 +3843,7 @@ namespace Server.MirObjects
 
             if (meditationLvl >= 0)
             {
-                int rnd = Env.Random.Next(10);
+                int rnd = RandomProvider.Next(10);
                 if (rnd >= (8 - meditationLvl - concentrateChance))
                 {
                     ObtainElement(false);
@@ -3975,9 +3975,9 @@ namespace Server.MirObjects
 
                             if (!ob.IsAttackTarget(this) || ob.Level >= Level) continue;
 
-                            if (Env.Random.Next(20) >= 6 + magic.Level * 3 + Level - ob.Level) continue;
+                            if (RandomProvider.Next(20) >= 6 + magic.Level * 3 + Level - ob.Level) continue;
 
-                            int distance = 1 + Math.Max(0, magic.Level - 1) + Env.Random.Next(2);
+                            int distance = 1 + Math.Max(0, magic.Level - 1) + RandomProvider.Next(2);
                             MirDirection dir = Functions.DirectionFromPoint(CurrentLocation, ob.CurrentLocation);
 
                             if (ob.Pushed(this, dir, distance) == 0) continue;
@@ -4016,9 +4016,9 @@ namespace Server.MirObjects
             
             if (target == null || !target.IsAttackTarget(this)) return;
 
-            if (Env.Random.Next(4 - magic.Level) > 0)
+            if (RandomProvider.Next(4 - magic.Level) > 0)
             {
-                if (Env.Random.Next(2) == 0) LevelMagic(magic);
+                if (RandomProvider.Next(2) == 0) LevelMagic(magic);
                 return;
             }
 
@@ -4031,7 +4031,7 @@ namespace Server.MirObjects
                 return;
             }
 
-            if (Env.Random.Next(2) > 0)
+            if (RandomProvider.Next(2) > 0)
             {
                 target.ShockTime = Env.Time + (magic.Level * 5 + 10) * 1000;
                 target.Target = null;
@@ -4049,11 +4049,11 @@ namespace Server.MirObjects
                 if (currentBossTames >= limit) return;
             }
 
-            if (Env.Random.Next(Level + 20 + magic.Level * 5) <= target.Level + 10)
+            if (RandomProvider.Next(Level + 20 + magic.Level * 5) <= target.Level + 10)
             {
-                if (Env.Random.Next(5) > 0 && target.Master == null)
+                if (RandomProvider.Next(5) > 0 && target.Master == null)
                 {
-                    target.RageTime = Env.Time + (Env.Random.Next(20) + 10) * 1000;
+                    target.RageTime = Env.Time + (RandomProvider.Next(20) + 10) * 1000;
                     target.Target = null;
                 }
                 return;
@@ -4067,7 +4067,7 @@ namespace Server.MirObjects
             if (rate <= 2) rate = 2;
             else rate *= 2;
 
-            if (Env.Random.Next(rate) != 0) return;
+            if (RandomProvider.Next(rate) != 0) return;
             //else if (Envir.Random.Next(20) == 0) target.Die();
 
             if (target.Master != null)
@@ -4231,7 +4231,7 @@ namespace Server.MirObjects
                     }   
                 }
 
-                if (Env.Random.Next(2) + Level - 1 <= target.Level)
+                if (RandomProvider.Next(2) + Level - 1 <= target.Level)
                 {
                     target.Target = this;
                     return;
@@ -4239,7 +4239,7 @@ namespace Server.MirObjects
 
                 int dif = Level - target.Level + 15;
 
-                if (Env.Random.Next(100) >= (magic.Level + 1 << 3) + dif)
+                if (RandomProvider.Next(100) >= (magic.Level + 1 << 3) + dif)
                 {
                     target.Target = this;
                     return;
@@ -4331,7 +4331,7 @@ namespace Server.MirObjects
         private void IceThrust(UserMagic magic)
         {
             int damageBase = GetAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC]);
-            if (Env.Random.Next(100) < (1 + Stats[Stat.Luck]))
+            if (RandomProvider.Next(100) < (1 + Stats[Stat.Luck]))
                 damageBase += damageBase;
             int damageFinish = magic.GetDamage(damageBase);
 
@@ -4553,7 +4553,7 @@ namespace Server.MirObjects
             int delay = Functions.MaxDistance(CurrentLocation, location) * 50 + 500; //50 MS per Step
             int damage = magic.GetDamage(GetAttackPower(Stats[Stat.MinSC], Stats[Stat.MaxSC]));
 
-            DelayedAction action = new DelayedAction(DelayedType.Magic, Env.Time + delay, this, magic, damage, location, (byte)Env.Random.Next(Stats[Stat.PoisonAttack]));
+            DelayedAction action = new DelayedAction(DelayedType.Magic, Env.Time + delay, this, magic, damage, location, (byte)RandomProvider.Next(Stats[Stat.PoisonAttack]));
 
             ConsumeItem(amulet, 5);
             ConsumeItem(poison, 5);
@@ -4684,7 +4684,7 @@ namespace Server.MirObjects
                 ob.Spawned();
                 ConsumeItem(item, 1);
                 // chance of failing Reincarnation when casting
-                if (Env.Random.Next(30) > (1 + magic.Level) * 10)
+                if (RandomProvider.Next(30) > (1 + magic.Level) * 10)
                 {
                     return;
                 }
@@ -4863,7 +4863,7 @@ namespace Server.MirObjects
 
             ConsumeItem(item, 1);
 
-            if (Env.Random.Next(10 - ((magic.Level + 1) * 2)) > 2) return;
+            if (RandomProvider.Next(10 - ((magic.Level + 1) * 2)) > 2) return;
 
             int delay = Functions.MaxDistance(CurrentLocation, location) * 50 + 500; //50 MS per Step
 
@@ -4903,7 +4903,7 @@ namespace Server.MirObjects
         private void BladeAvalanche(UserMagic magic)
         {
             int damageBase = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
-            if (Env.Random.Next(0, 100) <= (1 + Stats[Stat.Luck]))
+            if (RandomProvider.Next(0, 100) <= (1 + Stats[Stat.Luck]))
                 damageBase += damageBase;//crit should do something like double dmg, not double max dc dmg!
             int damageFinal = magic.GetDamage(damageBase);
 
@@ -4986,7 +4986,7 @@ namespace Server.MirObjects
             bool _canDash = false;
 
             int _cellsTravelled = 0;
-            int dist = Env.Random.Next(2) + magic.Level + 2;
+            int dist = RandomProvider.Next(2) + magic.Level + 2;
 
             ActionTime = Env.Time + MoveDelay;
 
@@ -5216,7 +5216,7 @@ namespace Server.MirObjects
             if (CounterAttack == false) return;
 
             int damageBase = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
-            if (Env.Random.Next(0, 100) <= Stats[Stat.Accuracy])
+            if (RandomProvider.Next(0, 100) <= Stats[Stat.Accuracy])
                 damageBase += damageBase;//crit should do something like double dmg, not double max dc dmg!
             int damageFinal = magic.GetDamage(damageBase);
 
@@ -5225,7 +5225,7 @@ namespace Server.MirObjects
             Direction = dir;
 
             if (Functions.InRange(CurrentLocation, target.CurrentLocation, 1) == false) return;
-            if (Env.Random.Next(10) > magic.Level + 6) return;
+            if (RandomProvider.Next(10) > magic.Level + 6) return;
             Enqueue(new S.ObjectMagic { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Spell = Spell.CounterAttack, TargetID = target.ObjectID, Target = target.CurrentLocation, Cast = true, Level = GetMagic(Spell.CounterAttack).Level, SelfBroadcast = true });
             DelayedAction action = new DelayedAction(DelayedType.Damage, AttackTime, target, damageFinal, DefenceType.AC, true);
             ActionList.Add(action);
@@ -5308,7 +5308,7 @@ namespace Server.MirObjects
                         Owner = this,
                         PType = PoisonType.Green,
                         TickSpeed = 1000,
-                        Value = power / 10 + magic.Level + 1 + Env.Random.Next(Stats[Stat.PoisonAttack])
+                        Value = power / 10 + magic.Level + 1 + RandomProvider.Next(Stats[Stat.PoisonAttack])
                     }, this);
 
                     target.OperateTime = 0;
@@ -5365,7 +5365,7 @@ namespace Server.MirObjects
         private void CrescentSlash(UserMagic magic)
         {
             int damageBase = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
-            if (Env.Random.Next(0, 100) <= Stats[Stat.Accuracy])
+            if (RandomProvider.Next(0, 100) <= Stats[Stat.Accuracy])
                 damageBase += damageBase;//crit should do something like double dmg, not double max dc dmg!
             int damageFinal = magic.GetDamage(damageBase);
 
@@ -5481,7 +5481,7 @@ namespace Server.MirObjects
                                     DelayedAction action = new DelayedAction(DelayedType.Damage, AttackTime, ob, magic.GetDamage(GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC])), DefenceType.AC, true);
                                     ActionList.Add(action);
                                     success = true;
-                                    if ((((ob.Race != ObjectType.Player) || Settings.PvpCanResistPoison) && (Env.Random.Next(Settings.PoisonAttackWeight) >= ob.Stats[Stat.PoisonResist])) && (Env.Random.Next(15) <= magic.Level + 1))
+                                    if ((((ob.Race != ObjectType.Player) || Settings.PvpCanResistPoison) && (RandomProvider.Next(Settings.PoisonAttackWeight) >= ob.Stats[Stat.PoisonResist])) && (RandomProvider.Next(15) <= magic.Level + 1))
                                     {
                                         DelayedAction pa = new DelayedAction(DelayedType.Poison, AttackTime, ob, PoisonType.Stun, SpellEffect.TwinDrakeBlade, magic.Level + 1, 1000);
                                         ActionList.Add(pa);
@@ -5663,8 +5663,8 @@ namespace Server.MirObjects
             if (target.Race != ObjectType.Monster && target.Race != ObjectType.Player && target.Race != ObjectType.Hero) return;
             if (!target.IsAttackTarget(this) || target.Level >= Level) return;
 
-            if (Env.Random.Next(20) >= 6 + magic.Level * 3 + ElementsLevel + Level - target.Level) return;
-            int distance = 1 + Math.Max(0, magic.Level - 1) + Env.Random.Next(2);
+            if (RandomProvider.Next(20) >= 6 + magic.Level * 3 + ElementsLevel + Level - target.Level) return;
+            int distance = 1 + Math.Max(0, magic.Level - 1) + RandomProvider.Next(2);
             MirDirection dir = Functions.DirectionFromPoint(CurrentLocation, target.CurrentLocation);
 
             target.Pushed(this, dir, distance);
@@ -5948,7 +5948,7 @@ namespace Server.MirObjects
 
                         if (targets.Count > 0)
                         {
-                            var nextTarget = targets[Env.Random.Next(targets.Count)];
+                            var nextTarget = targets[RandomProvider.Next(targets.Count)];
 
                             this.FireBounce(nextTarget, magic, target, --bounce);
                         }
@@ -5967,24 +5967,24 @@ namespace Server.MirObjects
                     if (target == null || !target.IsAttackTarget(this) || target.CurrentMap != CurrentMap || target.Node == null || !Functions.InRange(target.CurrentLocation, targetLocation, 2)) return;
                     if (target.Attacked(this, value, DefenceType.MAC, false) > 0)
                     {
-                        if (Level + (target.Race == ObjectType.Player ? 2 : 10) >= target.Level && Env.Random.Next(target.Race == ObjectType.Player ? 100 : 20) <= magic.Level)
+                        if (Level + (target.Race == ObjectType.Player ? 2 : 10) >= target.Level && RandomProvider.Next(target.Race == ObjectType.Player ? 100 : 20) <= magic.Level)
                         {
                             target.ApplyPoison(new Poison
                             {
                                 Owner = this,
-                                Duration = target.Race == ObjectType.Player ? 4 : 5 + Env.Random.Next(5),
+                                Duration = target.Race == ObjectType.Player ? 4 : 5 + RandomProvider.Next(5),
                                 PType = PoisonType.Slow,
                                 TickSpeed = 1000,
                             }, this);
                             target.OperateTime = 0;
                         }
 
-                        if (Level + (target.Race == ObjectType.Player ? 2 : 10) >= target.Level && Env.Random.Next(target.Race == ObjectType.Player ? 100 : 40) <= magic.Level)
+                        if (Level + (target.Race == ObjectType.Player ? 2 : 10) >= target.Level && RandomProvider.Next(target.Race == ObjectType.Player ? 100 : 40) <= magic.Level)
                         {
                             target.ApplyPoison(new Poison
                             {
                                 Owner = this,
-                                Duration = target.Race == ObjectType.Player ? 2 : 5 + Env.Random.Next(Stats[Stat.Freezing]),
+                                Duration = target.Race == ObjectType.Player ? 2 : 5 + RandomProvider.Next(Stats[Stat.Freezing]),
                                 PType = PoisonType.Frozen,
                                 TickSpeed = 1000,
                             }, this);
@@ -6056,7 +6056,7 @@ namespace Server.MirObjects
                                 Owner = this,
                                 PType = PoisonType.Green,
                                 TickSpeed = 2000,
-                                Value = value / 15 + magic.Level + 1 + Env.Random.Next(Stats[Stat.PoisonAttack])
+                                Value = value / 15 + magic.Level + 1 + RandomProvider.Next(Stats[Stat.PoisonAttack])
                             }, this);
                             break;
                         case 2:
@@ -6084,7 +6084,7 @@ namespace Server.MirObjects
                         ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.YouCannotTeleportOnMap), ChatType.System);
                         return;
                     }
-                    if (!CurrentMap.ValidPoint(location) || Env.Random.Next(4) >= magic.Level + 1 || !Teleport(CurrentMap, location, false)) return;
+                    if (!CurrentMap.ValidPoint(location) || RandomProvider.Next(4) >= magic.Level + 1 || !Teleport(CurrentMap, location, false)) return;
                     CurrentMap.Broadcast(new S.ObjectEffect { ObjectID = ObjectID, Effect = SpellEffect.StormEscape }, CurrentLocation);
 
                     AddBuff(BuffType.TemporalFlux, this, Settings.Second * 30, new Stats { [Stat.TeleportManaPenaltyPercent] = 30 });
@@ -6120,7 +6120,7 @@ namespace Server.MirObjects
                             return;
                         }
                         if (Functions.InRange(CurrentLocation, location, magic.Info.Range) == false) return;
-                        if (!CurrentMap.ValidPoint(location) || Env.Random.Next(4) >= magic.Level + 1 || !Teleport(CurrentMap, location, false)) return;
+                        if (!CurrentMap.ValidPoint(location) || RandomProvider.Next(4) >= magic.Level + 1 || !Teleport(CurrentMap, location, false)) return;
                         CurrentMap.Broadcast(new S.ObjectEffect { ObjectID = ObjectID, Effect = SpellEffect.Teleport }, CurrentLocation);
                         LevelMagic(magic);
 
@@ -6247,7 +6247,7 @@ namespace Server.MirObjects
                     target = (MapObject)data[1];
 
                     if (target == null || !target.IsFriendlyTarget(this) || target.CurrentMap != CurrentMap || target.Node == null) return;
-                    if (Env.Random.Next(4) > magic.Level) return;
+                    if (RandomProvider.Next(4) > magic.Level) return;
 
                     for (int i = 0; i < target.Buffs.Count; i++)
                     {
@@ -6286,7 +6286,7 @@ namespace Server.MirObjects
                     target = (MapObject)data[2];
                     if (target == null || target.CurrentMap != CurrentMap || target.Node == null) return;
                     if (target.Race != ObjectType.Player && target.Race != ObjectType.Monster) return;
-                    if (Env.Random.Next(4) > magic.Level || Env.Time < target.RevTime) return;
+                    if (RandomProvider.Next(4) > magic.Level || Env.Time < target.RevTime) return;
 
                     target.RevTime = Env.Time + value * 1000;
                     target.OperateTime = 0;
@@ -6317,7 +6317,7 @@ namespace Server.MirObjects
                     target = (MapObject)data[2];
 
                     if (target == null || !target.IsAttackTarget(this) || target.CurrentMap != CurrentMap || target.Node == null || target.Race != ObjectType.Monster ||
-                        Functions.MaxDistance(CurrentLocation, target.CurrentLocation) > 7 || target.Level >= Level + 5 + Env.Random.Next(8)) return;
+                        Functions.MaxDistance(CurrentLocation, target.CurrentLocation) > 7 || target.Level >= Level + 5 + RandomProvider.Next(8)) return;
 
                     MirDirection pulldirection = (MirDirection)((byte)(Direction - 4) % 8);
                     int pulldistance = 0;
@@ -6327,7 +6327,7 @@ namespace Server.MirObjects
                         pulldistance = pulldirection == MirDirection.Up || pulldirection == MirDirection.Down ? Math.Abs(CurrentLocation.Y - target.CurrentLocation.Y) - 2 : Math.Abs(CurrentLocation.X - target.CurrentLocation.X) - 2;
 
                     int levelgap = target.Race == ObjectType.Player ? Level - target.Level + 4 : Level - target.Level + 9;
-                    if (Env.Random.Next(30) >= ((magic.Level + 1) * 3) + levelgap) return;
+                    if (RandomProvider.Next(30) >= ((magic.Level + 1) * 3) + levelgap) return;
 
                     int duration = target.Race == ObjectType.Player ? (int)Math.Round((magic.Level + 1) * 1.6) : (int)Math.Round((magic.Level + 1) * 0.8);
                     if (duration > 0) target.ApplyPoison(new Poison { PType = PoisonType.Paralysis, Duration = duration, TickSpeed = 1000 }, this);
@@ -6344,11 +6344,11 @@ namespace Server.MirObjects
                     target = (MapObject)data[2];
 
                     if (target == null || !target.IsAttackTarget(this) || target.CurrentMap != CurrentMap || target.Node == null ||
-                        Functions.MaxDistance(CurrentLocation, target.CurrentLocation) > 7 || Env.Random.Next(Level + 20 + magic.Level * 5) <= target.Level + 10) return;
+                        Functions.MaxDistance(CurrentLocation, target.CurrentLocation) > 7 || RandomProvider.Next(Level + 20 + magic.Level * 5) <= target.Level + 10) return;
                     item = GetAmulet(1);
                     if (item == null) return;
 
-                    ((MonsterObject)target).HallucinationTime = Env.Time + (Env.Random.Next(20) + 10) * 1000;
+                    ((MonsterObject)target).HallucinationTime = Env.Time + (RandomProvider.Next(20) + 10) * 1000;
                     target.Target = null;
 
                     ConsumeItem(item, 1);
@@ -6393,7 +6393,7 @@ namespace Server.MirObjects
                     if (target == null || !target.IsAttackTarget(this) || target.CurrentMap != CurrentMap || target.Node == null) return;
                     if (target.Attacked(this, value, DefenceType.AC, false) > 0)
                     {
-                        int rnd = Env.Random.Next(10);
+                        int rnd = RandomProvider.Next(10);
                         if (rnd >= 8)
                         {
                             if (target.Race == ObjectType.Player && Settings.PvpCanFreeze)
@@ -6568,7 +6568,7 @@ namespace Server.MirObjects
                     if (magic.Spell == Spell.VampireShot)
                     {
                         doVamp = true;
-                        if (!hasVampBuff && !hasPoisonBuff && (Env.Random.Next(20) >= 8))//40% chance
+                        if (!hasVampBuff && !hasPoisonBuff && (RandomProvider.Next(20) >= 8))//40% chance
                         {
                             AddBuff(BuffType.VampireShot, this, Settings.Second * buffTime, new Stats());
                             BroadcastInfo();
@@ -6577,7 +6577,7 @@ namespace Server.MirObjects
                     if (magic.Spell == Spell.PoisonShot)
                     {
                         doPoison = true;
-                        if (!hasPoisonBuff && !hasVampBuff && (Env.Random.Next(20) >= 8))//40% chance
+                        if (!hasPoisonBuff && !hasVampBuff && (RandomProvider.Next(20) >= 8))//40% chance
                         {
                             AddBuff(BuffType.PoisonShot, this, Settings.Second * buffTime, new Stats());
                             BroadcastInfo();
@@ -6625,7 +6625,7 @@ namespace Server.MirObjects
                                                 Owner = this,
                                                 PType = PoisonType.Green,
                                                 TickSpeed = 2000,
-                                                Value = value / 25 + magic.Level + 1 + Env.Random.Next(Stats[Stat.PoisonAttack])
+                                                Value = value / 25 + magic.Level + 1 + RandomProvider.Next(Stats[Stat.PoisonAttack])
                                             }, this);
                                             targetob.OperateTime = 0;
                                         }
@@ -6649,7 +6649,7 @@ namespace Server.MirObjects
                                 Owner = this,
                                 PType = PoisonType.Green,
                                 TickSpeed = 2000,
-                                Value = value / 25 + magic.Level + 1 + Env.Random.Next(Stats[Stat.PoisonAttack])
+                                Value = value / 25 + magic.Level + 1 + RandomProvider.Next(Stats[Stat.PoisonAttack])
                             }, this);
                             target.OperateTime = 0;
                         }
@@ -6803,8 +6803,8 @@ namespace Server.MirObjects
                 if (userMagic.Spell == Spell.TwinDrakeBlade)
                 {
                     if ((((target.Race != ObjectType.Player) || Settings.PvpCanResistPoison) &&
-                        (Env.Random.Next(Settings.PoisonAttackWeight) >= target.Stats[Stat.PoisonResist])) &&
-                        (target.Level < Level + 10 && Env.Random.Next(target.Race == ObjectType.Player ? 40 : 20) <= userMagic.Level + 1))
+                        (RandomProvider.Next(Settings.PoisonAttackWeight) >= target.Stats[Stat.PoisonResist])) &&
+                        (target.Level < Level + 10 && RandomProvider.Next(target.Race == ObjectType.Player ? 40 : 20) <= userMagic.Level + 1))
                     {
                         target.ApplyPoison(new Poison { PType = PoisonType.Stun, Duration = target.Race == ObjectType.Player ? 2 : 2 + userMagic.Level, TickSpeed = 1000 }, this);
                         target.Broadcast(new S.ObjectEffect { ObjectID = target.ObjectID, Effect = SpellEffect.TwinDrakeBlade });
@@ -6902,7 +6902,7 @@ namespace Server.MirObjects
         }
         public void LevelMagic(UserMagic magic)
         {
-            byte exp = (byte)(Env.Random.Next(3) + 1);
+            byte exp = (byte)(RandomProvider.Next(3) + 1);
 
             if (Settings.MentorSkillBoost && Info.Mentor != 0 && Info.IsMentor)
             {
@@ -7113,7 +7113,7 @@ namespace Server.MirObjects
 
             damage += attacker.Stats[Stat.AttackBonus];
 
-            if (Env.Random.Next(100) < Stats[Stat.Reflect])
+            if (RandomProvider.Next(100) < Stats[Stat.Reflect])
             {
                 if (attacker.IsAttackTarget(this))
                 {
@@ -7144,7 +7144,7 @@ namespace Server.MirObjects
             //EnergyShield
             if (Stats[Stat.EnergyShieldPercent] > 0)
             {
-                if (Env.Random.Next(100) < Stats[Stat.EnergyShieldPercent])
+                if (RandomProvider.Next(100) < Stats[Stat.EnergyShieldPercent])
                 {
                     if (HP + (Stats[Stat.EnergyShieldHPGain]) >= Stats[Stat.HP])
                         SetHP(Stats[Stat.HP]);
@@ -7153,7 +7153,7 @@ namespace Server.MirObjects
                 }
             }
 
-            if (Env.Random.Next(100) < (attacker.Stats[Stat.CriticalRate] * Settings.CriticalRateWeight))
+            if (RandomProvider.Next(100) < (attacker.Stats[Stat.CriticalRate] * Settings.CriticalRateWeight))
             {
                 CurrentMap.Broadcast(new S.ObjectEffect { ObjectID = ObjectID, Effect = SpellEffect.Critical }, CurrentLocation);
                 damage = Math.Min(int.MaxValue, damage + (int)Math.Floor(damage * (((double)attacker.Stats[Stat.CriticalDamage] / (double)Settings.CriticalDamageWeight) * 10)));
@@ -7228,7 +7228,7 @@ namespace Server.MirObjects
                 return 0;
             }
 
-            if (Env.Random.Next(100) < Stats[Stat.Reflect])
+            if (RandomProvider.Next(100) < Stats[Stat.Reflect])
             {
                 if (attacker.IsAttackTarget(this))
                 {
@@ -7261,7 +7261,7 @@ namespace Server.MirObjects
 
             if (Stats[Stat.EnergyShieldPercent] > 0)
             {
-                if (Env.Random.Next(100) < Stats[Stat.EnergyShieldPercent])
+                if (RandomProvider.Next(100) < Stats[Stat.EnergyShieldPercent])
                 {
                     if (HP + (Stats[Stat.EnergyShieldHPGain]) >= Stats[Stat.HP])
                         SetHP(Stats[Stat.HP]);
@@ -7381,7 +7381,7 @@ namespace Server.MirObjects
         {
             if (Caster != null && !NoResist)
             {
-                if (((Caster.Race != ObjectType.Player) || Settings.PvpCanResistPoison) && (Env.Random.Next(Settings.PoisonResistWeight) < Stats[Stat.PoisonResist]))
+                if (((Caster.Race != ObjectType.Player) || Settings.PvpCanResistPoison) && (RandomProvider.Next(Settings.PoisonResistWeight) < Stats[Stat.PoisonResist]))
                 {
                     return;
                 }
@@ -7839,12 +7839,12 @@ namespace Server.MirObjects
             if (!SpecialMode.HasFlag(SpecialItemMode.NoDuraLoss))
                 for (int i = 0; i < Info.Equipment.Length; i++)
                     if (i != (int)EquipmentSlot.Weapon)
-                        DamageItem(Info.Equipment[i], Env.Random.Next(1) + 1);
+                        DamageItem(Info.Equipment[i], RandomProvider.Next(1) + 1);
         }
         public void DamageWeapon()
         {
             if (!SpecialMode.HasFlag(SpecialItemMode.NoDuraLoss))
-                DamageItem(Info.Equipment[(int)EquipmentSlot.Weapon], Env.Random.Next(4) + 1);
+                DamageItem(Info.Equipment[(int)EquipmentSlot.Weapon], RandomProvider.Next(4) + 1);
         }
         public void DamageItem(UserItem item, int amount, bool isChanged = false)
         {

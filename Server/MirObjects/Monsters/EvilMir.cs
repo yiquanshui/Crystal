@@ -117,7 +117,7 @@ namespace Server.MirObjects.Monsters
 
             byte random = DragonLink ? (byte)(Env.DragonSystem.MaxLevel + 3 - Env.DragonSystem.Info.Level) : (byte)8;
 
-            if (Env.Random.Next(random) > 0 /*&& Target.CurrentLocation.Y >= CurrentLocation.Y - 1*/)//in theory it shouldnt fire 'behind' it, but it should shoot at stuff in it's top left corner (and this code made it only hit below him not 'infront' of him)
+            if (MirEnv.RandomProvider.Next(random) > 0 /*&& Target.CurrentLocation.Y >= CurrentLocation.Y - 1*/)//in theory it shouldnt fire 'behind' it, but it should shoot at stuff in it's top left corner (and this code made it only hit below him not 'infront' of him)
             {
                 MassAttack = false;
                 Direction = SetDirection(Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation));
@@ -166,7 +166,7 @@ namespace Server.MirObjects.Monsters
 
         public override void ChangeHP(int amount)
         {
-            if (DragonLink && amount < 0) Env.DragonSystem.GainExp(Env.Random.Next(1, 40));
+            if (DragonLink && amount < 0) Env.DragonSystem.GainExp(MirEnv.RandomProvider.Next(1, 40));
             base.ChangeHP(amount);
         }
 

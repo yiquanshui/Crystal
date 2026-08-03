@@ -33,13 +33,13 @@ namespace Server.MirObjects.Monsters
             {
                 if (CanAttack)
                 {
-                    if (Env.Random.Next(3) == 0)
+                    if (RandomProvider.Next(3) == 0)
                         LineAttack(4);
                 }
                 if (CurrentLocation == Target.CurrentLocation)
                 {
-                    MirDirection direction = (MirDirection)Env.Random.Next(8);
-                    int rotation = Env.Random.Next(2) == 0 ? 1 : -1;
+                    MirDirection direction = (MirDirection)RandomProvider.Next(8);
+                    int rotation = RandomProvider.Next(2) == 0 ? 1 : -1;
 
                     for (int d = 0; d < 8; d++)
                     {
@@ -54,7 +54,7 @@ namespace Server.MirObjects.Monsters
 
             if (!CanAttack) return;
 
-            if (Env.Random.Next(3) > 0)
+            if (RandomProvider.Next(3) > 0)
             {
                 if (InAttackRange())
                     Attack();
@@ -84,7 +84,7 @@ namespace Server.MirObjects.Monsters
 
             List<MapObject> targets = FindAllTargets(1, CurrentLocation);
 
-            if (targets.Count > 1 && Env.Random.Next(2) > 0)
+            if (targets.Count > 1 && RandomProvider.Next(2) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
                 for (int i = 0; i < targets.Count; i++)
@@ -121,7 +121,7 @@ namespace Server.MirObjects.Monsters
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]) * 3;
             if (damage == 0) return;
 
-            LineAttackTime = Env.Time + 3000 + Env.Random.Next(5) * 1000;
+            LineAttackTime = Env.Time + 3000 + RandomProvider.Next(5) * 1000;
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 2 });
 

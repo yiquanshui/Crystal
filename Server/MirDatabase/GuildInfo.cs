@@ -75,7 +75,7 @@ namespace Server.MirDatabase
                 MemberCap = Settings.Guild_MembercapList[Level];
             }
 
-            FlagColour = Color.FromArgb(255, Env.Random.Next(255), Env.Random.Next(255), Env.Random.Next(255));
+            FlagColour = Color.FromArgb(255, RandomProvider.Next(255), RandomProvider.Next(255), RandomProvider.Next(255));
         }
 
         public GuildInfo(BinaryReader reader)

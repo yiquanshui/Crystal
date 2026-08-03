@@ -17,13 +17,13 @@ namespace Server.MirObjects.Monsters
             : base(info)
         {
             RevivalCount = 0;
-            LifeCount = Env.Random.Next(3);
+            LifeCount = MirEnv.RandomProvider.Next(3);
         }
 
         public override void Die()
         {
             DieTime = Env.Time;
-            RevivalTime = (4 + Env.Random.Next(20)) * 1000;
+            RevivalTime = (4 + MirEnv.RandomProvider.Next(20)) * 1000;
             base.Die();
         }
 

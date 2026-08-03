@@ -52,13 +52,13 @@ namespace Server.MirObjects.Monsters
                     ActionList.Add(action);
                 }
 
-                MassAttackTime = Env.Time + 2000 + (Env.Random.Next(5) * 1000);
+                MassAttackTime = Env.Time + 2000 + (RandomProvider.Next(5) * 1000);
                 ActionTime = Env.Time + 800;
                 AttackTime = Env.Time + (AttackSpeed);
                 return;
             }
 
-            if (!Functions.InRange(CurrentLocation, Target.CurrentLocation, 1) || Env.Random.Next(3) == 0)
+            if (!Functions.InRange(CurrentLocation, Target.CurrentLocation, 1) || RandomProvider.Next(3) == 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 

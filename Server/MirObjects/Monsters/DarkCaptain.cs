@@ -34,7 +34,7 @@ namespace Server.MirObjects.Monsters
             {
                 AttackTime = Env.Time + AttackSpeed;
 
-                _ThunderTime = Env.Time + 10000 + Env.Random.Next(0, 10000);
+                _ThunderTime = Env.Time + 10000 + MirEnv.RandomProvider.Next(0, 10000);
 
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
@@ -50,7 +50,7 @@ namespace Server.MirObjects.Monsters
             {
                 AttackTime = Env.Time + AttackSpeed;
 
-                _MassThunderTime = Env.Time + 20000 + Env.Random.Next(0, 30000);
+                _MassThunderTime = Env.Time + 20000 + MirEnv.RandomProvider.Next(0, 30000);
 
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 
@@ -66,7 +66,7 @@ namespace Server.MirObjects.Monsters
             {
                 AttackTime = Env.Time + AttackSpeed;
 
-                _OrbTime = Env.Time + 30000 + Env.Random.Next(0, 10000);
+                _OrbTime = Env.Time + 30000 + MirEnv.RandomProvider.Next(0, 10000);
 
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 2 });
 
@@ -75,8 +75,8 @@ namespace Server.MirObjects.Monsters
 
                 for (int i = 0; i < attempts; i++)
                 {
-                    var location = new Point(CurrentLocation.X + Env.Random.Next(-distance, distance + 1),
-                                         CurrentLocation.Y + Env.Random.Next(-distance, distance + 1));
+                    var location = new Point(CurrentLocation.X + MirEnv.RandomProvider.Next(-distance, distance + 1),
+                                         CurrentLocation.Y + MirEnv.RandomProvider.Next(-distance, distance + 1));
 
                     if (PowerBead.SpawnRandom(this, location)) break;
                 }           
@@ -84,7 +84,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Env.Random.Next(5) == 0)
+            if (MirEnv.RandomProvider.Next(5) == 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 2 });
 
@@ -92,7 +92,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Env.Random.Next(5) > 0)
+            if (MirEnv.RandomProvider.Next(5) > 0)
             {
                 AttackTime = Env.Time + AttackSpeed;
 
@@ -102,7 +102,7 @@ namespace Server.MirObjects.Monsters
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                 if (damage == 0) return;
 
-                LineAttack(damage, 2, 300, DefenceType.ACAgility, Env.Random.Next(5) == 0);
+                LineAttack(damage, 2, 300, DefenceType.ACAgility, MirEnv.RandomProvider.Next(5) == 0);
             }
             else
             {
@@ -114,7 +114,7 @@ namespace Server.MirObjects.Monsters
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
                 if (damage == 0) return;
 
-                FullmoonAttack(damage, 500, DefenceType.ACAgility, Env.Random.Next(1, 3));
+                FullmoonAttack(damage, 500, DefenceType.ACAgility, MirEnv.RandomProvider.Next(1, 3));
             }
         }
 

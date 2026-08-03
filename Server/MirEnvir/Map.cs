@@ -44,7 +44,7 @@ namespace Server.MirEnv
         public Map(MapInfo info)
         {
             Info = info;
-            Thread = Env.Random.Next(Settings.ThreadLimit);
+            Thread = RandomProvider.Next(Settings.ThreadLimit);
         }
 
         public Door AddDoor(byte DoorIndex, Point location)
@@ -666,24 +666,24 @@ namespace Server.MirEnv
 
             if ((Info.Lightning) && Env.Time > LightningTime)
             {
-                LightningTime = Env.Time + Env.Random.Next(3000, 15000);
+                LightningTime = Env.Time + RandomProvider.Next(3000, 15000);
                 for (int i = Players.Count - 1; i >= 0; i--)
                 {
                     PlayerObject player = Players[i];
                     Point location;
-                    if (Env.Random.Next(4) == 0)
+                    if (RandomProvider.Next(4) == 0)
                     {
                         location = player.CurrentLocation;          
                     }
                     else
-                        location = new Point(player.CurrentLocation.X - 10 + Env.Random.Next(20), player.CurrentLocation.Y - 10 + Env.Random.Next(20));
+                        location = new Point(player.CurrentLocation.X - 10 + RandomProvider.Next(20), player.CurrentLocation.Y - 10 + RandomProvider.Next(20));
 
                     if (!ValidPoint(location)) continue;
 
                     SpellObject lightning = new SpellObject
                     {
                         Spell = Spell.MapLightning,
-                        Value = Env.Random.Next(Info.LightningDamage),
+                        Value = RandomProvider.Next(Info.LightningDamage),
                         ExpireTime = Env.Time + (1000),
                         TickSpeed = 500,
                         Caster = null,
@@ -698,25 +698,25 @@ namespace Server.MirEnv
 
             if ((Info.Fire) && Env.Time > FireTime)
             {
-                FireTime = Env.Time + Env.Random.Next(3000, 15000);
+                FireTime = Env.Time + RandomProvider.Next(3000, 15000);
                 for (int i = Players.Count - 1; i >= 0; i--)
                 {
                     PlayerObject player = Players[i];
                     Point location;
-                    if (Env.Random.Next(4) == 0)
+                    if (RandomProvider.Next(4) == 0)
                     {
                         location = player.CurrentLocation;
 
                     }
                     else
-                        location = new Point(player.CurrentLocation.X - 10 + Env.Random.Next(20), player.CurrentLocation.Y - 10 + Env.Random.Next(20));
+                        location = new Point(player.CurrentLocation.X - 10 + RandomProvider.Next(20), player.CurrentLocation.Y - 10 + RandomProvider.Next(20));
 
                     if (!ValidPoint(location)) continue;
 
                     SpellObject lightning = new SpellObject
                     {
                         Spell = Spell.MapLava,
-                        Value = Env.Random.Next(Info.FireDamage),
+                        Value = RandomProvider.Next(Info.FireDamage),
                         ExpireTime = Env.Time + (1000),
                         TickSpeed = 500,
                         Caster = null,
@@ -756,7 +756,7 @@ namespace Server.MirEnv
                 if (Success)
                 {
                     respawn.ErrorCount = 0;
-                    long delay = Math.Max(1, respawn.Info.Delay - respawn.Info.RandomDelay + Env.Random.Next(respawn.Info.RandomDelay * 2));
+                    long delay = Math.Max(1, respawn.Info.Delay - respawn.Info.RandomDelay + RandomProvider.Next(respawn.Info.RandomDelay * 2));
                     respawn.RespawnTime = Env.Time + (delay * Settings.Minute);
                     if (respawn.Info.RespawnTicks != 0)
                     {
@@ -1535,24 +1535,24 @@ namespace Server.MirEnv
                                                 //Only targets
                                                 if (target.Attacked(player, j <= 1 ? nearDamage : farDamage, DefenceType.MAC, false) > 0)
                                                 {
-                                                    if (player.Level + (target.Race == ObjectType.Player ? 2 : 10) >= target.Level && Env.Random.Next(target.Race == ObjectType.Player ? 100 : 20) <= magic.Level)
+                                                    if (player.Level + (target.Race == ObjectType.Player ? 2 : 10) >= target.Level && RandomProvider.Next(target.Race == ObjectType.Player ? 100 : 20) <= magic.Level)
                                                     {
                                                         target.ApplyPoison(new Poison
                                                         {
                                                             Owner = player,
-                                                            Duration = target.Race == ObjectType.Player ? 4 : 5 + Env.Random.Next(5),
+                                                            Duration = target.Race == ObjectType.Player ? 4 : 5 + RandomProvider.Next(5),
                                                             PType = PoisonType.Slow,
                                                             TickSpeed = 1000,
                                                         }, player);
                                                         target.OperateTime = 0;
                                                     }
 
-                                                    if (player.Level + (target.Race == ObjectType.Player ? 2 : 10) >= target.Level && Env.Random.Next(target.Race == ObjectType.Player ? 100 : 40) <= magic.Level)
+                                                    if (player.Level + (target.Race == ObjectType.Player ? 2 : 10) >= target.Level && RandomProvider.Next(target.Race == ObjectType.Player ? 100 : 40) <= magic.Level)
                                                     {
                                                         target.ApplyPoison(new Poison
                                                         {
                                                             Owner = player,
-                                                            Duration = target.Race == ObjectType.Player ? 2 : 5 + Env.Random.Next(player.Stats[Stat.Freezing]),
+                                                            Duration = target.Race == ObjectType.Player ? 2 : 5 + RandomProvider.Next(player.Stats[Stat.Freezing]),
                                                             PType = PoisonType.Frozen,
                                                             TickSpeed = 1000,
                                                         }, player);
@@ -1864,7 +1864,7 @@ namespace Server.MirEnv
                                     case ObjectType.Monster:
                                     case ObjectType.Player:
 
-                                        if (Env.Random.Next(10) >= 4) continue;
+                                        if (RandomProvider.Next(10) >= 4) continue;
 
                                         //Only targets
                                         if (target.IsAttackTarget(player))
@@ -1996,7 +1996,7 @@ namespace Server.MirEnv
                                     if (target.IsAttackTarget(player))
                                     {
 
-                                        int chance = Env.Random.Next(15);
+                                        int chance = RandomProvider.Next(15);
                                         PoisonType poison;
                                         if (new int[] { 0, 1, 2 }.Contains(chance)) //3 in 15 chances it'll slow
                                             poison = PoisonType.Slow;
@@ -2150,7 +2150,7 @@ namespace Server.MirEnv
                                                 Owner = player,
                                                 PType = PoisonType.Green,
                                                 TickSpeed = 2000,
-                                                Value = value / 15 + magic.Level + 1 + Env.Random.Next(player.Stats[Stat.PoisonAttack])
+                                                Value = value / 15 + magic.Level + 1 + RandomProvider.Next(player.Stats[Stat.PoisonAttack])
                                             }, player);
                                             target.OperateTime = 0;
                                         }
@@ -2255,7 +2255,7 @@ namespace Server.MirEnv
                     int startY = Math.Max(location.Y - 2, 0);
                     int endY = Math.Min(location.Y + 2, Height - 1);
 
-                    int randomValue = Env.Random.Next(100);
+                    int randomValue = RandomProvider.Next(100);
 
                     for (int y = startY; y <= endY; y++)
                     {

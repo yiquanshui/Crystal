@@ -185,9 +185,9 @@ namespace Server.MirObjects.Monsters
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
             //Charge-Up AOE Rock Fall
-            if (_StartAdvanced && Env.Random.Next(20) == 0)
+            if (_StartAdvanced && RandomProvider.Next(20) == 0)
             {
-                byte rockFallLoops = (byte)Env.Random.Next(5, 10);
+                byte rockFallLoops = (byte)RandomProvider.Next(5, 10);
                 int rockFallDuration = rockFallLoops * 500;
 
                 _Immune = true;
@@ -209,9 +209,9 @@ namespace Server.MirObjects.Monsters
             }
 
             //Charge-Up Spin Hit
-            if (_StartAdvanced && Env.Random.Next(15) == 0)
+            if (_StartAdvanced && RandomProvider.Next(15) == 0)
             {
-                byte spinLoops = (byte)Env.Random.Next(5, 10);
+                byte spinLoops = (byte)RandomProvider.Next(5, 10);
                 int spinDuration = spinLoops * 700;
 
                 _Immune = true;
@@ -232,7 +232,7 @@ namespace Server.MirObjects.Monsters
             }
 
             //Hammer Smash
-            if (_StartAdvanced && Env.Random.Next(10) == 0)
+            if (_StartAdvanced && RandomProvider.Next(10) == 0)
             {
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 
@@ -245,7 +245,7 @@ namespace Server.MirObjects.Monsters
             }
             
             //Teleport
-            if (_StartAdvanced && Env.Random.Next(10) == 0)
+            if (_StartAdvanced && RandomProvider.Next(10) == 0)
             {
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
@@ -256,7 +256,7 @@ namespace Server.MirObjects.Monsters
             }
 
             //Normal Attacks
-            if (Env.Random.Next(2) == 0)
+            if (RandomProvider.Next(2) == 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
@@ -342,10 +342,10 @@ namespace Server.MirObjects.Monsters
                 Point location;
 
                 if (distance <= 0)
-                    location = new Point(Env.Random.Next(CurrentMap.Width), Env.Random.Next(CurrentMap.Height));
+                    location = new Point(RandomProvider.Next(CurrentMap.Width), RandomProvider.Next(CurrentMap.Height));
                 else
-                    location = new Point(CurrentLocation.X + Env.Random.Next(-distance, distance + 1),
-                                         CurrentLocation.Y + Env.Random.Next(-distance, distance + 1));
+                    location = new Point(CurrentLocation.X + RandomProvider.Next(-distance, distance + 1),
+                                         CurrentLocation.Y + RandomProvider.Next(-distance, distance + 1));
 
                 if (Teleport(CurrentMap, location, true, 10)) return true;
             }
@@ -363,7 +363,7 @@ namespace Server.MirObjects.Monsters
                 {
                     var location = new Point(centerPoint.X + x, centerPoint.Y + y);
 
-                    SpawnRockFall(location, Env.Random.Next(0, 200), duration);
+                    SpawnRockFall(location, RandomProvider.Next(0, 200), duration);
                 }
             }
         }

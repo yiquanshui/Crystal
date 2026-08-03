@@ -198,7 +198,7 @@ namespace Server.MirObjects
                 {
                     case IntelligentCreatureType.BabyDragon:
                     case IntelligentCreatureType.OlympicFlame:
-                        if (Env.Random.Next(10) > 5)
+                        if (RandomProvider.Next(10) > 5)
                             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
                         else
                             Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 2 });
@@ -207,7 +207,7 @@ namespace Server.MirObjects
                         Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
                         break;
                     default:
-                        switch(Env.Random.Next(10))
+                        switch(RandomProvider.Next(10))
                         {
                             case 0:
                                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
@@ -280,7 +280,7 @@ namespace Server.MirObjects
 
             SearchTime = Env.Time + SearchDelay;
 
-            if (Target == null || Env.Random.Next(3) == 0) FindTarget();
+            if (Target == null || RandomProvider.Next(3) == 0) FindTarget();
         }
         protected override void ProcessRoam()
         {
@@ -295,7 +295,7 @@ namespace Server.MirObjects
                 if (!Functions.InRange(CurrentLocation, Master.CurrentLocation, 2))
                     MoveTo(Functions.PointMove(Master.CurrentLocation,Master.Direction, -2));
                 else
-                    if (Env.Random.Next(100) >= 60) ProcessAnimVariant();//random anims
+                    if (RandomProvider.Next(100) >= 60) ProcessAnimVariant();//random anims
             }
         }
         
@@ -520,7 +520,7 @@ namespace Server.MirObjects
 
             if (Walk(dir)) return true;
 
-            switch (Env.Random.Next(2)) //No favour
+            switch (RandomProvider.Next(2)) //No favour
             {
                 case 0:
                     for (int i = 0; i < 7; i++)

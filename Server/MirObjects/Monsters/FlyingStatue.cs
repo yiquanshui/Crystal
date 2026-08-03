@@ -43,7 +43,7 @@ namespace Server.MirObjects.Monsters
 
             if (!ranged)
             {
-                if (Env.Random.Next(6) != 0)
+                if (MirEnv.RandomProvider.Next(6) != 0)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
@@ -78,7 +78,7 @@ namespace Server.MirObjects.Monsters
 
             if (count == 0) return;
 
-            var target = targets[Env.Random.Next(count)];
+            var target = targets[MirEnv.RandomProvider.Next(count)];
 
             var location = target.CurrentLocation;
 
@@ -155,7 +155,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Env.Random.Next(2)) //No favour
+                switch (MirEnv.RandomProvider.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)

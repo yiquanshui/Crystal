@@ -33,7 +33,7 @@ namespace Server.MirObjects.Monsters
             ActionTime = Env.Time + 300;
             AttackTime = Env.Time + AttackSpeed;
 
-            if (!ranged && Env.Random.Next(5) > 0)
+            if (!ranged && MirEnv.RandomProvider.Next(5) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);

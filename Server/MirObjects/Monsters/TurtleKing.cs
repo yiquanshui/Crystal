@@ -56,7 +56,7 @@ namespace Server.MirObjects.Monsters
 
             if (!ranged)
             {
-                switch (Env.Random.Next(5))
+                switch (RandomProvider.Next(5))
                 {
                     case 0:
                     case 1:
@@ -95,14 +95,14 @@ namespace Server.MirObjects.Monsters
             }
             else
             {
-                if (!Functions.InRange(CurrentLocation, Target.CurrentLocation, CloseRange) && Env.Random.Next(4) == 0)
+                if (!Functions.InRange(CurrentLocation, Target.CurrentLocation, CloseRange) && RandomProvider.Next(4) == 0)
                 {
                     Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
                     Point target = Functions.PointMove(CurrentLocation, Direction, 1);
                     Target.Teleport(CurrentMap, target, true, 6);
                 }
-                else if (!Functions.InRange(CurrentLocation, Target.CurrentLocation, CloseRange) && Env.Random.Next(4) == 0)
+                else if (!Functions.InRange(CurrentLocation, Target.CurrentLocation, CloseRange) && RandomProvider.Next(4) == 0)
                 {
                     Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 2 });
 
@@ -162,7 +162,7 @@ namespace Server.MirObjects.Monsters
             for (int i = 0; i < count; i++)
             {
                 MonsterObject mob = null;
-                switch (Env.Random.Next(7))
+                switch (RandomProvider.Next(7))
                 {
                     case 0:
                         mob = GetMonster(Env.GetMonsterInfo(Settings.Turtle1));

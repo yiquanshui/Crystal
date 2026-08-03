@@ -21,14 +21,14 @@ namespace Server.MirObjects.Monsters
 
             RemainingSkinCount = 5;
 
-            if (Env.Random.Next(7) == 0)
+            if (MirEnv.RandomProvider.Next(7) == 0)
             {
                 _runAway = true;
-                Quality = (short)(Env.Random.Next(8) * 2000);
+                Quality = (short)(MirEnv.RandomProvider.Next(8) * 2000);
                 MoveSpeed -= 300;
             }
             else
-                Quality = (short)(Env.Random.Next(4) * 1000);
+                Quality = (short)(MirEnv.RandomProvider.Next(4) * 1000);
         }
 
         public override void RefreshAll()
@@ -53,7 +53,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Env.Random.Next(2)) //No favour
+                switch (MirEnv.RandomProvider.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)

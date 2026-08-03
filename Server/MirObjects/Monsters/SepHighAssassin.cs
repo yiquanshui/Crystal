@@ -29,14 +29,14 @@ namespace Server.MirObjects.Monsters
             {
                 if (CanAttack)
                 {
-                    if (Env.Random.Next(5) == 0)
+                    if (RandomProvider.Next(5) == 0)
                         RangeAttack();
                 }
 
                 if (CurrentLocation == Target.CurrentLocation)
                 {
-                    MirDirection direction = (MirDirection)Env.Random.Next(8);
-                    int rotation = Env.Random.Next(2) == 0 ? 1 : -1;
+                    MirDirection direction = (MirDirection)RandomProvider.Next(8);
+                    int rotation = RandomProvider.Next(2) == 0 ? 1 : -1;
 
                     for (int d = 0; d < 8; d++)
                     {
@@ -51,7 +51,7 @@ namespace Server.MirObjects.Monsters
 
             if (!CanAttack) return;
 
-            if (Env.Random.Next(5) > 0)
+            if (RandomProvider.Next(5) > 0)
             {
                 if (InAttackRange())
                     Attack();
@@ -183,7 +183,7 @@ namespace Server.MirObjects.Monsters
             DelayedAction action;
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            if (Env.Random.Next(5) == 0)
+            if (RandomProvider.Next(5) == 0)
             {
                 Broadcast(new S.ObjectMagic { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Spell = Spell.CrescentSlash, TargetID = Target.ObjectID, Target = Target.CurrentLocation, Cast = true, Level = 3 });
                 MirDirection backDir = Functions.ReverseDirection(Direction);
@@ -306,10 +306,10 @@ namespace Server.MirObjects.Monsters
                 Name = master != null ? master.Name : Name,
                 NameColour = NameColour,
                 Class = MirClass.Assassin,
-                Gender = master != null ? master.Gender : Env.Random.Next(2) == 0 ? MirGender.Male : MirGender.Female,
+                Gender = master != null ? master.Gender : RandomProvider.Next(2) == 0 ? MirGender.Male : MirGender.Female,
                 Location = CurrentLocation,
                 Direction = Direction,
-                Hair = master != null ? master.Hair : (byte)Env.Random.Next(0, 5),
+                Hair = master != null ? master.Hair : (byte)RandomProvider.Next(0, 5),
                 Weapon = 113,
                 Armour = 34,
                 Light = master != null ? master.Light : Light,

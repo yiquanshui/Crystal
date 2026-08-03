@@ -48,12 +48,12 @@ namespace Server.MirObjects.Monsters
                     if (targets[i].IsAttackTarget(this) && targets[i].Level < Level)
                         targets[i].Pushed(this, Functions.DirectionFromPoint(targets[i].CurrentLocation, targets[i].Back), 4);
                 }
-                RepulsionTime = Env.Time + Settings.Second * Env.Random.Next(10, 30);
+                RepulsionTime = Env.Time + Settings.Second * RandomProvider.Next(10, 30);
                 Broadcast(new S.ObjectMagic { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Spell = Spell.Repulsion, Cast = true, Level = 3 });
                 return;
             }
 
-            if (Functions.InRange(CurrentLocation, Target.CurrentLocation, 2) && Env.Random.Next(3) == 0)
+            if (Functions.InRange(CurrentLocation, Target.CurrentLocation, 2) && RandomProvider.Next(3) == 0)
             {
                 Broadcast(new S.ObjectMagic { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Spell = Spell.FlameField, TargetID = Target.ObjectID, Target = Target.CurrentLocation });
                 ProjectileAttack(damage);
@@ -61,14 +61,14 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (Env.Random.Next(3) == 0)
+            if (RandomProvider.Next(3) == 0)
             {
                 Broadcast(new S.ObjectMagic { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Spell = Spell.FireBang, TargetID = Target.ObjectID, Target = Target.CurrentLocation, Cast = true, Level = 3 });
                 ProjectileAttack(damage);
                 return;
             }
 
-            if (PercentHealth <= 80 && Env.Random.Next(4) == 0)
+            if (PercentHealth <= 80 && RandomProvider.Next(4) == 0)
             {
                 Broadcast(new S.ObjectMagic { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Spell = Spell.Vampirism, TargetID = Target.ObjectID, Target = Target.CurrentLocation, Cast = true, Level = 3 });
                 ProjectileAttack(damage);
@@ -92,8 +92,8 @@ namespace Server.MirObjects.Monsters
             {
                 if (CurrentLocation == Target.CurrentLocation)
                 {
-                    MirDirection direction = (MirDirection)Env.Random.Next(8);
-                    int rotation = Env.Random.Next(2) == 0 ? 1 : -1;
+                    MirDirection direction = (MirDirection)RandomProvider.Next(8);
+                    int rotation = RandomProvider.Next(2) == 0 ? 1 : -1;
 
                     for (int d = 0; d < 8; d++)
                     {
@@ -130,7 +130,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Env.Random.Next(2)) //No favour
+                switch (RandomProvider.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)
@@ -309,10 +309,10 @@ namespace Server.MirObjects.Monsters
                 Name = master != null ? master.Name : Name,
                 NameColour = NameColour,
                 Class = MirClass.Wizard,
-                Gender = master != null ? master.Gender : Env.Random.Next(2) == 0 ? MirGender.Male : MirGender.Female,
+                Gender = master != null ? master.Gender : RandomProvider.Next(2) == 0 ? MirGender.Male : MirGender.Female,
                 Location = CurrentLocation,
                 Direction = Direction,
-                Hair = master != null ? master.Hair : (byte)Env.Random.Next(0, 5),
+                Hair = master != null ? master.Hair : (byte)RandomProvider.Next(0, 5),
                 Weapon = 54,
                 Armour = 32,
                 Light = master != null ? master.Light : Light,

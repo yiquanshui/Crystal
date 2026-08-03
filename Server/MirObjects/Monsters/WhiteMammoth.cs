@@ -20,9 +20,9 @@ namespace Server.MirObjects.Monsters
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            if (Env.Random.Next(8) > 0)
+            if (MirEnv.RandomProvider.Next(8) > 0)
             {
-                if (Env.Random.Next(6) > 0)
+                if (MirEnv.RandomProvider.Next(6) > 0)
                 {
                     base.Attack();
                 }

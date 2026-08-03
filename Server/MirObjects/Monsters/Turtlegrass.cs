@@ -39,7 +39,7 @@ namespace Server.MirObjects.Monsters
             ActionTime = Env.Time + 300;
             AttackTime = Env.Time + AttackSpeed;
 
-            if (Env.Random.Next(4) > 0)
+            if (RandomProvider.Next(4) > 0)
             {
                 base.Attack();
             }

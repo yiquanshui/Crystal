@@ -27,7 +27,7 @@ namespace Server.MirObjects.Monsters
 
             List<MapObject> targets = FindAllTargets(1, CurrentLocation);
 
-            if ((targets.Count > 1 && Env.Random.Next(2) == 0) || Env.Random.Next(8) == 0)
+            if ((targets.Count > 1 && RandomProvider.Next(2) == 0) || RandomProvider.Next(8) == 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 

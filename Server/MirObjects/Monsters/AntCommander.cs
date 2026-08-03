@@ -33,7 +33,7 @@ namespace Server.MirObjects.Monsters
 
             if (!ranged)
             {
-                switch (Env.Random.Next(6))
+                switch (MirEnv.RandomProvider.Next(6))
                 {
                     case 0:
                     case 3:

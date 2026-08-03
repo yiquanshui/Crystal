@@ -40,9 +40,9 @@ namespace Server.MirObjects.Monsters
             ActionTime = Env.Time + 300;
             AttackTime = Env.Time + AttackSpeed;
 
-            if (!ranged && Env.Random.Next(3) > 0)
+            if (!ranged && RandomProvider.Next(3) > 0)
             {
-                if (Env.Random.Next(5) > 0)
+                if (RandomProvider.Next(5) > 0)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
@@ -65,7 +65,7 @@ namespace Server.MirObjects.Monsters
             }
             else
             {
-                if (Env.Random.Next(3) > 0)
+                if (RandomProvider.Next(3) > 0)
                 {
                     Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID });
                     AttackTime = Env.Time + AttackSpeed + 500;
@@ -132,7 +132,7 @@ namespace Server.MirObjects.Monsters
                 {
                     if (targets[i].Attacked(this, damage, defence) <= 0) continue;
 
-                    if (Env.Random.Next(3) >= 0)
+                    if (RandomProvider.Next(3) >= 0)
                     {
                         Broadcast(new S.ObjectEffect { ObjectID = targets[i].ObjectID, Effect = SpellEffect.KingGuard, EffectType = 0 });
                         PoisonTarget(targets[i], 5, 10, PoisonType.Slow, 1000);

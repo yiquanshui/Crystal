@@ -49,15 +49,15 @@ namespace Server.MirObjects.Monsters
                 mob.PetLevel = target.PetLevel;
                 mob.ActionTime = Env.Time + 1000;
 
-                if (Env.Random.Next(3) == 0)
+                if (RandomProvider.Next(3) == 0)
                 {
                     var attempts = 4;
                     var distance = 5;
 
                     for (int j = 0; j < attempts; j++)
                     {
-                        var location = new Point(CurrentLocation.X + Env.Random.Next(-distance, distance + 1),
-                                             CurrentLocation.Y + Env.Random.Next(-distance, distance + 1));
+                        var location = new Point(CurrentLocation.X + RandomProvider.Next(-distance, distance + 1),
+                                             CurrentLocation.Y + RandomProvider.Next(-distance, distance + 1));
 
                         if (location == CurrentLocation) continue;
 

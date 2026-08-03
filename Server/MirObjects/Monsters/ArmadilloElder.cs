@@ -26,7 +26,7 @@ namespace Server.MirObjects.Monsters
             ActionTime = Env.Time + 300;
             AttackTime = Env.Time + AttackSpeed;
 
-            switch (Env.Random.Next(0, 6))
+            switch (RandomProvider.Next(0, 6))
             {
                 case 0:
                     {

@@ -42,7 +42,7 @@ namespace Server.MirObjects.Monsters
 
             bool range = !Functions.InRange(CurrentLocation, Target.CurrentLocation, 1);
 
-            if (!range && Env.Random.Next(3) > 0)
+            if (!range && RandomProvider.Next(3) > 0)
             {
                 if (Env.Time >= PullTime)
                 {
@@ -51,7 +51,7 @@ namespace Server.MirObjects.Monsters
                     AttackTime = Env.Time + AttackSpeed;
                     ActionTime = Env.Time + 300;
 
-                    Target.Pushed(this, Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation), 2 + Env.Random.Next(3));
+                    Target.Pushed(this, Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation), 2 + RandomProvider.Next(3));
                     DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.AC);
                     ActionList.Add(action);
 

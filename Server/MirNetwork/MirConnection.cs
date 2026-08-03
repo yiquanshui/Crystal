@@ -53,7 +53,7 @@ namespace Server.MirNetwork
         byte[] _rawBytes = new byte[8 * 1024];
 
         public AccountInfo Account;
-        public PlayerObject Player;
+        public PlayerObject? Player;
 
         public List<MirConnection> Observers = new List<MirConnection>();
         public MirConnection Observing;

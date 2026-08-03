@@ -59,7 +59,7 @@ namespace Server.MirObjects.Monsters
             }
             else
             {
-                _areaTime = Env.Time + 5000 + Env.Random.Next(10) * 1000;
+                _areaTime = Env.Time + 5000 + RandomProvider.Next(10) * 1000;
 
                 ActionTime = Env.Time + 500;
                 AttackTime = Env.Time + (AttackSpeed * 2);
@@ -95,7 +95,7 @@ namespace Server.MirObjects.Monsters
                 {
                     targets[i].Attacked(this, Stats[Stat.MaxMC], defence);
 
-                    PoisonTarget(targets[i], 2, Env.Random.Next(5, 10), PoisonType.Dazed, 1000);
+                    PoisonTarget(targets[i], 2, RandomProvider.Next(5, 10), PoisonType.Dazed, 1000);
                 }
             }
         }

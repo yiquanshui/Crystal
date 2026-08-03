@@ -518,7 +518,7 @@ namespace Server.MirDatabase
 
             if (rate < 1) rate = 1;
 
-            if (Env.Random.Next(rate) != 0)
+            if (RandomProvider.Next(rate) != 0)
             {
                 return null;
             }
@@ -538,7 +538,7 @@ namespace Server.MirDatabase
 
                 if (lowerGoldRange > upperGoldRange) lowerGoldRange = upperGoldRange;
 
-                gold = (uint)Env.Random.Next(lowerGoldRange, upperGoldRange);
+                gold = (uint)RandomProvider.Next(lowerGoldRange, upperGoldRange);
             }
             else if (Item != null)
             {
@@ -569,7 +569,7 @@ namespace Server.MirDatabase
                 {
                     if (tempItems.Count > 0)
                     {
-                        items.Add(tempItems[Env.Random.Next(tempItems.Count)]);
+                        items.Add(tempItems[RandomProvider.Next(tempItems.Count)]);
                     }
                 }
                 else

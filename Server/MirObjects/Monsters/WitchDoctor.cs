@@ -30,7 +30,7 @@ namespace Server.MirObjects.Monsters
 
             ShockTime = 0;
 
-            if (Env.Random.Next(5) == 0)
+            if (RandomProvider.Next(5) == 0)
             {
                 TeleportRandom(10, AttackRange);
             }
@@ -38,7 +38,7 @@ namespace Server.MirObjects.Monsters
             {
                 var hpPercent = (HP * 100) / Stats[Stat.HP];
 
-                if (Env.Random.Next(3) == 0 && hpPercent < 50)
+                if (RandomProvider.Next(3) == 0 && hpPercent < 50)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
@@ -94,7 +94,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Env.Random.Next(2)) //No favour
+                switch (RandomProvider.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)
@@ -127,8 +127,8 @@ namespace Server.MirObjects.Monsters
             {
                 Point location;
 
-                location = new Point(Target.CurrentLocation.X + Env.Random.Next(-distance, distance + 1),
-                                          Target.CurrentLocation.Y + Env.Random.Next(-distance, distance + 1));
+                location = new Point(Target.CurrentLocation.X + RandomProvider.Next(-distance, distance + 1),
+                                          Target.CurrentLocation.Y + RandomProvider.Next(-distance, distance + 1));
 
                 if (Teleport(CurrentMap, location, true, 5)) return true;
             }

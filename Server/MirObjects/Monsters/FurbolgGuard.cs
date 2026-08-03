@@ -60,7 +60,7 @@ namespace Server.MirObjects.Monsters
                 Point location = Functions.PointMove(CurrentLocation, Functions.ReverseDirection(Direction), 3);
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
 
-                if (dist <= 2 && CurrentMap.ValidPoint(location) && Env.Random.Next(3) == 0)
+                if (dist <= 2 && CurrentMap.ValidPoint(location) && RandomProvider.Next(3) == 0)
                 {
                     LineAttack(damage, 3, 500, DefenceType.ACAgility, true);
                     JumpBack(3);

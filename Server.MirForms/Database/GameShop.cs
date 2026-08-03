@@ -356,7 +356,7 @@ namespace Server
             if (SMain.Env.Running)
             {
                 if (MessageBox.Show("Reseting purchase logs cannot be reverted and will set stock levels back to defaults, This will take effect instantly.", "Remove Logs?", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
-                SMain.Env.ClearGameshopLog();
+                SMain.Env.ClearGameShopLog();
             }
             else
             {

@@ -81,7 +81,7 @@ namespace Server.MirObjects.Monsters
             AttackTime = Env.Time + AttackSpeed;
 
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
-            if (!ranged && Env.Random.Next(5) > 0)
+            if (!ranged && RandomProvider.Next(5) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
                 if (damage == 0) return;
@@ -94,7 +94,7 @@ namespace Server.MirObjects.Monsters
                 AttackTime = Env.Time + AttackSpeed + 500;
                 if (damage == 0) return;
 
-                if (InRangedAttackRange(PoisonAttackRange) && Env.Random.Next(6) == 0)
+                if (InRangedAttackRange(PoisonAttackRange) && RandomProvider.Next(6) == 0)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
 
@@ -216,10 +216,10 @@ namespace Server.MirObjects.Monsters
                 Point location;
 
                 if (distance <= 0)
-                    location = new Point(Env.Random.Next(CurrentMap.Width), Env.Random.Next(CurrentMap.Height));
+                    location = new Point(RandomProvider.Next(CurrentMap.Width), RandomProvider.Next(CurrentMap.Height));
                 else
-                    location = new Point(CurrentLocation.X + Env.Random.Next(-distance, distance + 1),
-                                         CurrentLocation.Y + Env.Random.Next(-distance, distance + 1));
+                    location = new Point(CurrentLocation.X + RandomProvider.Next(-distance, distance + 1),
+                                         CurrentLocation.Y + RandomProvider.Next(-distance, distance + 1));
 
                 if (Teleport(CurrentMap, location, true, 1)) return true;
             }

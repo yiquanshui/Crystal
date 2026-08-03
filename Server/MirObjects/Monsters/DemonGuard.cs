@@ -19,7 +19,7 @@ namespace Server.MirObjects.Monsters
             : base(info)
         {
             RevivalCount = 0;
-            LifeCount = Env.Random.Next(3);
+            LifeCount = RandomProvider.Next(3);
         }
 
         protected override void Attack()
@@ -37,7 +37,7 @@ namespace Server.MirObjects.Monsters
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            if (Env.Random.Next(3) > 0)
+            if (RandomProvider.Next(3) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
@@ -62,7 +62,7 @@ namespace Server.MirObjects.Monsters
         public override void Die()
         {
             DieTime = Env.Time;
-            RevivalTime = (4 + Env.Random.Next(20)) * 1000;
+            RevivalTime = (4 + RandomProvider.Next(20)) * 1000;
             base.Die();
         }
 

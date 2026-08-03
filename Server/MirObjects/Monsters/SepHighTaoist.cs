@@ -48,7 +48,7 @@ namespace Server.MirObjects.Monsters
                 int power = GetAttackPower(Stats[Stat.MinSC], Stats[Stat.MaxSC]);
                 Target.ApplyPoison(new Poison
                 {
-                    Duration = power + ((Env.Random.Next(0, 3) + 1) * 7),
+                    Duration = power + ((RandomProvider.Next(0, 3) + 1) * 7),
                     Owner = this,
                     PType = PoisonType.Green,
                     TickSpeed = 2000,
@@ -63,7 +63,7 @@ namespace Server.MirObjects.Monsters
                 int power = GetAttackPower(Stats[Stat.MinSC], Stats[Stat.MaxSC]);
                 Target.ApplyPoison(new Poison
                 {
-                    Duration = power + ((Env.Random.Next(0, 3) + 1) * 7),
+                    Duration = power + ((RandomProvider.Next(0, 3) + 1) * 7),
                     Owner = this,
                     PType = PoisonType.Red,
                     TickSpeed = 2000,
@@ -77,7 +77,7 @@ namespace Server.MirObjects.Monsters
                 int power = GetAttackPower(Stats[Stat.MinSC], Stats[Stat.MaxSC]);
                 Target.ApplyPoison(new Poison
                 {
-                    Duration = power + ((Env.Random.Next(0, 3) + 1) * 7),
+                    Duration = power + ((RandomProvider.Next(0, 3) + 1) * 7),
                     Owner = this,
                     PType = PoisonType.Green,
                     TickSpeed = 2000,
@@ -86,14 +86,14 @@ namespace Server.MirObjects.Monsters
             }
 
 
-            if (!Target.Buffs.Any(e => e.Type == BuffType.Curse) && Env.Random.Next(8) == 0)
+            if (!Target.Buffs.Any(e => e.Type == BuffType.Curse) && RandomProvider.Next(8) == 0)
             {
                 Broadcast(new S.ObjectMagic { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Spell = Spell.Curse, TargetID = Target.ObjectID, Target = Target.CurrentLocation, Cast = true, Level = 3 });
                 PoisonTarget(Target, 1, 5, PoisonType.Slow, 1000);
                 return;
             }
 
-            if (PercentHealth <= 90 && Env.Random.Next(8) == 0)
+            if (PercentHealth <= 90 && RandomProvider.Next(8) == 0)
             {
                 Broadcast(new S.ObjectMagic { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Spell = Spell.MassHealing, TargetID = ObjectID, Target = CurrentLocation, Cast = true, Level = 3 });
                 TriangleAttack(damage, 2, 1, 800);
@@ -141,8 +141,8 @@ namespace Server.MirObjects.Monsters
             {
                 if (CurrentLocation == Target.CurrentLocation)
                 {
-                    MirDirection direction = (MirDirection)Env.Random.Next(8);
-                    int rotation = Env.Random.Next(2) == 0 ? 1 : -1;
+                    MirDirection direction = (MirDirection)RandomProvider.Next(8);
+                    int rotation = RandomProvider.Next(2) == 0 ? 1 : -1;
 
                     for (int d = 0; d < 8; d++)
                     {
@@ -179,7 +179,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Env.Random.Next(2)) //No favour
+                switch (RandomProvider.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)
@@ -361,10 +361,10 @@ namespace Server.MirObjects.Monsters
                 Name = master != null ? master.Name : Name,
                 NameColour = NameColour,
                 Class = MirClass.Taoist,
-                Gender = master != null ? master.Gender : Env.Random.Next(1, 2) == 1 ? MirGender.Male : MirGender.Female,
+                Gender = master != null ? master.Gender : RandomProvider.Next(1, 2) == 1 ? MirGender.Male : MirGender.Female,
                 Location = CurrentLocation,
                 Direction = Direction,
-                Hair = master != null ? master.Hair : (byte)Env.Random.Next(0, 5),
+                Hair = master != null ? master.Hair : (byte)RandomProvider.Next(0, 5),
                 Weapon = 53,
                 Armour = 33,
                 Light = master != null ? master.Light : Light,

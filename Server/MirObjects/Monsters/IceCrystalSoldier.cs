@@ -27,7 +27,7 @@ namespace Server.MirObjects.Monsters
 
             if (Env.Time < _areaTime)
             {
-                if (Env.Random.Next(4) == 0)
+                if (RandomProvider.Next(4) == 0)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
                     DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage * 3 / 2, DefenceType.ACAgility);
@@ -40,7 +40,7 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            _areaTime = Env.Time + 2000 + Env.Random.Next(5) * 1000;
+            _areaTime = Env.Time + 2000 + RandomProvider.Next(5) * 1000;
 
             Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
             ActionList.Add(new DelayedAction(DelayedType.RangeDamage, Env.Time + 500));

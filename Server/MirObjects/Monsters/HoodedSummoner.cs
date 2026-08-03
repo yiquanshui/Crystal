@@ -35,7 +35,7 @@ namespace Server.MirObjects.Monsters
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            switch (Env.Random.Next(6))
+            switch (MirEnv.RandomProvider.Next(6))
             {
                 case 0:
                 case 1:
@@ -110,7 +110,7 @@ namespace Server.MirObjects.Monsters
 
                 if (slaves1 == true)
                 {
-                    switch (Env.Random.Next(2))
+                    switch (MirEnv.RandomProvider.Next(2))
                     {
                         case 0:
                             mob = GetMonster(Env.GetMonsterInfo(Settings.ScrollMob1));
@@ -123,7 +123,7 @@ namespace Server.MirObjects.Monsters
 
                 if (slaves2 == true)
                 {
-                    switch (Env.Random.Next(2))
+                    switch (MirEnv.RandomProvider.Next(2))
                     {
                         case 0:
                             mob = GetMonster(Env.GetMonsterInfo(Settings.ScrollMob3));
@@ -172,7 +172,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Env.Random.Next(2)) //No favour
+                switch (MirEnv.RandomProvider.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)

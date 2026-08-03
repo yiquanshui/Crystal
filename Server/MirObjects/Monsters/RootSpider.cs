@@ -9,7 +9,7 @@ namespace Server.MirObjects.Monsters
         protected internal RootSpider(MonsterInfo info) 
             : base(info)
         {
-            byte randomdirection = (byte)Env.Random.Next(3);
+            byte randomdirection = (byte)MirEnv.RandomProvider.Next(3);
             Direction = (MirDirection)randomdirection;
         }
 

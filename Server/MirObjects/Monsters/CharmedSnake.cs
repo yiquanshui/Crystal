@@ -88,7 +88,7 @@ namespace Server.MirObjects.Monsters
                 {
                     MirDirection dir = Direction;
 
-                    switch (Env.Random.Next(3)) // favour Clockwise
+                    switch (RandomProvider.Next(3)) // favour Clockwise
                     {
                         case 0:
                             for (int i = 0; i < 7; i++)
@@ -112,7 +112,7 @@ namespace Server.MirObjects.Monsters
                 }
             }
 
-            if (Target == null || Env.Random.Next(3) == 0) FindTarget();
+            if (Target == null || RandomProvider.Next(3) == 0) FindTarget();
         }
 
         protected override void ProcessRoam()
@@ -128,12 +128,12 @@ namespace Server.MirObjects.Monsters
             }
 
             RoamTime = Env.Time + RoamDelay;
-            if (Env.Random.Next(10) != 0) return;
+            if (RandomProvider.Next(10) != 0) return;
 
-            switch (Env.Random.Next(3)) //Face Walk
+            switch (RandomProvider.Next(3)) //Face Walk
             {
                 case 0:
-                    Turn((MirDirection)Env.Random.Next(8));
+                    Turn((MirDirection)RandomProvider.Next(8));
                     break;
                 default:
                     Walk(Direction);

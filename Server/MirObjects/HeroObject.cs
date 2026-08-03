@@ -165,7 +165,7 @@ namespace Server.MirObjects
         protected override void NewCharacter()
         {
             base.NewCharacter();
-            Grade = (byte)Env.Random.Next(4);
+            Grade = (byte)RandomProvider.Next(4);
         }
 
         public override void Enqueue(Packet p) 
@@ -844,7 +844,7 @@ namespace Server.MirObjects
                 {
                     MirDirection dir = Direction;
 
-                    switch (Env.Random.Next(3)) 
+                    switch (RandomProvider.Next(3)) 
                     {
                         case 0:
                             for (int i = 0; i < 7; i++)
@@ -878,7 +878,7 @@ namespace Server.MirObjects
 
             SearchTime = Env.Time + SearchDelay;
 
-            if (Target == null || Env.Random.Next(3) == 0)
+            if (Target == null || RandomProvider.Next(3) == 0)
                 FindTarget();
         }
 
@@ -1014,7 +1014,7 @@ namespace Server.MirObjects
 
             if (Walk(dir)) return;
 
-            switch (Env.Random.Next(2))
+            switch (RandomProvider.Next(2))
             {
                 case 0:
                     for (int i = 0; i < 7; i++)

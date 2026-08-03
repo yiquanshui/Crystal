@@ -22,7 +22,7 @@ namespace Server.MirObjects.Monsters
         {
             base.ApplyNegativeEffects(attacker, type, levelOffset);
 
-            if (Env.Random.Next(3) == 0)
+            if (RandomProvider.Next(3) == 0)
             {
                 Broadcast(new S.ObjectEffect { ObjectID = ObjectID, Effect = SpellEffect.DeathCrawlerBreath });
 

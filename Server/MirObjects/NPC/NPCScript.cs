@@ -1434,7 +1434,7 @@ namespace Server.MirObjects
             player.Account.Gold -= (recipe.Gold * count);
             player.Enqueue(new S.LoseGold { Gold = (recipe.Gold * count) });
 
-            if (Env.Random.Next(100) >= recipe.Chance + player.Stats[Stat.CraftRatePercent])
+            if (RandomProvider.Next(100) >= recipe.Chance + player.Stats[Stat.CraftRatePercent])
             {
                 player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CraftingAttemptFailed), ChatType.System);
             }

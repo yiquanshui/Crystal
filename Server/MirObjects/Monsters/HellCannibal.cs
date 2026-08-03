@@ -25,7 +25,7 @@ namespace Server.MirObjects.Monsters
             ActionTime = Env.Time + 300;
             AttackTime = Env.Time + AttackSpeed;
 
-            if (Env.Random.Next(4) > 0)
+            if (RandomProvider.Next(4) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
@@ -60,7 +60,7 @@ namespace Server.MirObjects.Monsters
 
                 for (int i = 0; i < targets.Count; i++)
                 {
-                    PoisonTarget(targets[i], 1, Env.Random.Next(GetAttackPower(Stats[Stat.MinSC], Stats[Stat.MaxSC]) / 2), PoisonType.Red, 1000);
+                    PoisonTarget(targets[i], 1, RandomProvider.Next(GetAttackPower(Stats[Stat.MinSC], Stats[Stat.MaxSC]) / 2), PoisonType.Red, 1000);
                 }
             }
             else

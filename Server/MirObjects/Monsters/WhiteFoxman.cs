@@ -33,7 +33,7 @@ namespace Server.MirObjects.Monsters
             ActionTime = Env.Time + 300;
             AttackTime = Env.Time + AttackSpeed;
 
-            if (Env.Random.Next(8) != 0)
+            if (MirEnv.RandomProvider.Next(8) != 0)
             {
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID });
 
@@ -62,7 +62,7 @@ namespace Server.MirObjects.Monsters
 
             int levelgap = 50 - target.Level;
 
-            if (Env.Random.Next(20) < 4 + levelgap) {
+            if (MirEnv.RandomProvider.Next(20) < 4 + levelgap) {
                 PoisonTarget(target, 1, 5, PoisonType.Slow, 1000);
             }
         }
@@ -95,7 +95,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Env.Random.Next(2)) //No favour
+                switch (MirEnv.RandomProvider.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)

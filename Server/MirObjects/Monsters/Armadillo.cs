@@ -37,7 +37,7 @@ namespace Server.MirObjects.Monsters
 
         public override int Attacked(HumanObject attacker, int damage, DefenceType type = DefenceType.ACAgility, bool damageWeapon = true)
         {
-            if (_runAway && Env.Random.Next(4) == 0)
+            if (_runAway && RandomProvider.Next(4) == 0)
             {
                 _runAway = false;
             }
@@ -47,7 +47,7 @@ namespace Server.MirObjects.Monsters
 
         public override int Attacked(MonsterObject attacker, int damage, DefenceType type = DefenceType.ACAgility)
         {
-            if (_runAway && Env.Random.Next(4) == 0)
+            if (_runAway && RandomProvider.Next(4) == 0)
             {
                 _runAway = false;
             }
@@ -70,7 +70,7 @@ namespace Server.MirObjects.Monsters
             ActionTime = Env.Time + 300;
             AttackTime = Env.Time + AttackSpeed;
 
-            switch (Env.Random.Next(0, 6))
+            switch (RandomProvider.Next(0, 6))
             {
                 case 0:
                     {
@@ -173,7 +173,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Env.Random.Next(2)) //No favour
+                switch (RandomProvider.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)

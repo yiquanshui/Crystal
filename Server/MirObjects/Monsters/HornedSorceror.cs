@@ -55,9 +55,9 @@ namespace Server.MirObjects.Monsters
             AttackTime = Env.Time + AttackSpeed;
 
             //Charged Stomp
-            if (Env.Time > _ChargedStompTime && HealthPercent < 90 && Env.Random.Next(4) == 0)
+            if (Env.Time > _ChargedStompTime && HealthPercent < 90 && RandomProvider.Next(4) == 0)
             {
-                byte stompLoops = (byte)Env.Random.Next(5, 10);
+                byte stompLoops = (byte)RandomProvider.Next(5, 10);
                 int stompDuration = stompLoops * 500;
 
                 _ChargedStompTime = Env.Time + 20000;
@@ -78,7 +78,7 @@ namespace Server.MirObjects.Monsters
             }
 
             //Dust Tornado
-            if (Env.Time > _TornadoTime && HealthPercent < 90 && Env.Random.Next(4) == 0)
+            if (Env.Time > _TornadoTime && HealthPercent < 90 && RandomProvider.Next(4) == 0)
             {
                 _TornadoTime = Env.Time + 15000;
 
@@ -88,7 +88,7 @@ namespace Server.MirObjects.Monsters
 
             if (!ranged)
             {
-                if (Env.Random.Next(5) > 2) //Thrust hit
+                if (RandomProvider.Next(5) > 2) //Thrust hit
                 {
                     ActionTime = Env.Time + 300;
 
@@ -99,7 +99,7 @@ namespace Server.MirObjects.Monsters
 
                     LineAttack(damage, 2, 300);
                 }
-                else if (Env.Random.Next(5) > 2) //Dust hit
+                else if (RandomProvider.Next(5) > 2) //Dust hit
                 {
                     ActionTime = Env.Time + 300;
 
@@ -119,7 +119,7 @@ namespace Server.MirObjects.Monsters
             }
             else
             {
-                if (Env.Random.Next(3) == 0)
+                if (RandomProvider.Next(3) == 0)
                 {
                     ActionTime = Env.Time + 500;
 

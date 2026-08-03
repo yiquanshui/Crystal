@@ -38,7 +38,7 @@ namespace Server.MirObjects.Monsters
 
             ShockTime = 0;
 
-            byte level = (byte)Env.Random.Next(0, 3);
+            byte level = (byte)RandomProvider.Next(0, 3);
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
             Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID, Type = 0, Level = level });
@@ -98,7 +98,7 @@ namespace Server.MirObjects.Monsters
 
                 if (Walk(dir)) return;
 
-                switch (Env.Random.Next(2)) //No favour
+                switch (RandomProvider.Next(2)) //No favour
                 {
                     case 0:
                         for (int i = 0; i < 7; i++)

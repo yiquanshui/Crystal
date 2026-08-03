@@ -37,11 +37,11 @@ namespace Server.MirObjects.Monsters
 
             if (InAttackRange() && CanAttack)
             {
-                if (Env.Random.Next(3) == 1)
+                if (MirEnv.RandomProvider.Next(3) == 1)
                 {
                     int targetXOffset, targetYOffset;
-                    targetXOffset = Env.Random.Next(-1, 2);
-                    targetYOffset = Env.Random.Next(-1, 2);
+                    targetXOffset = MirEnv.RandomProvider.Next(-1, 2);
+                    targetYOffset = MirEnv.RandomProvider.Next(-1, 2);
                     Point point = new Point(Target.CurrentLocation.X + targetXOffset, Target.CurrentLocation.Y + targetYOffset);
                     MoveTo(point);
                 }
@@ -95,7 +95,7 @@ namespace Server.MirObjects.Monsters
             if (result > 0)
             {
                 int damage;
-                damage = distance * (Math.Max(50, (Env.Random.Next(Stats[Stat.HP]) / 5)));
+                damage = distance * (Math.Max(50, (MirEnv.RandomProvider.Next(Stats[Stat.HP]) / 5)));
                 if (pusher is PlayerObject)
                 {
                     //int damage = Math.Max(50, Envir.Random.Next(Stats[Stat.HP]));

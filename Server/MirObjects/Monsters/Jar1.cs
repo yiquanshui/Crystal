@@ -59,7 +59,7 @@ namespace Server.MirObjects.Monsters
 
             if (validMonsters.Count > 0)
             {
-                var idx = Env.Random.Next(validMonsters.Count);
+                var idx = RandomProvider.Next(validMonsters.Count);
                 var monster = validMonsters[idx];
 
                 var mob = GetMonster(monster);

@@ -160,11 +160,11 @@ namespace Server.MirEnv
                 DragonInfo.DropInfo drop = droplist[i];
 
                 int rate = (int)(drop.Chance / Settings.DropRate); if (rate < 1) rate = 1;
-                if (Env.Random.Next(rate) != 0) continue;
+                if (RandomProvider.Next(rate) != 0) continue;
 
                 if (drop.Gold > 0)
                 {
-                    int gold = Env.Random.Next((int)(drop.Gold / 2), (int)(drop.Gold + drop.Gold / 2)); //Messy
+                    int gold = RandomProvider.Next((int)(drop.Gold / 2), (int)(drop.Gold + drop.Gold / 2)); //Messy
 
                     if (gold <= 0) continue;
 

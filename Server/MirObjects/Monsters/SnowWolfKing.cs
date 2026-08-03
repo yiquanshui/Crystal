@@ -20,7 +20,7 @@ namespace Server.MirObjects.Monsters
 
             int ownDamage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
 
-            if (attackerDamage > ownDamage && Env.Random.Next(2) == 0)
+            if (attackerDamage > ownDamage && RandomProvider.Next(2) == 0)
             {
                 FindWeakerTarget();
             }
@@ -34,7 +34,7 @@ namespace Server.MirObjects.Monsters
 
             int ownDamage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
 
-            if (attackerDamage > ownDamage && Env.Random.Next(10) == 0)
+            if (attackerDamage > ownDamage && RandomProvider.Next(10) == 0)
             {
                 FindWeakerTarget();
             }
@@ -95,7 +95,7 @@ namespace Server.MirObjects.Monsters
             ActionTime = Env.Time + 300;
             AttackTime = Env.Time + AttackSpeed;
 
-            if (Env.Random.Next(3) > 0)
+            if (RandomProvider.Next(3) > 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);

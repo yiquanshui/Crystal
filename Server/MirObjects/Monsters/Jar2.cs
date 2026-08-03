@@ -36,7 +36,7 @@ namespace Server.MirObjects.Monsters
             ActionTime = Env.Time + 300;
             AttackTime = Env.Time + AttackSpeed;
 
-            if (!ranged && Env.Random.Next(3) == 0)
+            if (!ranged && RandomProvider.Next(3) == 0)
             {
                 int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
 

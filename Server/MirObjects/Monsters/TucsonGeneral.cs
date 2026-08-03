@@ -49,18 +49,18 @@ namespace Server.MirObjects.Monsters
 
                 for (int i = 0; i < _RockCount; i++)
                 {
-                    Point location = new Point(CurrentLocation.X + Env.Random.Next(-Info.ViewRange, Info.ViewRange + 1),
-                                                                 CurrentLocation.Y + Env.Random.Next(-Info.ViewRange, Info.ViewRange + 1));
+                    Point location = new Point(CurrentLocation.X + RandomProvider.Next(-Info.ViewRange, Info.ViewRange + 1),
+                                                                 CurrentLocation.Y + RandomProvider.Next(-Info.ViewRange, Info.ViewRange + 1));
 
-                    if (Env.Random.Next(3) == 0 && targets.Count > 0)
+                    if (RandomProvider.Next(3) == 0 && targets.Count > 0)
                     {
-                        location = targets[Env.Random.Next(targets.Count)].CurrentLocation;
+                        location = targets[RandomProvider.Next(targets.Count)].CurrentLocation;
                     }
 
                     if (location.X == CurrentLocation.X || location.Y == CurrentLocation.Y) continue;
 
-                    var start = Env.Random.Next(0, 5000);
-                    var value = Env.Random.Next(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
+                    var start = RandomProvider.Next(0, 5000);
+                    var value = RandomProvider.Next(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
 
                     var spellObj = new SpellObject
                     {
@@ -82,9 +82,9 @@ namespace Server.MirObjects.Monsters
                 return;
             }
 
-            if (!ranged && Env.Random.Next(4) > 0)
+            if (!ranged && RandomProvider.Next(4) > 0)
             {
-                if (Env.Random.Next(3) > 0)
+                if (RandomProvider.Next(3) > 0)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
@@ -105,7 +105,7 @@ namespace Server.MirObjects.Monsters
             }
             else
             {
-                if (Env.Random.Next(4) > 0)
+                if (RandomProvider.Next(4) > 0)
                 {
                     Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID, Type = 1 });
                     int damage = GetAttackPower(Stats[Stat.MinSC], Stats[Stat.MaxSC]);

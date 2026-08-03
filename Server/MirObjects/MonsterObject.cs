@@ -671,15 +671,15 @@ namespace Server.MirObjects
 
             Undead = Info.Undead;
             AutoRev = info.AutoRev;
-            CoolEye = info.CoolEye > Env.Random.Next(100);
-            Direction = (MirDirection)Env.Random.Next(8);
+            CoolEye = info.CoolEye > RandomProvider.Next(100);
+            Direction = (MirDirection)RandomProvider.Next(8);
 
             AMode = AttackMode.All;
             PMode = PetMode.Both;
 
-            RegenTime = Env.Random.Next(RegenDelay) + Env.Time;
-            SearchTime = Env.Random.Next(SearchDelay) + Env.Time;
-            RoamTime = Env.Random.Next(RoamDelay) + Env.Time;
+            RegenTime = RandomProvider.Next(RegenDelay) + Env.Time;
+            SearchTime = RandomProvider.Next(SearchDelay) + Env.Time;
+            RoamTime = RandomProvider.Next(RoamDelay) + Env.Time;
         }
 
         public void SetMonsterType(MonsterType type)
@@ -710,7 +710,7 @@ namespace Server.MirObjects
             if (Respawn.Map == null) return false;
             if (Respawn.WalkableCells == null || Respawn.WalkableCells.Count == 0) return false;
 
-            var spawnPoint = Respawn.WalkableCells[Env.Random.Next(Respawn.WalkableCells.Count)];
+            var spawnPoint = Respawn.WalkableCells[RandomProvider.Next(Respawn.WalkableCells.Count)];
 
             CurrentLocation = spawnPoint;
 
@@ -1774,7 +1774,7 @@ namespace Server.MirObjects
                 {
                     MirDirection dir = Direction;
 
-                    switch (Env.Random.Next(3)) // favour Clockwise
+                    switch (RandomProvider.Next(3)) // favour Clockwise
                     {
                         case 0:
                             for (int i = 0; i < 7; i++)
@@ -1808,7 +1808,7 @@ namespace Server.MirObjects
 
             SearchTime = Env.Time + SearchDelay;
 
-            if (Target == null || Env.Random.Next(3) == 0)
+            if (Target == null || RandomProvider.Next(3) == 0)
                 FindTarget();
         }
 
@@ -1826,12 +1826,12 @@ namespace Server.MirObjects
 
             RoamTime = Env.Time + RoamDelay;
 
-            if (Env.Random.Next(10) != 0) return;
+            if (RandomProvider.Next(10) != 0) return;
 
-            switch (Env.Random.Next(3)) //Face Walk
+            switch (RandomProvider.Next(3)) //Face Walk
             {
                 case 0:
-                    Turn((MirDirection)Env.Random.Next(8));
+                    Turn((MirDirection)RandomProvider.Next(8));
                     break;
                 default:
                     Walk(Direction);
@@ -2047,7 +2047,7 @@ namespace Server.MirObjects
 
             if (Walk(dir)) return;
 
-            switch (Env.Random.Next(2)) //No favour
+            switch (RandomProvider.Next(2)) //No favour
             {
                 case 0:
                     for (int i = 0; i < 7; i++)
@@ -2591,7 +2591,7 @@ namespace Server.MirObjects
                 return 0;
             }
 
-            if (Env.Random.Next(100) < (attacker.Stats[Stat.CriticalRate] * Settings.CriticalRateWeight))
+            if (RandomProvider.Next(100) < (attacker.Stats[Stat.CriticalRate] * Settings.CriticalRateWeight))
             {
                 Broadcast(new S.ObjectEffect { ObjectID = ObjectID, Effect = SpellEffect.Critical });
                 damage = Math.Min(int.MaxValue, damage + (int)Math.Floor(damage * (((double)attacker.Stats[Stat.CriticalDamage] / (double)Settings.CriticalDamageWeight) * 10)));
@@ -3528,9 +3528,9 @@ namespace Server.MirObjects
         {
             int value = GetAttackPower(Stats[Stat.MinSC], Stats[Stat.MaxSC]);
 
-            if (Env.Random.Next(Settings.PoisonResistWeight) >= target.Stats[Stat.PoisonResist])
+            if (RandomProvider.Next(Settings.PoisonResistWeight) >= target.Stats[Stat.PoisonResist])
             {
-                if (Env.Random.Next(chanceToPoison) == 0)
+                if (RandomProvider.Next(chanceToPoison) == 0)
                 {
                     target.ApplyPoison(new Poison { Owner = this, Duration = poisonDuration, PType = poison, Value = value, TickSpeed = poisonTickSpeed }, this, noResist, ignoreDefence);
                 }

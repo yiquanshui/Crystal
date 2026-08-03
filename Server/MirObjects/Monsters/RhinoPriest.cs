@@ -43,7 +43,7 @@ namespace Server.MirObjects.Monsters
                 int damage = GetAttackPower(Stats[Stat.MinMC], Stats[Stat.MaxMC]);
                 if (damage == 0) return;
 
-                if (Env.Random.Next(3) > 0)
+                if (MirEnv.RandomProvider.Next(3) > 0)
                 {
                     //Rhino Ranged Attack
                     Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID, Type = 0 });
@@ -75,7 +75,7 @@ namespace Server.MirObjects.Monsters
 
             if (poison)
             {
-                if (Env.Random.Next(4) > 0)
+                if (MirEnv.RandomProvider.Next(4) > 0)
                 {
                     PoisonTarget(target, 2, 5, PoisonType.Slow, 1000);
                 }

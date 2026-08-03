@@ -30,8 +30,8 @@ namespace Server.MirObjects.Monsters
             {
                 if (CurrentLocation == Target.CurrentLocation)
                 {
-                    MirDirection direction = (MirDirection)Env.Random.Next(8);
-                    int rotation = Env.Random.Next(2) == 0 ? 1 : -1;
+                    MirDirection direction = (MirDirection)RandomProvider.Next(8);
+                    int rotation = RandomProvider.Next(2) == 0 ? 1 : -1;
 
                     for (int d = 0; d < 8; d++)
                     {
@@ -69,7 +69,7 @@ namespace Server.MirObjects.Monsters
 
             Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 
-            switch (Env.Random.Next(5))
+            switch (RandomProvider.Next(5))
             {
                 case 0:
                     TwinDrakeBlade();
@@ -97,7 +97,7 @@ namespace Server.MirObjects.Monsters
             Target.Attacked(this, (int)(damage * 0.8), DefenceType.AC);
             ProjectileAttack((int)(damage * 0.8), DefenceType.ACAgility);
 
-            if (((Target.Race != ObjectType.Player || Settings.PvpCanResistPoison) && (Env.Random.Next(Settings.PoisonAttackWeight) >= Target.Stats[Stat.PoisonResist])) && (Target.Level <= Level + 8 && Env.Random.Next(20) <= 5))
+            if (((Target.Race != ObjectType.Player || Settings.PvpCanResistPoison) && (RandomProvider.Next(Settings.PoisonAttackWeight) >= Target.Stats[Stat.PoisonResist])) && (Target.Level <= Level + 8 && RandomProvider.Next(20) <= 5))
             {
                 Target.ApplyPoison(new Poison { PType = PoisonType.Stun, Duration = 5, TickSpeed = 1000 }, this);
                 Target.Broadcast(new S.ObjectEffect { ObjectID = Target.ObjectID, Effect = SpellEffect.TwinDrakeBlade });
@@ -324,10 +324,10 @@ namespace Server.MirObjects.Monsters
                 Name = master != null ? master.Name : Name,
                 NameColour = NameColour,
                 Class = MirClass.Warrior,
-                Gender = master != null ? master.Gender : Env.Random.Next(2) == 0 ? MirGender.Male : MirGender.Female,
+                Gender = master != null ? master.Gender : RandomProvider.Next(2) == 0 ? MirGender.Male : MirGender.Female,
                 Location = CurrentLocation,
                 Direction = Direction,
-                Hair = master != null ? master.Hair : (byte)Env.Random.Next(0, 5),
+                Hair = master != null ? master.Hair : (byte)RandomProvider.Next(0, 5),
                 Weapon = 52,
                 Armour = 31,
                 Light = master != null ? master.Light : Light,

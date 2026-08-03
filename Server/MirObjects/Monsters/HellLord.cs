@@ -99,7 +99,7 @@ namespace Server.MirObjects.Monsters
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation });
             }
 
-            if (Env.Random.Next(_bombChance) == 0 || _raged)
+            if (RandomProvider.Next(_bombChance) == 0 || _raged)
             {
                 SpawnBomb();
             }
@@ -114,8 +114,8 @@ namespace Server.MirObjects.Monsters
 
         private void SpawnQuakes()
         {
-            int count = Env.Random.Next(1, _raged ? _quakeCount * 2 : _quakeCount);
-            int distance = Env.Random.Next(_quakeSpreadMin, _quakeSpreadMax);
+            int count = RandomProvider.Next(1, _raged ? _quakeCount * 2 : _quakeCount);
+            int distance = RandomProvider.Next(_quakeSpreadMin, _quakeSpreadMax);
 
             for (int j = 0; j < CurrentMap.Players.Count; j++)
             {
@@ -123,22 +123,22 @@ namespace Server.MirObjects.Monsters
 
                 for (int i = 0; i < count; i++)
                 {
-                    Point location = new Point(playerLocation.X + Env.Random.Next(-distance, distance + 1),
-                                             playerLocation.Y + Env.Random.Next(-distance, distance + 1));
+                    Point location = new Point(playerLocation.X + RandomProvider.Next(-distance, distance + 1),
+                                             playerLocation.Y + RandomProvider.Next(-distance, distance + 1));
 
-                    if(Env.Random.Next(10) == 0)
+                    if(RandomProvider.Next(10) == 0)
                     {
                         location = playerLocation;
                     }
 
                     if (!CurrentMap.ValidPoint(location)) continue;
 
-                    var start = Env.Random.Next(5000);
+                    var start = RandomProvider.Next(5000);
 
                     var spellObj = new SpellObject
                     {
-                        Spell = Env.Random.Next(2) == 0 ? Spell.MapQuake1 : Spell.MapQuake2,
-                        Value = Env.Random.Next(Env.Random.Next(Stats[Stat.MinDC], Stats[Stat.MaxDC])),
+                        Spell = RandomProvider.Next(2) == 0 ? Spell.MapQuake1 : Spell.MapQuake2,
+                        Value = RandomProvider.Next(RandomProvider.Next(Stats[Stat.MinDC], Stats[Stat.MaxDC])),
                         ExpireTime = Env.Time + 2000 + start,
                         TickSpeed = 500,
                         Caster = null,
@@ -156,17 +156,17 @@ namespace Server.MirObjects.Monsters
 
         private void SpawnBomb()
         {
-            int distance = Env.Random.Next(_bombSpreadMin, _bombSpreadMax);
+            int distance = RandomProvider.Next(_bombSpreadMin, _bombSpreadMax);
 
             for (int j = 0; j < CurrentMap.Players.Count; j++)
             {
                 Point playerLocation = CurrentMap.Players[j].CurrentLocation;
 
-                Point location = new Point(playerLocation.X + Env.Random.Next(-distance, distance + 1),
-                                             playerLocation.Y + Env.Random.Next(-distance, distance + 1));
+                Point location = new Point(playerLocation.X + RandomProvider.Next(-distance, distance + 1),
+                                             playerLocation.Y + RandomProvider.Next(-distance, distance + 1));
 
                 MonsterObject mob = null;
-                switch (Env.Random.Next(3))
+                switch (RandomProvider.Next(3))
                 {
                     case 0:
                         mob = GetMonster(Env.GetMonsterInfo(Settings.HellBomb1));
@@ -215,8 +215,8 @@ namespace Server.MirObjects.Monsters
 
             for (int i = 0; i < 50; i++)
             {
-                Point location = new Point(front.X + Env.Random.Next(-10, 10),
-                                         front.Y + Env.Random.Next(-10, 10));
+                Point location = new Point(front.X + RandomProvider.Next(-10, 10),
+                                         front.Y + RandomProvider.Next(-10, 10));
 
                 if (CurrentMap.ValidPoint(location))
                 {

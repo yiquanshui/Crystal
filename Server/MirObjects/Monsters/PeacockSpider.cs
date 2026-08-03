@@ -49,7 +49,7 @@ namespace Server.MirObjects.Monsters
                 //return;
             }
 
-            if (!ranged && Env.Random.Next(4) > 0)
+            if (!ranged && RandomProvider.Next(4) > 0)
             {
                 if (Env.Time > _PoisonTime) //Poison
                 {
@@ -65,7 +65,7 @@ namespace Server.MirObjects.Monsters
                     return;
                 }
 
-                if (Env.Random.Next(3) > 0) //Normal
+                if (RandomProvider.Next(3) > 0) //Normal
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
 
@@ -87,7 +87,7 @@ namespace Server.MirObjects.Monsters
             }
             else
             {
-                if (Env.Random.Next(5) == 0)
+                if (RandomProvider.Next(5) == 0)
                 {
                     Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID, Type = 0 });
 
@@ -116,7 +116,7 @@ namespace Server.MirObjects.Monsters
                 for (int i = 0; i < targets.Count; i++)
                 {
                     if (targets[i].Attacked(this, damage, defence) <= 0) continue;
-                    PoisonTarget(targets[i], 2, Env.Random.Next(2, 6), PoisonType.Green, 1000);
+                    PoisonTarget(targets[i], 2, RandomProvider.Next(2, 6), PoisonType.Green, 1000);
                 }
 
                 return;
@@ -124,7 +124,7 @@ namespace Server.MirObjects.Monsters
             if (daze)
             {
                 if (target.Attacked(this, damage, defence) <= 0) return;
-                PoisonTarget(target, 2, Env.Random.Next(2, 6), PoisonType.Dazed, 1000);
+                PoisonTarget(target, 2, RandomProvider.Next(2, 6), PoisonType.Dazed, 1000);
                 return;
             }
 

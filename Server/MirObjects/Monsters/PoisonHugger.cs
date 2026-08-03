@@ -35,7 +35,7 @@ namespace Server.MirObjects.Monsters
             {
                 if (ranged)
                 {
-                    if(Env.Random.Next(5) == 0)
+                    if(RandomProvider.Next(5) == 0)
                     {
                         Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
                         Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID });

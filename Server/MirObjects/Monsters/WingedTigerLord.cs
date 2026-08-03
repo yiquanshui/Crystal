@@ -113,7 +113,7 @@ namespace Server.MirObjects.Monsters
                     return;
                 }
 
-                switch (Env.Random.Next(2))
+                switch (RandomProvider.Next(2))
                 {
                     case 0:
                         //Slash
@@ -137,10 +137,10 @@ namespace Server.MirObjects.Monsters
                         break;
                 }
 
-                if (Env.Random.Next(5) == 0)
+                if (RandomProvider.Next(5) == 0)
                     stomp = true;
 
-                if (Env.Random.Next(2) == 0)
+                if (RandomProvider.Next(2) == 0)
                     tornado = true;
             }
         }

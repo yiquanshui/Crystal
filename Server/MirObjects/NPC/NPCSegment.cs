@@ -1832,7 +1832,7 @@ namespace Server.MirObjects
                             break;
                         }
 
-                        failed = 0 != Env.Random.Next(0, tempInt);
+                        failed = 0 != RandomProvider.Next(0, tempInt);
                         break;
                     case CheckType.CheckCalc:
                         int left;
@@ -2040,7 +2040,7 @@ namespace Server.MirObjects
                             break;
                         }
 
-                        failed = 0 != Env.Random.Next(0, tempInt);
+                        failed = 0 != RandomProvider.Next(0, tempInt);
                         break;
                     case CheckType.CheckCalc:
                         int left;
@@ -2418,7 +2418,7 @@ namespace Server.MirObjects
                             break;
                         }
 
-                        failed = 0 != Env.Random.Next(0, tempInt);
+                        failed = 0 != RandomProvider.Next(0, tempInt);
                         break;
 
                     case CheckType.Groupleader:
@@ -3140,7 +3140,7 @@ namespace Server.MirObjects
                         player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.YouRentedGuildTerritory), ChatType.System);
                         player.MyGuild.GTIndex = GTmap.Index;
                         player.MyGuild.GTRent = DateTime.Now.AddDays(Settings.GTDays);
-                        player.MyGuild.GTKey = Env.Random.Next(100, int.MaxValue - 100);
+                        player.MyGuild.GTKey = RandomProvider.Next(100, int.MaxValue - 100);
                         player.MyGuild.GTPrice = 0;
                         GTmap.Owner = player.MyGuild.Name;
                         GTmap.Leader = player.MyGuild.Ranks[0].Members[0].Name;
@@ -3588,7 +3588,7 @@ namespace Server.MirObjects
                         {
                             if (param.Count < 1)
                             {
-                                player.Info.Hair = (byte)Env.Random.Next(0, 9);
+                                player.Info.Hair = (byte)RandomProvider.Next(0, 9);
                             }
                             else
                             {
@@ -4337,7 +4337,7 @@ namespace Server.MirObjects
                             else
                             {
                                 var lines = File.ReadAllLines(randomTextPath);
-                                int index = Env.Random.Next(0, lines.Length);
+                                int index = RandomProvider.Next(0, lines.Length);
                                 string randomText = lines[index];
                                 AddVariable(player, param[1], randomText);
                             }
@@ -4466,7 +4466,7 @@ namespace Server.MirObjects
                             {
                                 continue;//dont try to recall yourself
                             }
-                            ob.Teleport(player.CurrentMap, new Point(player.CurrentLocation.X + Env.Random.Next(4), player.CurrentLocation.Y + Env.Random.Next(4)));
+                            ob.Teleport(player.CurrentMap, new Point(player.CurrentLocation.X + RandomProvider.Next(4), player.CurrentLocation.Y + RandomProvider.Next(4)));
                             ob.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.YouHaveBeenSummoned)+player.Name, ChatType.System);
                         }
                         break;
@@ -4508,7 +4508,7 @@ namespace Server.MirObjects
                             player.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerNotInGuildButInAnother), param[0], player.MyGuild.Name, guildmember.MyGuild.Name), ChatType.System);
                             return;
                         }
-                        guildmember.Teleport(player.CurrentMap, new Point(player.CurrentLocation.X + Env.Random.Next(4), player.CurrentLocation.Y + Env.Random.Next(4)));
+                        guildmember.Teleport(player.CurrentMap, new Point(player.CurrentLocation.X + RandomProvider.Next(4), player.CurrentLocation.Y + RandomProvider.Next(4)));
                         guildmember.ReceiveChat(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.YouHaveBeenSummonedBy), player.Name), ChatType.System);
                         break;
 
@@ -4558,7 +4558,7 @@ namespace Server.MirObjects
                         {
                             bool.TryParse(param[1], out bool autoRoll);
 
-                            var result = Env.Random.Next(1, 7);
+                            var result = RandomProvider.Next(1, 7);
 
                             S.Roll p = new S.Roll { Type = 0, Page = param[0], AutoRoll = autoRoll, Result = result };
 
@@ -4570,7 +4570,7 @@ namespace Server.MirObjects
                         {
                             bool.TryParse(param[1], out bool autoRoll);
 
-                            var result = Env.Random.Next(1, 7);
+                            var result = RandomProvider.Next(1, 7);
 
                             S.Roll p = new S.Roll { Type = 1, Page = param[0], AutoRoll = autoRoll, Result = result };
 

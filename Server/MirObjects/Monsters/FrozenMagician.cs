@@ -31,13 +31,13 @@ namespace Server.MirObjects.Monsters
             {
                 if (CanAttack)
                 {
-                    if (Env.Random.Next(2) == 0)
+                    if (RandomProvider.Next(2) == 0)
                         RangeAttack();
                 }
                 if (CurrentLocation == Target.CurrentLocation)
                 {
-                    MirDirection direction = (MirDirection)Env.Random.Next(8);
-                    int rotation = Env.Random.Next(2) == 0 ? 1 : -1;
+                    MirDirection direction = (MirDirection)RandomProvider.Next(8);
+                    int rotation = RandomProvider.Next(2) == 0 ? 1 : -1;
 
                     for (int d = 0; d < 8; d++)
                     {
@@ -52,7 +52,7 @@ namespace Server.MirObjects.Monsters
 
             if (!CanAttack) return;
 
-            if (Env.Random.Next(3) > 0)
+            if (RandomProvider.Next(3) > 0)
             {
                 if (InAttackRange())
                     Attack();
@@ -111,7 +111,7 @@ namespace Server.MirObjects.Monsters
 
             int delay = Functions.MaxDistance(CurrentLocation, Target.CurrentLocation) * 50 + 500; //50 MS per Step
 
-            if (Env.Random.Next(3) > 0)
+            if (RandomProvider.Next(3) > 0)
             {
                 Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID });
                 if (damage == 0) return;

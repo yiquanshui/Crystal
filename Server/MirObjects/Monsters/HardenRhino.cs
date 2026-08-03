@@ -26,10 +26,10 @@ namespace Server.MirObjects.Monsters
 
             SearchTime = Env.Time + SearchDelay;
 
-            if (Target == null || Env.Random.Next(3) == 0)
+            if (Target == null || RandomProvider.Next(3) == 0)
                 FindTarget();
 
-            if (Target != null && !Functions.InRange(CurrentLocation, Target.CurrentLocation, 3) && Env.Random.Next(3) == 0)
+            if (Target != null && !Functions.InRange(CurrentLocation, Target.CurrentLocation, 3) && RandomProvider.Next(3) == 0)
             {
                 Direction = Functions.DirectionFromPoint(CurrentLocation, Target.CurrentLocation);
 

@@ -175,7 +175,7 @@ namespace Server.MirObjects.Monsters
                 {
                     MirDirection dir = Direction;
 
-                    switch (Env.Random.Next(3)) // favour Clockwise
+                    switch (RandomProvider.Next(3)) // favour Clockwise
                     {
                         case 0:
                             for (int i = 0; i < 7; i++)
@@ -199,7 +199,7 @@ namespace Server.MirObjects.Monsters
                 }
             }
 
-            if (Target == null || Env.Random.Next(3) == 0)
+            if (Target == null || RandomProvider.Next(3) == 0)
                 FindTarget();
         }
 
@@ -295,7 +295,7 @@ namespace Server.MirObjects.Monsters
 
         private void ExplosionDie()
         {
-            int criticalDamage = Env.Random.Next(0, 100) <= Stats[Stat.Accuracy] ? Stats[Stat.MaxDC] * 2 : Stats[Stat.MinDC] * 2;
+            int criticalDamage = RandomProvider.Next(0, 100) <= Stats[Stat.Accuracy] ? Stats[Stat.MaxDC] * 2 : Stats[Stat.MinDC] * 2;
             int damage = (Stats[Stat.MinDC] / 5 + 4 * (Level / 20)) * criticalDamage / 20 + Stats[Stat.MaxDC];
 
             for (int i = 0; i < 16; i++)

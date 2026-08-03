@@ -11,6 +11,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
 using System.Text.RegularExpressions;
+using static System.Int32;
 using S = ServerPackets;
 
 namespace Server.MirEnv
@@ -22,23 +23,25 @@ namespace Server.MirEnv
         public long StartTime = 0;
         public long EndTime = 0;
         public readonly LinkedList<MapObject> ObjectsList = new LinkedList<MapObject>();
-        public LinkedListNode<MapObject> Current = null;
+        public LinkedListNode<MapObject>? Current = null;
         public bool Stop = false;
     }
+    
+    
     public class RandomProvider
     {
         private static int seed = Environment.TickCount;
-        private static readonly ThreadLocal<Random> RandomWrapper = new ThreadLocal<Random>(() => new Random(Interlocked.Increment(ref seed)));
+        private static readonly ThreadLocal<Random> RandomWrapper = new(() => new Random(Interlocked.Increment(ref seed)));
 
         public static Random GetThreadRandom() =>
-            RandomWrapper.Value;
+            RandomWrapper.Value!;
 
-        public int Next() =>
-            RandomWrapper.Value.Next();
-        public int Next(int maxValue) =>
-            RandomWrapper.Value.Next(maxValue);
-        public int Next(int minValue, int maxValue) =>
-            RandomWrapper.Value.Next(minValue, maxValue);
+
+        public static int Next(int maxValue) =>
+            RandomWrapper.Value!.Next(maxValue);
+        
+        public static int Next(int minValue, int maxValue) =>
+            RandomWrapper.Value!.Next(minValue, maxValue);
     }
 
     public class Env
@@ -78,9 +81,9 @@ namespace Server.MirEnv
         private static List<string> DisabledCharNames = new List<string>();
         private static List<string> LineMessages = new List<string>();
 
-        public static ConcurrentDictionary<string, DateTime> IPBlocks = new ConcurrentDictionary<string, DateTime>();
+        public static ConcurrentDictionary<string, DateTime> IPBlocks = new();
 
-        public static ConcurrentDictionary<string, MirConnectionLog> ConnectionLogs = new ConcurrentDictionary<string, MirConnectionLog>();
+        public static ConcurrentDictionary<string, MirConnectionLog> ConnectionLogs = new();
 
         public DateTime Now =>
             _startTime.AddMilliseconds(Time);
@@ -105,53 +108,53 @@ namespace Server.MirEnv
         public List<MirStatusConnection> StatusConnections = new List<MirStatusConnection>();
         private TcpListener _StatusPort;
         private int _sessionID;
-        public List<MirConnection> Connections = new List<MirConnection>();
+        public List<MirConnection> Connections = [];
 
         //Server DB
         public int MapIndex, ItemIndex, MonsterIndex, NPCIndex, QuestIndex, GameshopIndex, ConquestIndex, RespawnIndex, ScriptIndex;
-        public List<MapInfo> MapInfoList = new List<MapInfo>();
-        public List<ItemInfo> ItemInfoList = new List<ItemInfo>();
-        public List<MonsterInfo> MonsterInfoList = new List<MonsterInfo>();
-        public List<MagicInfo> MagicInfoList = new List<MagicInfo>();
-        public List<NPCInfo> NPCInfoList = new List<NPCInfo>();
+        public List<MapInfo> MapInfoList = [];
+        public List<ItemInfo> ItemInfoList = [];
+        public List<MonsterInfo> MonsterInfoList = [];
+        public List<MagicInfo> MagicInfoList = [];
+        public List<NPCInfo> NPCInfoList = [];
         public DragonInfo DragonInfo = new DragonInfo();
-        public List<QuestInfo> QuestInfoList = new List<QuestInfo>();
-        public List<GameShopItem> GameShopList = new List<GameShopItem>();
-        public List<RecipeInfo> RecipeInfoList = new List<RecipeInfo>();
-        public List<BuffInfo> BuffInfoList = new List<BuffInfo>();
-        public List<ConquestInfo> ConquestInfoList = new List<ConquestInfo>();
-        public List<GTMap> GTMapList = new List<GTMap>();
+        public List<QuestInfo> QuestInfoList = [];
+        public List<GameShopItem> GameShopList = [];
+        public List<RecipeInfo> RecipeInfoList = [];
+        public List<BuffInfo> BuffInfoList = [];
+        public List<ConquestInfo> ConquestInfoList = [];
+        public List<GTMap> GTMapList = [];
 
         //User DB
         public int NextAccountID, NextCharacterID, NextGuildID, NextHeroID;
         public ulong NextUserItemID, NextAuctionID, NextMailID, NextRecipeID;
-        public List<AccountInfo> AccountList = new List<AccountInfo>();
-        public List<CharacterInfo> CharacterList = new List<CharacterInfo>();
-        public List<GuildInfo> GuildList = new List<GuildInfo>();
-        public LinkedList<AuctionInfo> Auctions = new LinkedList<AuctionInfo>();
-        public List<ConquestGuildInfo> ConquestList = new List<ConquestGuildInfo>();
-        public Dictionary<int, int> GameshopLog = new Dictionary<int, int>();
-        public List<HeroInfo> HeroList = new List<HeroInfo>();
+        public List<AccountInfo> AccountList = [];
+        public List<CharacterInfo> CharacterList = [];
+        public List<GuildInfo> GuildList = [];
+        public LinkedList<AuctionInfo> Auctions = new();
+        public List<ConquestGuildInfo> ConquestList = [];
+        public Dictionary<int, int> GameshopLog = new();
+        public List<HeroInfo> HeroList = [];
 
         public int GuildCount; //This shouldn't be needed?? -> remove in the future
 
         //Live Info
         public bool Saving = false;
-        public List<Map> MapList = new List<Map>();
-        public List<SafeZoneInfo> StartPoints = new List<SafeZoneInfo>();
-        public List<ItemInfo> StartItems = new List<ItemInfo>();
+        public List<Map> MapList = [];
+        public List<SafeZoneInfo> StartPoints = [];
+        public List<ItemInfo> StartItems = [];
 
-        public List<PlayerObject> Players = new List<PlayerObject>();
-        public List<SpellObject> Spells = new List<SpellObject>();
-        public List<NPCObject> NPCs = new List<NPCObject>();
-        public List<GuildObject> Guilds = new List<GuildObject>();
-        public List<ConquestObject> Conquests = new List<ConquestObject>();
-        public List<HeroObject> Heroes = new List<HeroObject>();
+        public List<PlayerObject> Players = [];
+        public List<SpellObject> Spells = [];
+        public List<NPCObject> NPCs = [];
+        public List<GuildObject> Guilds = [];
+        public List<ConquestObject> Conquests = [];
+        public List<HeroObject> Heroes = [];
 
         public LightSetting Lights;
-        public LinkedList<MapObject> Objects = new LinkedList<MapObject>();
-        public Dictionary<int, NPCScript> Scripts = new Dictionary<int, NPCScript>();
-        public Dictionary<string, Timer> Timers = new Dictionary<string, Timer>();
+        public LinkedList<MapObject> Objects = new();
+        public Dictionary<int, NPCScript> Scripts = new();
+        public Dictionary<string, Timer> Timers = new();
 
         //multithread vars
         readonly object _locker = new object();
@@ -164,16 +167,16 @@ namespace Server.MirEnv
         public Dragon? DragonSystem;
         public NPCScript DefaultNPC, MonsterNPC, RobotNPC;
 
-        public List<DropInfo> FishingDrops = new List<DropInfo>();
-        public List<DropInfo> AwakeningDrops = new List<DropInfo>();
+        public List<DropInfo> FishingDrops = [];
+        public List<DropInfo> AwakeningDrops = [];
 
-        public List<DropInfo> StrongboxDrops = new List<DropInfo>();
-        public List<DropInfo> BlackstoneDrops = new List<DropInfo>();
+        public List<DropInfo> StrongboxDrops = [];
+        public List<DropInfo> BlackstoneDrops = [];
 
-        public List<GuildAtWar> GuildsAtWar = new List<GuildAtWar>();
-        public List<MapRespawn> SavedSpawns = new List<MapRespawn>();
+        public List<GuildAtWar> GuildsAtWar = [];
+        public List<MapRespawn> SavedSpawns = [];
 
-        public List<RankCharacterInfo> RankTop = new List<RankCharacterInfo>();
+        public List<RankCharacterInfo> RankTop = [];
         public readonly List<RankCharacterInfo>?[] RankClass = new List<RankCharacterInfo>[5];
 
         static HttpServer http;
@@ -199,93 +202,91 @@ namespace Server.MirEnv
 
         private long warTime, guildTime, conquestTime, rentalItemsTime, auctionTime, spawnTime, robotTime, timerTime;
         private int dailyTime = DateTime.UtcNow.Day;
+        
         private bool MagicExists(Spell spell)
         {
-            for (var i = 0; i < MagicInfoList.Count; i++)
-            {
-                if (MagicInfoList[i].Spell == spell) return true;
-            }
-            return false;
+            return MagicInfoList.Any(t => t.Spell == spell);
         }
 
         private void UpdateMagicInfo()
         {
-            for (var i = 0; i < MagicInfoList.Count; i++)
+            foreach (var magicInfo in MagicInfoList)
             {
-                switch (MagicInfoList[i].Spell)
+                switch (magicInfo.Spell)
                 {
                     //warrior
                     case Spell.Thrusting:
-                        MagicInfoList[i].MultiplierBase = 0.25f;
-                        MagicInfoList[i].MultiplierBonus = 0.25f;
+                        magicInfo.MultiplierBase = 0.25f;
+                        magicInfo.MultiplierBonus = 0.25f;
                         break;
                     case Spell.HalfMoon:
-                        MagicInfoList[i].MultiplierBase = 0.3f;
-                        MagicInfoList[i].MultiplierBonus = 0.1f;
+                        magicInfo.MultiplierBase = 0.3f;
+                        magicInfo.MultiplierBonus = 0.1f;
                         break;
                     case Spell.ShoulderDash:
-                        MagicInfoList[i].MPowerBase = 4;
+                        magicInfo.MPowerBase = 4;
                         break;
                     case Spell.TwinDrakeBlade:
-                        MagicInfoList[i].MultiplierBase = 0.8f;
-                        MagicInfoList[i].MultiplierBonus = 0.1f;
+                        magicInfo.MultiplierBase = 0.8f;
+                        magicInfo.MultiplierBonus = 0.1f;
                         break;
                     case Spell.FlamingSword:
-                        MagicInfoList[i].MultiplierBase = 1.4f;
-                        MagicInfoList[i].MultiplierBonus = 0.4f;
+                        magicInfo.MultiplierBase = 1.4f;
+                        magicInfo.MultiplierBonus = 0.4f;
                         break;
                     case Spell.CrossHalfMoon:
-                        MagicInfoList[i].MultiplierBase = 0.4f;
-                        MagicInfoList[i].MultiplierBonus = 0.1f;
+                        magicInfo.MultiplierBase = 0.4f;
+                        magicInfo.MultiplierBonus = 0.1f;
                         break;
                     case Spell.BladeAvalanche:
-                        MagicInfoList[i].MultiplierBase = 1f;
-                        MagicInfoList[i].MultiplierBonus = 0.4f;
+                        magicInfo.MultiplierBase = 1f;
+                        magicInfo.MultiplierBonus = 0.4f;
                         break;
                     case Spell.SlashingBurst:
-                        MagicInfoList[i].MultiplierBase = 3.25f;
-                        MagicInfoList[i].MultiplierBonus = 0.25f;
+                        magicInfo.MultiplierBase = 3.25f;
+                        magicInfo.MultiplierBonus = 0.25f;
                         break;
                     //wiz
                     case Spell.Repulsion:
-                        MagicInfoList[i].MPowerBase = 4;
+                        magicInfo.MPowerBase = 4;
                         break;
                     //tao
                     case Spell.Poisoning:
-                        MagicInfoList[i].MPowerBase = 0;
+                        magicInfo.MPowerBase = 0;
                         break;
                     case Spell.Curse:
-                        MagicInfoList[i].MPowerBase = 20;
+                        magicInfo.MPowerBase = 20;
                         break;
                     case Spell.Plague:
-                        MagicInfoList[i].MPowerBase = 0;
-                        MagicInfoList[i].PowerBase = 0;
+                        magicInfo.MPowerBase = 0;
+                        magicInfo.PowerBase = 0;
                         break;
                     //sin
                     case Spell.FatalSword:
-                        MagicInfoList[i].MPowerBase = 20;
+                        magicInfo.MPowerBase = 20;
                         break;
                     case Spell.DoubleSlash:
-                        MagicInfoList[i].MultiplierBase = 0.8f;
-                        MagicInfoList[i].MultiplierBonus = 0.1f;
+                        magicInfo.MultiplierBase = 0.8f;
+                        magicInfo.MultiplierBonus = 0.1f;
                         break;
                     case Spell.FireBurst:
-                        MagicInfoList[i].MPowerBase = 4;
+                        magicInfo.MPowerBase = 4;
                         break;
                     case Spell.MoonLight:
-                        MagicInfoList[i].MPowerBase = 20;
-                        break;
                     case Spell.DarkBody:
-                        MagicInfoList[i].MPowerBase = 20;
+                        magicInfo.MPowerBase = 20;
                         break;
                     case Spell.Hemorrhage:
-                        MagicInfoList[i].MultiplierBase = 0.2f;
-                        MagicInfoList[i].MultiplierBonus = 0.05f;
+                        magicInfo.MultiplierBase = 0.2f;
+                        magicInfo.MultiplierBonus = 0.05f;
                         break;
                     case Spell.CrescentSlash:
-                        MagicInfoList[i].MultiplierBase = 1f;
-                        MagicInfoList[i].MultiplierBonus = 0.4f;
+                        magicInfo.MultiplierBase = 1f;
+                        magicInfo.MultiplierBonus = 0.4f;
                         break;
+                    default:
+                        break;
+                    // throw new ArgumentOutOfRangeException();
                 }
             }
         }
@@ -466,7 +467,7 @@ namespace Server.MirEnv
                 });
             if (!MagicExists(Spell.Rage))
                 MagicInfoList.Add(new MagicInfo
-                { Name = "Rage", Spell = Spell.Rage, Icon = 49, Level1 = 44, Level2 = 47, Level3 = 50, Need1 = 8000, Need2 = 14000, Need3 = 20000, BaseCost = 20, LevelCost = 5, Range = 0 });
+                    { Name = "Rage", Spell = Spell.Rage, Icon = 49, Level1 = 44, Level2 = 47, Level3 = 50, Need1 = 8000, Need2 = 14000, Need3 = 20000, BaseCost = 20, LevelCost = 5, Range = 0 });
             if (!MagicExists(Spell.CounterAttack))
                 MagicInfoList.Add(new MagicInfo
                 {
@@ -653,7 +654,7 @@ namespace Server.MirEnv
                 });
             if (!MagicExists(Spell.Teleport))
                 MagicInfoList.Add(new MagicInfo
-                { Name = "Teleport", Spell = Spell.Teleport, Icon = 20, Level1 = 19, Level2 = 22, Level3 = 25, Need1 = 350, Need2 = 1000, Need3 = 2000, BaseCost = 10, LevelCost = 3, Range = 0 });
+                    { Name = "Teleport", Spell = Spell.Teleport, Icon = 20, Level1 = 19, Level2 = 22, Level3 = 25, Need1 = 350, Need2 = 1000, Need3 = 2000, BaseCost = 10, LevelCost = 3, Range = 0 });
             if (!MagicExists(Spell.FireBang))
                 MagicInfoList.Add(new MagicInfo
                 {
@@ -835,7 +836,7 @@ namespace Server.MirEnv
                 });
             if (!MagicExists(Spell.Mirroring))
                 MagicInfoList.Add(new MagicInfo
-                { Name = "Mirroring", Spell = Spell.Mirroring, Icon = 41, Level1 = 41, Level2 = 43, Level3 = 45, Need1 = 6000, Need2 = 11000, Need3 = 16000, BaseCost = 21, Range = 0 });
+                    { Name = "Mirroring", Spell = Spell.Mirroring, Icon = 41, Level1 = 41, Level2 = 43, Level3 = 45, Need1 = 6000, Need2 = 11000, Need3 = 16000, BaseCost = 21, Range = 0 });
             if (!MagicExists(Spell.FlameField))
                 MagicInfoList.Add(new MagicInfo
                 {
@@ -930,7 +931,7 @@ namespace Server.MirEnv
                 });
             if (!MagicExists(Spell.Blink))
                 MagicInfoList.Add(new MagicInfo
-                { Name = "Blink", Spell = Spell.Blink, Icon = 20, Level1 = 19, Level2 = 22, Level3 = 25, Need1 = 350, Need2 = 1000, Need3 = 2000, BaseCost = 10, LevelCost = 3, Range = 9 });
+                    { Name = "Blink", Spell = Spell.Blink, Icon = 20, Level1 = 19, Level2 = 22, Level3 = 25, Need1 = 350, Need2 = 1000, Need3 = 2000, BaseCost = 10, LevelCost = 3, Range = 9 });
             //if (!MagicExists(Spell.FastMove)) MagicInfoList.Add(new MagicInfo { Name = "FastMove", Spell = Spell.ImmortalSkin, Icon = ?, Level1 = ?, Level2 = ?, Level3 = ?, Need1 = ?, Need2 = ?, Need3 = ?, BaseCost = ?, LevelCost = ?, DelayBase = ?, DelayReduction = ? });
             if (!MagicExists(Spell.StormEscape))
                 MagicInfoList.Add(new MagicInfo
@@ -972,10 +973,10 @@ namespace Server.MirEnv
                 });
             if (!MagicExists(Spell.SpiritSword))
                 MagicInfoList.Add(new MagicInfo
-                { Name = "SpiritSword", Spell = Spell.SpiritSword, Icon = 3, Level1 = 9, Level2 = 12, Level3 = 15, Need1 = 350, Need2 = 1300, Need3 = 2700, Range = 0 });
+                    { Name = "SpiritSword", Spell = Spell.SpiritSword, Icon = 3, Level1 = 9, Level2 = 12, Level3 = 15, Need1 = 350, Need2 = 1300, Need3 = 2700, Range = 0 });
             if (!MagicExists(Spell.Poisoning))
                 MagicInfoList.Add(new MagicInfo
-                { Name = "Poisoning", Spell = Spell.Poisoning, Icon = 5, Level1 = 14, Level2 = 17, Level3 = 20, Need1 = 700, Need2 = 1300, Need3 = 2700, BaseCost = 2, LevelCost = 1, Range = 9 });
+                    { Name = "Poisoning", Spell = Spell.Poisoning, Icon = 5, Level1 = 14, Level2 = 17, Level3 = 20, Need1 = 700, Need2 = 1300, Need3 = 2700, BaseCost = 2, LevelCost = 1, Range = 9 });
             if (!MagicExists(Spell.SoulFireBall))
                 MagicInfoList.Add(new MagicInfo
                 {
@@ -1012,7 +1013,7 @@ namespace Server.MirEnv
                 });
             if (!MagicExists(Spell.Hiding))
                 MagicInfoList.Add(new MagicInfo
-                { Name = "Hiding", Spell = Spell.Hiding, Icon = 17, Level1 = 20, Level2 = 23, Level3 = 26, Need1 = 1300, Need2 = 2700, Need3 = 5300, BaseCost = 1, LevelCost = 1, Range = 0 });
+                    { Name = "Hiding", Spell = Spell.Hiding, Icon = 17, Level1 = 20, Level2 = 23, Level3 = 26, Need1 = 1300, Need2 = 2700, Need3 = 5300, BaseCost = 1, LevelCost = 1, Range = 0 });
             if (!MagicExists(Spell.MassHiding))
                 MagicInfoList.Add(new MagicInfo
                 {
@@ -1243,7 +1244,7 @@ namespace Server.MirEnv
                 });
             if (!MagicExists(Spell.Plague))
                 MagicInfoList.Add(new MagicInfo
-                { Name = "Plague", Spell = Spell.Plague, Icon = 74, Level1 = 42, Level2 = 44, Level3 = 47, Need1 = 5000, Need2 = 9000, Need3 = 13000, BaseCost = 20, LevelCost = 5, Range = 9 });
+                    { Name = "Plague", Spell = Spell.Plague, Icon = 74, Level1 = 42, Level2 = 44, Level3 = 47, Need1 = 5000, Need2 = 9000, Need3 = 13000, BaseCost = 20, LevelCost = 5, Range = 9 });
             if (!MagicExists(Spell.PoisonCloud))
                 MagicInfoList.Add(new MagicInfo
                 {
@@ -1316,10 +1317,10 @@ namespace Server.MirEnv
                 MagicInfoList.Add(new MagicInfo { Name = "FatalSword", Spell = Spell.FatalSword, Icon = 58, Level1 = 7, Level2 = 9, Level3 = 12, Need1 = 500, Need2 = 1000, Need3 = 2300, Range = 0 });
             if (!MagicExists(Spell.DoubleSlash))
                 MagicInfoList.Add(new MagicInfo
-                { Name = "DoubleSlash", Spell = Spell.DoubleSlash, Icon = 59, Level1 = 15, Level2 = 17, Level3 = 19, Need1 = 700, Need2 = 1500, Need3 = 2200, BaseCost = 2, LevelCost = 1 });
+                    { Name = "DoubleSlash", Spell = Spell.DoubleSlash, Icon = 59, Level1 = 15, Level2 = 17, Level3 = 19, Need1 = 700, Need2 = 1500, Need3 = 2200, BaseCost = 2, LevelCost = 1 });
             if (!MagicExists(Spell.Haste))
                 MagicInfoList.Add(new MagicInfo
-                { Name = "Haste", Spell = Spell.Haste, Icon = 60, Level1 = 20, Level2 = 22, Level3 = 25, Need1 = 2000, Need2 = 3000, Need3 = 6000, BaseCost = 3, LevelCost = 2, Range = 0 });
+                    { Name = "Haste", Spell = Spell.Haste, Icon = 60, Level1 = 20, Level2 = 22, Level3 = 25, Need1 = 2000, Need2 = 3000, Need3 = 6000, BaseCost = 3, LevelCost = 2, Range = 0 });
             if (!MagicExists(Spell.FlashDash))
                 MagicInfoList.Add(new MagicInfo
                 {
@@ -1474,7 +1475,7 @@ namespace Server.MirEnv
                 });
             if (!MagicExists(Spell.Hemorrhage))
                 MagicInfoList.Add(new MagicInfo
-                { Name = "Hemorrhage", Spell = Spell.Hemorrhage, Icon = 75, Level1 = 47, Level2 = 51, Level3 = 55, Need1 = 9000, Need2 = 15000, Need3 = 21000, Range = 0 });
+                    { Name = "Hemorrhage", Spell = Spell.Hemorrhage, Icon = 75, Level1 = 47, Level2 = 51, Level3 = 55, Need1 = 9000, Need2 = 15000, Need3 = 21000, Range = 0 });
             if (!MagicExists(Spell.CrescentSlash))
                 MagicInfoList.Add(new MagicInfo
                 {
@@ -1704,7 +1705,7 @@ namespace Server.MirEnv
                 });
             if (!MagicExists(Spell.Stonetrap))
                 MagicInfoList.Add(new MagicInfo
-                { Name = "Stonetrap", Spell = Spell.Stonetrap, Icon = 97, Level1 = 40, Level2 = 43, Level3 = 46, Need1 = 4900, Need2 = 9800, Need3 = 141, BaseCost = 7, LevelCost = 3, Range = 9 });
+                    { Name = "Stonetrap", Spell = Spell.Stonetrap, Icon = 97, Level1 = 40, Level2 = 43, Level3 = 46, Need1 = 4900, Need2 = 9800, Need3 = 141, BaseCost = 7, LevelCost = 3, Range = 9 });
             if (!MagicExists(Spell.SummonVampire))
                 MagicInfoList.Add(new MagicInfo
                 {
@@ -1867,7 +1868,7 @@ namespace Server.MirEnv
             //Custom
             if (!MagicExists(Spell.Portal))
                 MagicInfoList.Add(new MagicInfo
-                { Name = "Portal", Spell = Spell.Portal, Icon = 1, Level1 = 7, Level2 = 11, Level3 = 14, Need1 = 150, Need2 = 350, Need3 = 700, BaseCost = 3, LevelCost = 2, Range = 9 });
+                    { Name = "Portal", Spell = Spell.Portal, Icon = 1, Level1 = 7, Level2 = 11, Level3 = 14, Need1 = 150, Need2 = 350, Need3 = 700, BaseCost = 3, LevelCost = 2, Range = 9 });
             if (!MagicExists(Spell.BattleCry))
                 MagicInfoList.Add(new MagicInfo
                 {
@@ -1922,75 +1923,137 @@ namespace Server.MirEnv
                 });
         }
 
-        private string CanStartEnvir()
+
+        private string? CheckDbs()
         {
-            if (StartPoints.Count == 0) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMapAndStartPoint);
+            if (GetMonsterInfo(Settings.SkeletonName, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.SkeletonName;
+            
+            if (GetMonsterInfo(Settings.ShinsuName, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ShinsuName;
+            
+            if (GetMonsterInfo(Settings.BugBatName, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BugBatName;
+            
+            if (GetMonsterInfo(Settings.Zuma1, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma1;
+            
+            if (GetMonsterInfo(Settings.Zuma2, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma2;
+            if (GetMonsterInfo(Settings.Zuma3, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma3;
+            if (GetMonsterInfo(Settings.Zuma4, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma4;
+            if (GetMonsterInfo(Settings.Zuma5, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma5;
+            if (GetMonsterInfo(Settings.Zuma6, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma6;
+            if (GetMonsterInfo(Settings.Zuma7, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma7;
+            if (GetMonsterInfo(Settings.Turtle1, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Turtle1;
+            if (GetMonsterInfo(Settings.Turtle2, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Turtle2;
+            if (GetMonsterInfo(Settings.Turtle3, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Turtle3;
+            if (GetMonsterInfo(Settings.Turtle4, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Turtle4;
+            if (GetMonsterInfo(Settings.Turtle5, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Turtle5;
+            if (GetMonsterInfo(Settings.BoneMonster1, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BoneMonster1;
+            if (GetMonsterInfo(Settings.BoneMonster2, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BoneMonster2;
+            if (GetMonsterInfo(Settings.BoneMonster3, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BoneMonster3;
+            if (GetMonsterInfo(Settings.BoneMonster4, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BoneMonster4;
+            if (GetMonsterInfo(Settings.BehemothMonster1, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BehemothMonster1;
+            if (GetMonsterInfo(Settings.BehemothMonster2, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BehemothMonster2;
+            if (GetMonsterInfo(Settings.BehemothMonster3, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BehemothMonster3;
+            if (GetMonsterInfo(Settings.HellKnight1, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellKnight1;
+            if (GetMonsterInfo(Settings.HellKnight2, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellKnight2;
+            if (GetMonsterInfo(Settings.HellKnight3, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellKnight3;
+            if (GetMonsterInfo(Settings.HellKnight4, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellKnight4;
+            if (GetMonsterInfo(Settings.HellBomb1, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellBomb1;
+            if (GetMonsterInfo(Settings.HellBomb2, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellBomb2;
+            if (GetMonsterInfo(Settings.HellBomb3, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellBomb3;
+            if (GetMonsterInfo(Settings.WhiteSnake, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.WhiteSnake;
+            if (GetMonsterInfo(Settings.AngelName, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.AngelName;
+            if (GetMonsterInfo(Settings.BombSpiderName, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BombSpiderName;
+            if (GetMonsterInfo(Settings.CloneName, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.CloneName;
+            if (GetMonsterInfo(Settings.AssassinCloneName, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.AssassinCloneName;
+            if (GetMonsterInfo(Settings.VampireName, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.VampireName;
+            if (GetMonsterInfo(Settings.ToadName, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ToadName;
+            if (GetMonsterInfo(Settings.SnakeTotemName, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.SnakeTotemName;
+            if (GetMonsterInfo(Settings.FishingMonster, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.FishingMonster;
+            if (GetMonsterInfo(Settings.GeneralMeowMeowMob1, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.GeneralMeowMeowMob1;
+            if (GetMonsterInfo(Settings.GeneralMeowMeowMob2, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.GeneralMeowMeowMob2;
+            if (GetMonsterInfo(Settings.GeneralMeowMeowMob3, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.GeneralMeowMeowMob3;
+            if (GetMonsterInfo(Settings.GeneralMeowMeowMob4, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.GeneralMeowMeowMob4;
+            if (GetMonsterInfo(Settings.KingHydraxMob, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.KingHydraxMob;
+            if (GetMonsterInfo(Settings.HornedCommanderMob, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HornedCommanderMob;
+            if (GetMonsterInfo(Settings.HornedCommanderBombMob, true) == null)
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HornedCommanderBombMob;
+            if (GetMonsterInfo(Settings.SnowWolfKingMob, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.SnowWolfKingMob;
+            if (GetMonsterInfo(Settings.ScrollMob1, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ScrollMob1;
+            if (GetMonsterInfo(Settings.ScrollMob2, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ScrollMob2;
+            if (GetMonsterInfo(Settings.ScrollMob3, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ScrollMob3;
+            if (GetMonsterInfo(Settings.ScrollMob4, true) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ScrollMob4;
+
+            if (GetItemInfo(Settings.RefineOreName) == null) 
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutItem) + Settings.RefineOreName;
+
+            return null;
+        }
+
+        private string CanStartEnv()
+        {
+            if (StartPoints.Count == 0)
+            {
+                return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMapAndStartPoint);
+            }
 
             if (Settings.EnforceDBChecks)
             {
-                if (GetMonsterInfo(Settings.SkeletonName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.SkeletonName;
-                if (GetMonsterInfo(Settings.ShinsuName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ShinsuName;
-                if (GetMonsterInfo(Settings.BugBatName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BugBatName;
-                if (GetMonsterInfo(Settings.Zuma1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma1;
-                if (GetMonsterInfo(Settings.Zuma2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma2;
-                if (GetMonsterInfo(Settings.Zuma3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma3;
-                if (GetMonsterInfo(Settings.Zuma4, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma4;
-                if (GetMonsterInfo(Settings.Zuma5, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma5;
-                if (GetMonsterInfo(Settings.Zuma6, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma6;
-                if (GetMonsterInfo(Settings.Zuma7, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Zuma7;
-                if (GetMonsterInfo(Settings.Turtle1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Turtle1;
-                if (GetMonsterInfo(Settings.Turtle2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Turtle2;
-                if (GetMonsterInfo(Settings.Turtle3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Turtle3;
-                if (GetMonsterInfo(Settings.Turtle4, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Turtle4;
-                if (GetMonsterInfo(Settings.Turtle5, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.Turtle5;
-                if (GetMonsterInfo(Settings.BoneMonster1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BoneMonster1;
-                if (GetMonsterInfo(Settings.BoneMonster2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BoneMonster2;
-                if (GetMonsterInfo(Settings.BoneMonster3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BoneMonster3;
-                if (GetMonsterInfo(Settings.BoneMonster4, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BoneMonster4;
-                if (GetMonsterInfo(Settings.BehemothMonster1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BehemothMonster1;
-                if (GetMonsterInfo(Settings.BehemothMonster2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BehemothMonster2;
-                if (GetMonsterInfo(Settings.BehemothMonster3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BehemothMonster3;
-                if (GetMonsterInfo(Settings.HellKnight1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellKnight1;
-                if (GetMonsterInfo(Settings.HellKnight2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellKnight2;
-                if (GetMonsterInfo(Settings.HellKnight3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellKnight3;
-                if (GetMonsterInfo(Settings.HellKnight4, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellKnight4;
-                if (GetMonsterInfo(Settings.HellBomb1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellBomb1;
-                if (GetMonsterInfo(Settings.HellBomb2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellBomb2;
-                if (GetMonsterInfo(Settings.HellBomb3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HellBomb3;
-                if (GetMonsterInfo(Settings.WhiteSnake, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.WhiteSnake;
-                if (GetMonsterInfo(Settings.AngelName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.AngelName;
-                if (GetMonsterInfo(Settings.BombSpiderName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.BombSpiderName;
-                if (GetMonsterInfo(Settings.CloneName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.CloneName;
-                if (GetMonsterInfo(Settings.AssassinCloneName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.AssassinCloneName;
-                if (GetMonsterInfo(Settings.VampireName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.VampireName;
-                if (GetMonsterInfo(Settings.ToadName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ToadName;
-                if (GetMonsterInfo(Settings.SnakeTotemName, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.SnakeTotemName;
-                if (GetMonsterInfo(Settings.FishingMonster, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.FishingMonster;
-                if (GetMonsterInfo(Settings.GeneralMeowMeowMob1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.GeneralMeowMeowMob1;
-                if (GetMonsterInfo(Settings.GeneralMeowMeowMob2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.GeneralMeowMeowMob2;
-                if (GetMonsterInfo(Settings.GeneralMeowMeowMob3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.GeneralMeowMeowMob3;
-                if (GetMonsterInfo(Settings.GeneralMeowMeowMob4, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.GeneralMeowMeowMob4;
-                if (GetMonsterInfo(Settings.KingHydraxMob, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.KingHydraxMob;
-                if (GetMonsterInfo(Settings.HornedCommanderMob, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HornedCommanderMob;
-                if (GetMonsterInfo(Settings.HornedCommanderBombMob, true) == null)
-                    return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.HornedCommanderBombMob;
-                if (GetMonsterInfo(Settings.SnowWolfKingMob, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.SnowWolfKingMob;
-                if (GetMonsterInfo(Settings.ScrollMob1, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ScrollMob1;
-                if (GetMonsterInfo(Settings.ScrollMob2, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ScrollMob2;
-                if (GetMonsterInfo(Settings.ScrollMob3, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ScrollMob3;
-                if (GetMonsterInfo(Settings.ScrollMob4, true) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutMob) + Settings.ScrollMob4;
-
-                if (GetItemInfo(Settings.RefineOreName) == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.CannotStartServerWithoutItem) + Settings.RefineOreName;
+                string? error = CheckDbs();
+                if (error != null) return error;
             }
 
-            WorldMapIcon wmi = ValidateWorldMap();
-            if (wmi != null)
-                return GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.InvalidWorldmapIndex), wmi.MapIndex, wmi.Title);
-
-
-            //add intelligent creature checks?
-
-            return "true";
+            WorldMapIcon? wmi = ValidateWorldMap();
+            return wmi != null ? GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.InvalidWorldmapIndex), wmi.MapIndex, wmi.Title) :
+                //add intelligent creature checks?
+                "true";
         }
 
         private void WorkLoop()
@@ -2009,7 +2072,7 @@ namespace Server.MirEnv
                 var processCount = 0;
                 var processRealCount = 0;
 
-                LinkedListNode<MapObject> current = null;
+                LinkedListNode<MapObject>? current = null;
 
                 if (Settings.Multithreaded)
                 {
@@ -2023,10 +2086,10 @@ namespace Server.MirEnv
                 }
 
                 StartEnviron();
-                var canstartserver = CanStartEnvir();
-                if (canstartserver != "true")
+                string canStartServer = CanStartEnv();
+                if (canStartServer != "true")
                 {
-                    MessageQueue.Enqueue(canstartserver);
+                    MessageQueue.Enqueue(canStartServer);
                     StopEnv();
                     _thread = null;
                     Stop();
@@ -2173,7 +2236,7 @@ namespace Server.MirEnv
                         lineMessageTime = Time + Settings.Minute * Settings.LineMessageTimer;
                         Broadcast(new S.Chat
                         {
-                            Message = LineMessages[Random.Next(LineMessages.Count)],
+                            Message = LineMessages[RandomProvider.Next(LineMessages.Count)],
                             Type = ChatType.LineMessage
                         });
 
@@ -2192,9 +2255,9 @@ namespace Server.MirEnv
                     // Get stack trace for the exception with source file information
                     var st = new StackTrace(ex, true);
                     // Get the top stack frame
-                    var frame = st.GetFrame(0);
+                    StackFrame? frame = st.GetFrame(0);
                     // Get the line number from the stack frame
-                    var line = frame.GetFileLineNumber();
+                    int? line = frame?.GetFileLineNumber() ?? 0;
 
                     MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.InnerWorkloopErrorLine), line, ex));
                 }
@@ -2212,7 +2275,7 @@ namespace Server.MirEnv
                 // Get the top stack frame
                 var frame = st.GetFrame(0);
                 // Get the line number from the stack frame
-                var line = frame.GetFileLineNumber();
+                int? line = frame?.GetFileLineNumber() ?? 0;
 
                 MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.OuterWorkloopErrorLine), line, ex));
             }
@@ -2269,11 +2332,13 @@ namespace Server.MirEnv
                             }
                         }
                         if (!stopping) continue;
+                        
                         mobThread.Stop = true;
                         return;
                     }
 
                     if (Stopwatch.ElapsedMilliseconds <= mobThread.EndTime || !Running) continue;
+                    
                     mobThread.Stop = true;
                     lock (_locker)
                     {
@@ -2390,7 +2455,7 @@ namespace Server.MirEnv
 
         private void ProcessAuction()
         {
-            LinkedListNode<AuctionInfo> auctionNode = Auctions.First;
+            LinkedListNode<AuctionInfo>? auctionNode = Auctions.First;
 
             while (auctionNode != null)
             {
@@ -2510,7 +2575,7 @@ namespace Server.MirEnv
         }
 
 
-        public CharacterInfo GetArchivedCharacter(string name)
+        public CharacterInfo? GetArchivedCharacter(string name)
         {
             DirectoryInfo dir = new DirectoryInfo(ArchivePath);
             FileInfo[] files = dir.GetFiles($"{name}*.MirCA");
@@ -2522,17 +2587,12 @@ namespace Server.MirEnv
 
             var fileInfo = files[0];
 
-            CharacterInfo info = null;
-
             using FileStream fileStream = fileInfo.OpenRead();
             using var reader = new BinaryReader(fileStream);
 
             var version = reader.ReadInt32();
             var customVersion = reader.ReadInt32();
-
-            info = new CharacterInfo(reader, version, customVersion);
-
-            return info;
+            return new CharacterInfo(reader, version, customVersion);
         }
 
         public void SaveArchivedCharacter(CharacterInfo info)
@@ -2641,7 +2701,7 @@ namespace Server.MirEnv
 
                 GuildList[i].NeedSave = false;
 
-                GuildObject liveGuild = Guilds.Find(g => g.Guildindex == GuildList[i].GuildIndex);
+                GuildObject? liveGuild = Guilds.Find(g => g.Guildindex == GuildList[i].GuildIndex);
                 if (liveGuild != null)
                 {
                     GuildList[i] = liveGuild.Info;
@@ -2655,13 +2715,14 @@ namespace Server.MirEnv
                 fileStream.BeginWrite(data, 0, data.Length, EndSaveGuildsAsync, fileStream);
             }
         }
+        
         private static void EndSaveGuildsAsync(IAsyncResult result)
         {
             var fileStream = result.AsyncState as FileStream;
             try
             {
                 if (fileStream == null) return;
-                var oldFilename = fileStream.Name.Substring(0, fileStream.Name.Length - 1);
+                var oldFilename = fileStream.Name[..^1];
                 var newFilename = fileStream.Name;
                 fileStream.EndWrite(result);
                 fileStream.Dispose();
@@ -2682,40 +2743,36 @@ namespace Server.MirEnv
         {
             if (!Directory.Exists(Settings.GoodsPath)) Directory.CreateDirectory(Settings.GoodsPath);
 
-            foreach (Map map in MapList)
+            foreach (var npc in MapList.Where(map => map.NPCs.Count != 0).SelectMany(map => map.NPCs))
             {
-                if (map.NPCs.Count == 0) continue;
-
-                foreach (NPCObject npc in map.NPCs)
+                if (forced)
                 {
-                    if (forced)
-                    {
-                        npc.ProcessGoods(true);
-                    }
-
-                    if (!npc.NeedSave) continue;
-
-                    var path = Path.Combine(Settings.GoodsPath, npc.Info.Index + ".msdn");
-
-                    var memoryStream = new MemoryStream();
-                    var writer = new BinaryWriter(memoryStream);
-                    const int temp = 9999;
-                    writer.Write(temp);
-                    writer.Write(Version);
-                    writer.Write(CustomVersion);
-                    writer.Write(npc.UsedGoods.Count);
-
-                    foreach (var good in npc.UsedGoods)
-                    {
-                        good.Save(writer);
-                    }
-
-                    FileStream fileStream = new FileStream(path, FileMode.Create);
-                    byte[] data = memoryStream.ToArray();
-                    fileStream.BeginWrite(data, 0, data.Length, EndSaveGoodsAsync, fileStream);
+                    npc.ProcessGoods(true);
                 }
+
+                if (!npc.NeedSave) continue;
+
+                var path = Path.Combine(Settings.GoodsPath, npc.Info.Index + ".msdn");
+
+                var memoryStream = new MemoryStream();
+                var writer = new BinaryWriter(memoryStream);
+                const int temp = 9999;
+                writer.Write(temp);
+                writer.Write(Version);
+                writer.Write(CustomVersion);
+                writer.Write(npc.UsedGoods.Count);
+
+                foreach (var good in npc.UsedGoods)
+                {
+                    good.Save(writer);
+                }
+
+                FileStream fileStream = new FileStream(path, FileMode.Create);
+                byte[] data = memoryStream.ToArray();
+                fileStream.BeginWrite(data, 0, data.Length, EndSaveGoodsAsync, fileStream);
             }
         }
+        
         private static void EndSaveGoodsAsync(IAsyncResult result)
         {
             try
@@ -2754,6 +2811,7 @@ namespace Server.MirEnv
                 fileStream.BeginWrite(data, 0, data.Length, EndSaveConquestsAsync, fileStream);
             }
         }
+        
         private static void EndSaveConquestsAsync(IAsyncResult result)
         {
             FileStream? fileStream = result.AsyncState as FileStream;
@@ -3074,7 +3132,7 @@ namespace Server.MirEnv
                         GameshopLog.Add(accountReader.ReadInt32(), accountReader.ReadInt32());
                     }
 
-                    if (ResetGS) ClearGameshopLog();
+                    if (ResetGS) ClearGameShopLog();
                 }
 
                 if (LoadVersion >= 68)
@@ -3280,12 +3338,12 @@ namespace Server.MirEnv
                 Monitor.PulseAll(_locker);
             }
 
-            //simply intterupt all the mob threads if they are running (will give an invisible error on them but fastest way of getting rid of them on shutdowns)
+            //simply interrupt all the mob threads if they are running (will give an invisible error on them but fastest way of getting rid of them on shutdowns)
             if (Settings.Multithreaded)
             {
                 for (var i = 1; i < MobThreading.Length; i++)
                 {
-                        MobThreads[i].EndTime = Time + 9999;
+                    MobThreads[i].EndTime = Time + 9999;
                     if ( MobThreading[i].ThreadState != System.Threading.ThreadState.Stopped && MobThreading[i].ThreadState != System.Threading.ThreadState.Unstarted)
                     {
                         MobThreading[i].Interrupt();
@@ -3406,9 +3464,9 @@ namespace Server.MirEnv
                 MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.DragonLoaded));
             }
 
-            DefaultNPC = NPCScript.GetOrAdd((uint)Random.Next(1000000, 1999999), Settings.DefaultNPCFilename, NPCScriptType.AutoPlayer);
-            MonsterNPC = NPCScript.GetOrAdd((uint)Random.Next(2000000, 2999999), Settings.MonsterNPCFilename, NPCScriptType.AutoMonster);
-            RobotNPC = NPCScript.GetOrAdd((uint)Random.Next(3000000, 3999999), Settings.RobotNPCFilename, NPCScriptType.Robot);
+            DefaultNPC = NPCScript.GetOrAdd((uint)RandomProvider.Next(1000000, 1999999), Settings.DefaultNPCFilename, NPCScriptType.AutoPlayer);
+            MonsterNPC = NPCScript.GetOrAdd((uint)RandomProvider.Next(2000000, 2999999), Settings.MonsterNPCFilename, NPCScriptType.AutoMonster);
+            RobotNPC = NPCScript.GetOrAdd((uint)RandomProvider.Next(3000000, 3999999), Settings.RobotNPCFilename, NPCScriptType.Robot);
 
             MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.EnvirStarted));           
         }
@@ -3565,7 +3623,7 @@ namespace Server.MirEnv
                 TcpClient tempTcpClient = _listener.EndAcceptTcpClient(result);
 
                 bool connected = false;
-                var ipAddress = tempTcpClient.Client.RemoteEndPoint.ToString().Split(':')[0];
+                var ipAddress = tempTcpClient.Client.RemoteEndPoint!.ToString()!.Split(':')[0];
 
                 if (!IPBlocks.TryGetValue(ipAddress, out DateTime banDate) || banDate < Now)
                 {
@@ -3990,13 +4048,7 @@ namespace Server.MirEnv
                 ConnectionLogs[c.IPAddress] = new MirConnectionLog() { IPAddress = c.IPAddress };
             }
 
-            if (!CharacterReg.IsMatch(p.Name))
-            {
-                c.Enqueue(new ServerPackets.NewCharacter { Result = 1 });
-                return;
-            }
-
-            if (!isGm && DisabledCharNames.Contains(p.Name.ToUpper()))
+            if (!CharacterReg.IsMatch(p.Name) || !isGm && DisabledCharNames.Contains(p.Name.ToUpper()))
             {
                 c.Enqueue(new ServerPackets.NewCharacter { Result = 1 });
                 return;
@@ -4009,13 +4061,8 @@ namespace Server.MirEnv
             }
 
             if (p.Class != MirClass.Warrior && p.Class != MirClass.Wizard && p.Class != MirClass.Taoist &&
-                p.Class != MirClass.Assassin && p.Class != MirClass.Archer)
-            {
-                c.Enqueue(new ServerPackets.NewCharacter { Result = 3 });
-                return;
-            }
-
-            if (p.Class == MirClass.Assassin && !Settings.AllowCreateAssassin ||
+                p.Class != MirClass.Assassin && p.Class != MirClass.Archer ||
+                p.Class == MirClass.Assassin && !Settings.AllowCreateAssassin ||
                 p.Class == MirClass.Archer && !Settings.AllowCreateArcher)
             {
                 c.Enqueue(new ServerPackets.NewCharacter { Result = 3 });
@@ -4055,13 +4102,7 @@ namespace Server.MirEnv
                 return false;
             }
 
-            if (!CharacterReg.IsMatch(p.Name))
-            {
-                c.Enqueue(new S.NewHero { Result = 1 });
-                return false;
-            }
-
-            if (!IsGm && DisabledCharNames.Contains(p.Name.ToUpper()))
+            if (!CharacterReg.IsMatch(p.Name) || !IsGm && DisabledCharNames.Contains(p.Name.ToUpper()))
             {
                 c.Enqueue(new S.NewHero { Result = 1 });
                 return false;
@@ -4073,13 +4114,7 @@ namespace Server.MirEnv
                 return false;
             }
 
-            if (p.Class != MirClass.Warrior && p.Class != MirClass.Wizard && p.Class != MirClass.Taoist && p.Class != MirClass.Assassin && p.Class != MirClass.Archer)
-            {
-                c.Enqueue(new S.NewHero { Result = 3 });
-                return false;
-            }
-
-            if (p.Class == MirClass.Warrior && !Settings.Hero_CanCreateClass[0] || p.Class == MirClass.Wizard && !Settings.Hero_CanCreateClass[1] || p.Class == MirClass.Taoist && !Settings.Hero_CanCreateClass[2] || p.Class == MirClass.Assassin && !Settings.Hero_CanCreateClass[3] || p.Class == MirClass.Archer && !Settings.Hero_CanCreateClass[4])
+            if (p.Class != MirClass.Warrior && p.Class != MirClass.Wizard && p.Class != MirClass.Taoist && p.Class != MirClass.Assassin && p.Class != MirClass.Archer || p.Class == MirClass.Warrior && !Settings.Hero_CanCreateClass[0] || p.Class == MirClass.Wizard && !Settings.Hero_CanCreateClass[1] || p.Class == MirClass.Taoist && !Settings.Hero_CanCreateClass[2] || p.Class == MirClass.Assassin && !Settings.Hero_CanCreateClass[3] || p.Class == MirClass.Archer && !Settings.Hero_CanCreateClass[4])
             {
                 c.Enqueue(new S.NewHero { Result = 3 });
                 return false;
@@ -4109,15 +4144,16 @@ namespace Server.MirEnv
 
         public List<CharacterInfo> MatchPlayer(string playerId, bool match = false)
         {
-            if (string.IsNullOrEmpty(playerId)) return new List<CharacterInfo>(CharacterList);
+            if (string.IsNullOrEmpty(playerId)) return [.. CharacterList];
 
             Func<string, bool> matcher =
                 match ? name => name.Equals(playerId, StringComparison.OrdinalIgnoreCase) : name => name.Contains(playerId, StringComparison.OrdinalIgnoreCase);
             return [..CharacterList.Where(character => matcher(character.Name))];
         }
+        
         public List<CharacterInfo> MatchPlayerByItem(string itemIdentifier, bool match = false)
         {
-            List<CharacterInfo> list = new();
+            List<CharacterInfo> list = [];
 
             bool isNumeric = ulong.TryParse(itemIdentifier, out ulong itemId);
 
@@ -4348,7 +4384,7 @@ namespace Server.MirEnv
             {
                 UniqueID = ++NextUserItemID,
                 MaxDura = info.Durability,
-                CurrentDura = (ushort)Math.Min(info.Durability, Random.Next(info.Durability) + 1000)
+                CurrentDura = (ushort)Math.Min(info.Durability, RandomProvider.Next(info.Durability) + 1000)
             };
 
             UpgradeItem(item);
@@ -4389,30 +4425,22 @@ namespace Server.MirEnv
                 var match = numAlpha.Match(parameter);
 
                 var alpha = match.Groups["Alpha"].Value;
-                var num = 0;
 
-                int.TryParse(match.Groups["Numeric"].Value, out num);
-
-                switch (alpha)
+                if (TryParse(match.Groups["Numeric"].Value, out int num))
                 {
-                    case "m":
-                        expiryInfo.ExpiryDate = Now.AddMinutes(num);
-                        break;
-                    case "h":
-                        expiryInfo.ExpiryDate = Now.AddHours(num);
-                        break;
-                    case "d":
-                        expiryInfo.ExpiryDate = Now.AddDays(num);
-                        break;
-                    case "M":
-                        expiryInfo.ExpiryDate = Now.AddMonths(num);
-                        break;
-                    case "y":
-                        expiryInfo.ExpiryDate = Now.AddYears(num);
-                        break;
-                    default:
-                        expiryInfo.ExpiryDate = DateTime.MaxValue;
-                        break;
+                    expiryInfo.ExpiryDate = alpha switch
+                    {
+                        "m" => Now.AddMinutes(num),
+                        "h" => Now.AddHours(num),
+                        "d" => Now.AddDays(num),
+                        "M" => Now.AddMonths(num),
+                        "y" => Now.AddYears(num),
+                        _ => DateTime.MaxValue
+                    };
+                }
+                else
+                {
+                    expiryInfo.ExpiryDate = DateTime.MaxValue;
                 }
 
                 item.ExpireInfo = expiryInfo;
@@ -4422,38 +4450,61 @@ namespace Server.MirEnv
         private void UpgradeItem(UserItem item)
         {
             if (item.Info.RandomStats == null) return;
+            
             var stat = item.Info.RandomStats;
-            if (stat.MaxDuraChance > 0 && Random.Next(stat.MaxDuraChance) == 0)
+            if (stat.MaxDuraChance > 0 && RandomProvider.Next(stat.MaxDuraChance) == 0)
             {
                 var dura = RandomRange(stat.MaxDuraMaxStat, stat.MaxDuraStatChance);
                 item.MaxDura = (ushort)Math.Min(ushort.MaxValue, item.MaxDura + dura * 1000);
                 item.CurrentDura = (ushort)Math.Min(ushort.MaxValue, item.CurrentDura + dura * 1000);
             }
 
-            if (stat.MaxAcChance > 0 && Random.Next(stat.MaxAcChance) == 0) item.AddedStats[Stat.MaxAC] = (byte)(RandomRange(stat.MaxAcMaxStat - 1, stat.MaxAcStatChance) + 1);
-            if (stat.MaxMacChance > 0 && Random.Next(stat.MaxMacChance) == 0) item.AddedStats[Stat.MaxMAC] = (byte)(RandomRange(stat.MaxMacMaxStat - 1, stat.MaxMacStatChance) + 1);
-            if (stat.MaxDcChance > 0 && Random.Next(stat.MaxDcChance) == 0) item.AddedStats[Stat.MaxDC] = (byte)(RandomRange(stat.MaxDcMaxStat - 1, stat.MaxDcStatChance) + 1);
-            if (stat.MaxMcChance > 0 && Random.Next(stat.MaxMcChance) == 0) item.AddedStats[Stat.MaxMC] = (byte)(RandomRange(stat.MaxMcMaxStat - 1, stat.MaxMcStatChance) + 1);
-            if (stat.MaxScChance > 0 && Random.Next(stat.MaxScChance) == 0) item.AddedStats[Stat.MaxSC] = (byte)(RandomRange(stat.MaxScMaxStat - 1, stat.MaxScStatChance) + 1);
-            if (stat.AccuracyChance > 0 && Random.Next(stat.AccuracyChance) == 0) item.AddedStats[Stat.Accuracy] = (byte)(RandomRange(stat.AccuracyMaxStat - 1, stat.AccuracyStatChance) + 1);
-            if (stat.AgilityChance > 0 && Random.Next(stat.AgilityChance) == 0) item.AddedStats[Stat.Agility] = (byte)(RandomRange(stat.AgilityMaxStat - 1, stat.AgilityStatChance) + 1);
-            if (stat.HpChance > 0 && Random.Next(stat.HpChance) == 0) item.AddedStats[Stat.HP] = (byte)(RandomRange(stat.HpMaxStat - 1, stat.HpStatChance) + 1);
-            if (stat.MpChance > 0 && Random.Next(stat.MpChance) == 0) item.AddedStats[Stat.MP] = (byte)(RandomRange(stat.MpMaxStat - 1, stat.MpStatChance) + 1);
-            if (stat.StrongChance > 0 && Random.Next(stat.StrongChance) == 0) item.AddedStats[Stat.Strong] = (byte)(RandomRange(stat.StrongMaxStat - 1, stat.StrongStatChance) + 1);
-            if (stat.MagicResistChance > 0 && Random.Next(stat.MagicResistChance) == 0) item.AddedStats[Stat.MagicResist] = (byte)(RandomRange(stat.MagicResistMaxStat - 1, stat.MagicResistStatChance) + 1);
-            if (stat.PoisonResistChance > 0 && Random.Next(stat.PoisonResistChance) == 0) item.AddedStats[Stat.PoisonResist] = (byte)(RandomRange(stat.PoisonResistMaxStat - 1, stat.PoisonResistStatChance) + 1);
-            if (stat.HpRecovChance > 0 && Random.Next(stat.HpRecovChance) == 0) item.AddedStats[Stat.HealthRecovery] = (byte)(RandomRange(stat.HpRecovMaxStat - 1, stat.HpRecovStatChance) + 1);
-            if (stat.MpRecovChance > 0 && Random.Next(stat.MpRecovChance) == 0) item.AddedStats[Stat.SpellRecovery] = (byte)(RandomRange(stat.MpRecovMaxStat - 1, stat.MpRecovStatChance) + 1);
-            if (stat.PoisonRecovChance > 0 && Random.Next(stat.PoisonRecovChance) == 0) item.AddedStats[Stat.PoisonRecovery] = (byte)(RandomRange(stat.PoisonRecovMaxStat - 1, stat.PoisonRecovStatChance) + 1);
-            if (stat.CriticalRateChance > 0 && Random.Next(stat.CriticalRateChance) == 0) item.AddedStats[Stat.CriticalRate] = (byte)(RandomRange(stat.CriticalRateMaxStat - 1, stat.CriticalRateStatChance) + 1);
-            if (stat.CriticalDamageChance > 0 && Random.Next(stat.CriticalDamageChance) == 0) item.AddedStats[Stat.CriticalDamage] = (byte)(RandomRange(stat.CriticalDamageMaxStat - 1, stat.CriticalDamageStatChance) + 1);
-            if (stat.FreezeChance > 0 && Random.Next(stat.FreezeChance) == 0) item.AddedStats[Stat.Freezing] = (byte)(RandomRange(stat.FreezeMaxStat - 1, stat.FreezeStatChance) + 1);
-            if (stat.PoisonAttackChance > 0 && Random.Next(stat.PoisonAttackChance) == 0) item.AddedStats[Stat.PoisonAttack] = (byte)(RandomRange(stat.PoisonAttackMaxStat - 1, stat.PoisonAttackStatChance) + 1);
-            if (stat.AttackSpeedChance > 0 && Random.Next(stat.AttackSpeedChance) == 0) item.AddedStats[Stat.AttackSpeed] = (sbyte)(RandomRange(stat.AttackSpeedMaxStat - 1, stat.AttackSpeedStatChance) + 1);
-            if (stat.LuckChance > 0 && Random.Next(stat.LuckChance) == 0) item.AddedStats[Stat.Luck] = (sbyte)(RandomRange(stat.LuckMaxStat - 1, stat.LuckStatChance) + 1);
-            if (stat.CurseChance > 0 && Random.Next(100) <= stat.CurseChance) item.Cursed = true;
+            if (stat.MaxAcChance > 0 && RandomProvider.Next(stat.MaxAcChance) == 0) 
+                item.AddedStats[Stat.MaxAC] = (byte)(RandomRange(stat.MaxAcMaxStat - 1, stat.MaxAcStatChance) + 1);
+            if (stat.MaxMacChance > 0 && RandomProvider.Next(stat.MaxMacChance) == 0) 
+                item.AddedStats[Stat.MaxMAC] = (byte)(RandomRange(stat.MaxMacMaxStat - 1, stat.MaxMacStatChance) + 1);
+            if (stat.MaxDcChance > 0 && RandomProvider.Next(stat.MaxDcChance) == 0) 
+                item.AddedStats[Stat.MaxDC] = (byte)(RandomRange(stat.MaxDcMaxStat - 1, stat.MaxDcStatChance) + 1);
+            if (stat.MaxMcChance > 0 && RandomProvider.Next(stat.MaxMcChance) == 0) 
+                item.AddedStats[Stat.MaxMC] = (byte)(RandomRange(stat.MaxMcMaxStat - 1, stat.MaxMcStatChance) + 1);
+            if (stat.MaxScChance > 0 && RandomProvider.Next(stat.MaxScChance) == 0) 
+                item.AddedStats[Stat.MaxSC] = (byte)(RandomRange(stat.MaxScMaxStat - 1, stat.MaxScStatChance) + 1);
+            if (stat.AccuracyChance > 0 && RandomProvider.Next(stat.AccuracyChance) == 0) 
+                item.AddedStats[Stat.Accuracy] = (byte)(RandomRange(stat.AccuracyMaxStat - 1, stat.AccuracyStatChance) + 1);
+            if (stat.AgilityChance > 0 && RandomProvider.Next(stat.AgilityChance) == 0) 
+                item.AddedStats[Stat.Agility] = (byte)(RandomRange(stat.AgilityMaxStat - 1, stat.AgilityStatChance) + 1);
+            if (stat.HpChance > 0 && RandomProvider.Next(stat.HpChance) == 0) 
+                item.AddedStats[Stat.HP] = (byte)(RandomRange(stat.HpMaxStat - 1, stat.HpStatChance) + 1);
+            if (stat.MpChance > 0 && RandomProvider.Next(stat.MpChance) == 0) 
+                item.AddedStats[Stat.MP] = (byte)(RandomRange(stat.MpMaxStat - 1, stat.MpStatChance) + 1);
+            if (stat.StrongChance > 0 && RandomProvider.Next(stat.StrongChance) == 0) 
+                item.AddedStats[Stat.Strong] = (byte)(RandomRange(stat.StrongMaxStat - 1, stat.StrongStatChance) + 1);
+            if (stat.MagicResistChance > 0 && RandomProvider.Next(stat.MagicResistChance) == 0) 
+                item.AddedStats[Stat.MagicResist] = (byte)(RandomRange(stat.MagicResistMaxStat - 1, stat.MagicResistStatChance) + 1);
+            if (stat.PoisonResistChance > 0 && RandomProvider.Next(stat.PoisonResistChance) == 0) 
+                item.AddedStats[Stat.PoisonResist] = (byte)(RandomRange(stat.PoisonResistMaxStat - 1, stat.PoisonResistStatChance) + 1);
+            if (stat.HpRecovChance > 0 && RandomProvider.Next(stat.HpRecovChance) == 0) 
+                item.AddedStats[Stat.HealthRecovery] = (byte)(RandomRange(stat.HpRecovMaxStat - 1, stat.HpRecovStatChance) + 1);
+            if (stat.MpRecovChance > 0 && RandomProvider.Next(stat.MpRecovChance) == 0) 
+                item.AddedStats[Stat.SpellRecovery] = (byte)(RandomRange(stat.MpRecovMaxStat - 1, stat.MpRecovStatChance) + 1);
+            if (stat.PoisonRecovChance > 0 && RandomProvider.Next(stat.PoisonRecovChance) == 0) 
+                item.AddedStats[Stat.PoisonRecovery] = (byte)(RandomRange(stat.PoisonRecovMaxStat - 1, stat.PoisonRecovStatChance) + 1);
+            if (stat.CriticalRateChance > 0 && RandomProvider.Next(stat.CriticalRateChance) == 0) 
+                item.AddedStats[Stat.CriticalRate] = (byte)(RandomRange(stat.CriticalRateMaxStat - 1, stat.CriticalRateStatChance) + 1);
+            if (stat.CriticalDamageChance > 0 && RandomProvider.Next(stat.CriticalDamageChance) == 0) 
+                item.AddedStats[Stat.CriticalDamage] = (byte)(RandomRange(stat.CriticalDamageMaxStat - 1, stat.CriticalDamageStatChance) + 1);
+            if (stat.FreezeChance > 0 && RandomProvider.Next(stat.FreezeChance) == 0) 
+                item.AddedStats[Stat.Freezing] = (byte)(RandomRange(stat.FreezeMaxStat - 1, stat.FreezeStatChance) + 1);
+            if (stat.PoisonAttackChance > 0 && RandomProvider.Next(stat.PoisonAttackChance) == 0) 
+                item.AddedStats[Stat.PoisonAttack] = (byte)(RandomRange(stat.PoisonAttackMaxStat - 1, stat.PoisonAttackStatChance) + 1);
+            if (stat.AttackSpeedChance > 0 && RandomProvider.Next(stat.AttackSpeedChance) == 0) 
+                item.AddedStats[Stat.AttackSpeed] = (sbyte)(RandomRange(stat.AttackSpeedMaxStat - 1, stat.AttackSpeedStatChance) + 1);
+            if (stat.LuckChance > 0 && RandomProvider.Next(stat.LuckChance) == 0) 
+                item.AddedStats[Stat.Luck] = (sbyte)(RandomRange(stat.LuckMaxStat - 1, stat.LuckStatChance) + 1);
+            if (stat.CurseChance > 0 && RandomProvider.Next(100) <= stat.CurseChance) 
+                item.Cursed = true;
 
-            if (stat.SlotChance > 0 && Random.Next(stat.SlotChance) == 0)
+            if (stat.SlotChance > 0 && RandomProvider.Next(stat.SlotChance) == 0)
             {
                 var slot = (byte)(RandomRange(stat.SlotMaxStat - 1, stat.SlotStatChance) + 1);
 
@@ -4467,7 +4518,7 @@ namespace Server.MirEnv
         public int RandomRange(int count, int rate)
         {
             var x = 0;
-            for (var i = 0; i < count; i++) if (Random.Next(rate) == 0) x++;
+            for (var i = 0; i < count; i++) if (RandomProvider.Next(rate) == 0) x++;
             return x;
         }
         public bool BindItem(UserItem item)
@@ -4483,39 +4534,24 @@ namespace Server.MirEnv
 
         private static bool BindGameShop(GameShopItem item, bool editEnvir = true)
         {
-            for (var i = 0; i < Edit.ItemInfoList.Count; i++)
-            {
-                var info = Edit.ItemInfoList[i];
-                if (info.Index != item.ItemIndex) continue;
-                item.Info = info;
-
-                return true;
-            }
-            return false;
+            var itemInfo = Edit.ItemInfoList.FirstOrDefault(info => info.Index == item.ItemIndex);
+            if (itemInfo == null) return false;
+            
+            item.Info = itemInfo;
+            return true;
         }
 
         private bool BindSlotItems(UserItem item)
         {
-            foreach (var slot in item.Slots)
-            {
-                if (slot == null) continue;
-
-                if (!BindItem(slot)) return false;
-            }
-
-            return true;
+            return item.Slots.Where(slot => slot != null).All(BindItem);
         }
 
         public bool BindQuest(QuestProgressInfo quest)
         {
-            for (var i = 0; i < QuestInfoList.Count; i++)
-            {
-                var info = QuestInfoList[i];
-                if (info.Index != quest.Index) continue;
-                quest.Info = info;
-                return true;
-            }
-            return false;
+            var questInfo = QuestInfoList.FirstOrDefault(info => info.Index == quest.Index);
+            if (questInfo == null) return false;
+            quest.Info = questInfo;
+            return true;
         }
 
         public Map? GetMap(int index)
@@ -4523,139 +4559,110 @@ namespace Server.MirEnv
             return MapList.FirstOrDefault(t => t.Info.Index == index);
         }
 
-        public Map GetMap(string name, bool strict = true)
+        public Map? GetMap(string name, bool strict = true)
         {
-            return MapList.FirstOrDefault(t => strict ? string.Equals(t.Info.Title, name, StringComparison.CurrentCultureIgnoreCase) : t.Info.Title.StartsWith(name, StringComparison.CurrentCultureIgnoreCase));
+            return MapList.FirstOrDefault(t => strict ? 
+                string.Equals(t.Info.Title, name, StringComparison.CurrentCultureIgnoreCase) : 
+                t.Info.Title.StartsWith(name, StringComparison.CurrentCultureIgnoreCase));
         }
 
-        public Map GetWorldMap(string name)
+        public Map? GetWorldMap(string name)
         {
             return MapList.FirstOrDefault(t => t.Info.Title.StartsWith(name, StringComparison.CurrentCultureIgnoreCase) && t.Info.BigMap > 0);
         }
 
-        public MapInfo GetMapInfo(int index)
+        public MapInfo? GetMapInfo(int index)
         {
             return MapInfoList.FirstOrDefault(t => t.Index == index);
         }
 
-        public Map GetMapByNameAndInstance(string name, int instanceValue = 0)
+        public Map? GetMapByNameAndInstance(string name, int instanceValue = 0)
         {
             if (instanceValue < 0) instanceValue = 0;
             if (instanceValue > 0) instanceValue--;
 
             var instanceMapList = MapList.Where(t => string.Equals(t.Info.FileName, name, StringComparison.CurrentCultureIgnoreCase)).ToList();
-            return instanceValue < instanceMapList.Count() ? instanceMapList[instanceValue] : null;
+            return instanceValue < instanceMapList.Count ? instanceMapList[instanceValue] : null;
         }
 
-        public MapObject GetObject(uint objectID)
+        public MapObject? GetObject(uint objectID)
         {
             return Objects.FirstOrDefault(e => e.ObjectID == objectID);
         }
 
         public List<MapObject> GetObjects(int map, ObjectType race)
         {
-            return Objects.Where(x => x.CurrentMapIndex == map && x.Race == race).ToList();
+            return [.. Objects.Where(x => x.CurrentMapIndex == map && x.Race == race)];
         }
 
-        public MonsterInfo GetMonsterInfo(int index)
+        public MonsterInfo? GetMonsterInfo(int index)
         {
-            for (var i = 0; i < MonsterInfoList.Count; i++)
-                if (MonsterInfoList[i].Index == index) return MonsterInfoList[i];
-
-            return null;
+            return MonsterInfoList.FirstOrDefault(t => t.Index == index);
         }
 
-        public NPCInfo GetNPCInfo(int index)
+        public NPCInfo? GetNPCInfo(int index)
         {
-            for (var i = 0; i < NPCInfoList.Count; i++)
-            {
-                if (NPCInfoList[i].Index == index)
-                    return NPCInfoList[i];
-            }
-
-            return null;
+            return NPCInfoList.FirstOrDefault(t => t.Index == index);
         }
 
-        public MonsterInfo GetMonsterInfo(int ai, int effect = -1)
+        public MonsterInfo? GetMonsterInfo(int ai, int effect)
         {
-            for (var i = 0; i < MonsterInfoList.Count; i++)
-                if (MonsterInfoList[i].AI == ai && (MonsterInfoList[i].Effect == effect || effect < 0)) return MonsterInfoList[i];
-
-            return null;
+            return MonsterInfoList.FirstOrDefault(t => t.AI == ai && (t.Effect == effect || effect < 0));
         }
 
-        public NPCObject GetNPC(string name)
+        public NPCObject? GetNPC(string name)
         {
             return MapList.SelectMany(t1 => t1.NPCs.Where(t => t.Info.Name == name)).FirstOrDefault();
         }
 
-        public NPCObject GetWorldMapNPC(string name)
+        public NPCObject? GetWorldMapNPC(string name)
         {
             return MapList.SelectMany(t1 => t1.NPCs.Where(t => t.Info.GameName.StartsWith(name, StringComparison.CurrentCultureIgnoreCase) && t.Info.ShowOnBigMap)).FirstOrDefault();
         }
 
-        public MonsterInfo GetMonsterInfo(int id, bool strict = false)
+        public MonsterInfo? GetMonsterInfo(int id, bool strict = false)
         {
-            String monsterName = MonsterInfoList.FirstOrDefault(x => x.Index == id)?.Name;
+            string? monsterName = MonsterInfoList.FirstOrDefault(x => x.Index == id)?.Name;
 
-            if (monsterName == null)
+            return monsterName == null ? null : GetMonsterInfo(monsterName, strict);
+        }
+
+
+        public MonsterInfo? GetMonsterInfo(string name, bool Strict = false)
+        {
+            if (Strict)
             {
-                return null;
+                return MonsterInfoList.FirstOrDefault(monsterInfo => monsterInfo.Name == name);
             }
-            else
-            {
-                return (GetMonsterInfo(monsterName, strict));
-            }
+
+            return MonsterInfoList.FirstOrDefault(monsterInfo =>
+                monsterInfo.Name.Equals(name, StringComparison.OrdinalIgnoreCase) ||
+                monsterInfo.Name.Replace(" ", string.Empty).Equals(name.Replace(" ", string.Empty), StringComparison.OrdinalIgnoreCase));
         }
 
-        public MonsterInfo GetMonsterInfo(string name, bool Strict = false)
-        {
-            for (var i = 0; i < MonsterInfoList.Count; i++)
-            {
-                var info = MonsterInfoList[i];
-                if (Strict)
-                {
-                    if (info.Name != name) continue;
-                    return info;
-                }
-                else
-                {
-                    if (string.Compare(info.Name, name, StringComparison.OrdinalIgnoreCase) != 0 &&
-                        string.Compare(info.Name.Replace(" ", string.Empty), name.Replace(" ", string.Empty), StringComparison.OrdinalIgnoreCase) != 0) continue;
-                    return info;
-                }
-            }
-            return null;
-        }
-        public PlayerObject GetPlayer(string name)
-        {
-            for (var i = 0; i < Players.Count; i++)
-                if (string.Compare(Players[i].Name, name, StringComparison.OrdinalIgnoreCase) == 0)
-                    return Players[i];
 
-            return null;
-        }
-        public PlayerObject GetPlayer(uint PlayerId)
+        public PlayerObject? GetPlayer(string name)
         {
-            for (var i = 0; i < Players.Count; i++)
-                if (Players[i].Info.Index == PlayerId)
-                    return Players[i];
-
-            return null;
+            return Players.FirstOrDefault(t => string.Compare(t.Name, name, StringComparison.OrdinalIgnoreCase) == 0);
         }
-        public CharacterInfo GetCharacterInfo(string name)
+        
+        
+        public PlayerObject? GetPlayer(uint PlayerId)
         {
-            for (var i = 0; i < CharacterList.Count; i++)
-                if (string.Compare(CharacterList[i].Name, name, StringComparison.OrdinalIgnoreCase) == 0)
-                    return CharacterList[i];
-
-            return null;
+            return Players.FirstOrDefault(t => t.Info.Index == PlayerId);
+        }
+        
+        
+        public CharacterInfo? GetCharacterInfo(string name)
+        {
+            return CharacterList.FirstOrDefault(t => string.Compare(t.Name, name, StringComparison.OrdinalIgnoreCase) == 0);
         }
 
         public CharacterInfo? GetCharacterInfo(int index)
         {
             return CharacterList.FirstOrDefault(t => t.Index == index);
         }
+        
         public HeroInfo? GetHeroInfo(int index)
         {
             return HeroList.FirstOrDefault(x => x.Index == index);
@@ -4666,77 +4673,45 @@ namespace Server.MirEnv
             return ItemInfoList.FirstOrDefault(info => info.Index == index);
         }
 
-        public ItemInfo GetItemInfo(string name)
+        public ItemInfo? GetItemInfo(string name)
         {
-            for (var i = 0; i < ItemInfoList.Count; i++)
-            {
-                var info = ItemInfoList[i];
-                if (string.Compare(info.Name.Replace(" ", ""), name, StringComparison.OrdinalIgnoreCase) != 0) continue;
-                return info;
-            }
-            return null;
+            return ItemInfoList.FirstOrDefault(info => string.Compare(info.Name.Replace(" ", ""), name, StringComparison.OrdinalIgnoreCase) == 0);
         }
 
-        public QuestInfo GetQuestInfo(int index)
+        public QuestInfo? GetQuestInfo(int index)
         {
             return QuestInfoList.FirstOrDefault(info => info.Index == index);
         }
 
-        public ItemInfo GetBook(short Skill)
+        public ItemInfo? GetBook(short Skill)
         {
-            for (var i = 0; i < ItemInfoList.Count; i++)
-            {
-                var info = ItemInfoList[i];
-                if (info.Type != ItemType.Book || info.Shape != Skill) continue;
-                return info;
-            }
-            return null;
+            return ItemInfoList.FirstOrDefault(info => info.Type == ItemType.Book && info.Shape == Skill);
         }
 
-        public BuffInfo GetBuffInfo(BuffType type)
+        public BuffInfo? GetBuffInfo(BuffType type)
         {
-            for (int i = 0; i < BuffInfoList.Count; i++)
-            {
-                var info = BuffInfoList[i];
-                if (info.Type != type) continue;
-
-                return info;
-            }
-
-            throw new NotImplementedException($"{type} has not been implemented.");
+            return BuffInfoList.FirstOrDefault(info => info.Type == type);
         }
 
         public void MessageAccount(AccountInfo account, string message, ChatType type)
         {
-            if (account?.Characters == null) return;
-
-            for (var i = 0; i < account.Characters.Count; i++)
-            {
-                if (account.Characters[i].Player == null) continue;
-                account.Characters[i].Player.ReceiveChat(message, type);
-                return;
-            }
+            var player = account.Characters.FirstOrDefault(t => t.Player != null)?.Player;
+            player?.ReceiveChat(message, type);
         }
 
 
-        public void MailCharacter(CharacterInfo info, UserItem item = null, uint gold = 0, int reason = 0, string customMessage = null)
+        public void MailCharacter(CharacterInfo info, UserItem? item = null, uint gold = 0, int reason = 0, string? customMessage = null)
         {
             string sender = "Bichon Administrator";
 
             string message = "You have been mailed due to the following reason:\r\n\r\n";
 
-            switch (reason)
+            message += reason switch
             {
-                case 1:
-                    message += "Could not return item to bag after trade.";
-                    break;
-                case 99:
-                    message += "Code didn't correctly handle checking inventory space.";
-                    break;
-                default:
-                    message += customMessage ?? "No reason provided.";
-                    break;
-            }
+                1 => "Could not return item to bag after trade.",
+                99 => "Code didn't correctly handle checking inventory space.",
+                _ => customMessage ?? "No reason provided."
+            };
 
             MailInfo mail = new MailInfo(info.Index)
             {
@@ -4753,28 +4728,15 @@ namespace Server.MirEnv
             mail.Send();
         }
 
-        public GuildObject GetGuild(string name)
+        public GuildObject? GetGuild(string name)
         {
-            for (var i = 0; i < Guilds.Count; i++)
-            {
-                if (string.Compare(Guilds[i].Name.Replace(" ", ""), name, StringComparison.OrdinalIgnoreCase) != 0) continue;
-
-                return Guilds[i];
-            }
-
-            return null;
+            return Guilds.FirstOrDefault(t => string.Compare(t.Name.Replace(" ", ""), name, StringComparison.OrdinalIgnoreCase) == 0);
         }
-        public GuildObject GetGuild(int index)
+        
+        
+        public GuildObject? GetGuild(int index)
         {
-            for (var i = 0; i < Guilds.Count; i++)
-            {
-                if (Guilds[i].Guildindex == index)
-                {
-                    return Guilds[i];
-                }
-            }
-
-            return null;
+            return Guilds.FirstOrDefault(t => t.Guildindex == index);
         }
 
         public void ProcessNewDay()
@@ -4803,11 +4765,13 @@ namespace Server.MirEnv
                     if (rentedItemInfo.ItemReturnDate >= Now)
                         continue;
 
-                    var rentingPlayer = GetCharacterInfo(rentedItemInfo.RentingPlayerName);
+                    CharacterInfo? rentingPlayer = GetCharacterInfo(rentedItemInfo.RentingPlayerName);
+                    if (rentingPlayer == null)
+                        continue;
 
-                    for (var i = 0; i < rentingPlayer.Inventory.Length; i++)
+                    for (var i = 0; i < rentingPlayer!.Inventory.Length; i++)
                     {
-                        if (rentedItemInfo.ItemId != rentingPlayer?.Inventory[i]?.UniqueID)
+                        if (rentedItemInfo.ItemId != rentingPlayer.Inventory[i]?.UniqueID)
                         {
                             continue;
                         }
@@ -4868,13 +4832,8 @@ namespace Server.MirEnv
                 }
             }
 
-            foreach (var characterInfo in CharacterList)
+            foreach (var characterInfo in CharacterList.Where(characterInfo => characterInfo.RentedItemsToRemove.Count > 0))
             {
-                if (characterInfo.RentedItemsToRemove.Count <= 0)
-                {
-                    continue;
-                }
-
                 foreach (var rentalInformationToRemove in characterInfo.RentedItemsToRemove)
                 {
                     characterInfo.RentedItems.Remove(rentalInformationToRemove);
@@ -4891,15 +4850,17 @@ namespace Server.MirEnv
                 return false;
             }
 
-            var owner = GetCharacterInfo(ownerName);
+            CharacterInfo? owner = GetCharacterInfo(ownerName);
+            if (owner == null)
+            {
+                return false;
+            }
+
             var returnItems = new List<UserItem>();
 
-            foreach (var rentalInformation in owner.RentedItems)
+            foreach (var rentalInformation in owner.RentedItems.Where(rentalInformation => rentalInformation.ItemId == rentedItem.UniqueID))
             {
-                if (rentalInformation.ItemId == rentedItem.UniqueID)
-                {
-                    owner.RentedItemsToRemove.Add(rentalInformation);
-                }
+                owner.RentedItemsToRemove.Add(rentalInformation);
             }
 
             rentedItem.RentalInformation.BindingFlags = BindMode.None;
@@ -4932,14 +4893,13 @@ namespace Server.MirEnv
 
         private void ClearDailyQuests(CharacterInfo info)
         {
-            foreach (var quest in QuestInfoList)
+            foreach (var quest in QuestInfoList.Where(quest => quest.Type == QuestType.Daily))
             {
-                if (quest.Type != QuestType.Daily) continue;
-
                 for (var i = 0; i < info.CompletedQuests.Count; i++)
                 {
                     if (info.CompletedQuests[i] != quest.Index) continue;
 
+                    //TODO FIX 
                     info.CompletedQuests.RemoveAt(i);
                 }
             }
@@ -4947,28 +4907,20 @@ namespace Server.MirEnv
             info.Player?.GetCompletedQuests();
         }
 
-        public GuildBuffInfo FindGuildBuffInfo(int Id)
+        public GuildBuffInfo? FindGuildBuffInfo(int Id)
         {
-            for (var i = 0; i < Settings.Guild_BuffList.Count; i++)
-            {
-                if (Settings.Guild_BuffList[i].Id == Id)
-                {
-                    return Settings.Guild_BuffList[i];
-                }
-            }
-
-            return null;
+            return Settings.Guild_BuffList.FirstOrDefault(t => t.Id == Id);
         }
 
-        public void ClearGameshopLog()
+        public void ClearGameShopLog()
         {
             Main.GameshopLog.Clear();
 
-            for (var i = 0; i < AccountList.Count; i++)
+            foreach (var account in AccountList)
             {
-                for (var f = 0; f < AccountList[i].Characters.Count; f++)
+                foreach (var character in account.Characters)
                 {
-                    AccountList[i].Characters[f].GSpurchases.Clear();
+                    character.GSpurchases.Clear();
                 }
             }
 
@@ -4980,9 +4932,10 @@ namespace Server.MirEnv
         {
             if (ObjectID == id) return;
 
-            PlayerObject player = Players.SingleOrDefault(x => x.ObjectID == id || x.Pets.Count(y => y.ObjectID == id && y is HumanWizard) > 0);
+            PlayerObject? player = Players.SingleOrDefault(x => x.ObjectID == id || x.Pets.Any(y => y.ObjectID == id && y is HumanWizard));
 
             if (player == null) return;
+            
             Inspect(con, player.Info.Index);
         }
 
@@ -4990,10 +4943,10 @@ namespace Server.MirEnv
         {
             if (ObjectID == id) return;
 
-            CharacterInfo player = GetCharacterInfo(id);
+            CharacterInfo? player = GetCharacterInfo(id);
             if (player == null) return;
 
-            CharacterInfo Lover = null;
+            CharacterInfo? Lover = null;
             string loverName = "";
 
             if (player.Married != 0) Lover = GetCharacterInfo(player.Married);
@@ -5003,21 +4956,17 @@ namespace Server.MirEnv
                 loverName = Lover.Name;
             }
 
-            for (int i = 0; i < player.Equipment.Length; i++)
+            foreach (var u in player.Equipment.Where(u => u != null))
             {
-                UserItem u = player.Equipment[i];
-                if (u == null) continue;
-
                 con.CheckItem(u);
             }
 
-            string guildname = "";
-            string guildrank = "";
-            GuildObject guild = null;
-            GuildRank guildRank = null;
+            string guildName = "";
+            string guildRankName = "";
+            GuildRank? guildRank = null;
             if (player.GuildIndex != -1)
             {
-                guild = GetGuild(player.GuildIndex);
+                var guild = GetGuild(player.GuildIndex);
                 if (guild != null)
                 {
                     guildRank = guild.FindRank(player.Name);
@@ -5027,8 +4976,8 @@ namespace Server.MirEnv
                     }
                     else
                     {
-                        guildname = guild.Name;
-                        guildrank = guildRank.Name;
+                        guildName = guild.Name;
+                        guildRankName = guildRank.Name;
                     }
                 }
             }
@@ -5037,8 +4986,8 @@ namespace Server.MirEnv
             {
                 Name = player.Name,
                 Equipment = player.Equipment,
-                GuildName = guildname,
-                GuildRank = guildrank,
+                GuildName = guildName,
+                GuildRank = guildRankName,
                 Hair = player.Hair,
                 Gender = player.Gender,
                 Class = player.Class,
@@ -5055,30 +5004,23 @@ namespace Server.MirEnv
                 return;
             }
 
-            HeroObject heroObject = Heroes.SingleOrDefault(h => h.ObjectID == id);
+            HeroObject? heroObject = Heroes.SingleOrDefault(h => h.ObjectID == id);
 
             if (heroObject == null)
             {
                 return;
             }
 
-            HeroInfo heroInfo = GetHeroInfo(heroObject.Info.Index);
+            HeroInfo? heroInfo = GetHeroInfo(heroObject.Info.Index);
 
             if (heroInfo == null)
             {
                 return;
             }
 
-            for (int i = 0; i < heroInfo.Equipment.Length; i++)
+            foreach (var u in heroInfo.Equipment.Where(u => u != null))
             {
-                UserItem u = heroInfo.Equipment[i];
-
-                if (u == null)
-                {
-                    continue;
-                }
-
-                con.CheckItem(u);
+                con.CheckItem(u!);
             }
 
             var ownerName = heroObject.Owner.Name;
@@ -5087,13 +5029,13 @@ namespace Server.MirEnv
             {
                 Name = GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.PlayerHero), ownerName),
                 Equipment = heroInfo.Equipment,
-                GuildName = String.Empty,
-                GuildRank = String.Empty,
+                GuildName = string.Empty,
+                GuildRank = string.Empty,
                 Hair = heroInfo.Hair,
                 Gender = heroInfo.Gender,
                 Class = heroInfo.Class,
                 Level = heroInfo.Level,
-                LoverName = String.Empty,
+                LoverName = string.Empty,
                 AllowObserve = false,
                 IsHero = true
             });
@@ -5104,6 +5046,7 @@ namespace Server.MirEnv
             var player = GetPlayer(Name);
 
             if (player == null) return;
+            
             if (!player.AllowObserve || !Settings.AllowObserve) return;
 
             player.AddObserver(con);
@@ -5112,7 +5055,8 @@ namespace Server.MirEnv
         public void GetRanking(MirConnection con, byte RankType, int RankIndex, bool OnlineOnly)
         {
             if (RankType > 6) return;
-            List<RankCharacterInfo> listings = RankType == 0 ? RankTop : RankClass[RankType - 1];
+            
+            List<RankCharacterInfo>? listings = RankType == 0 ? RankTop : RankClass[RankType - 1];
 
             if (RankIndex >= listings.Count || RankIndex < 0) return;
 
@@ -5146,15 +5090,14 @@ namespace Server.MirEnv
             con.Enqueue(p);
         }
 
-        private bool CheckListing(MirConnection con, RankCharacterInfo listing)
+        private static bool CheckListing(MirConnection con, RankCharacterInfo listing)
         {
-            if (!con.SentRankings.ContainsKey(listing.PlayerId))
+            if (!con.SentRankings.TryGetValue(listing.PlayerId, out var lastUpdated))
             {
                 con.SentRankings.Add(listing.PlayerId, listing.LastUpdated);
                 return false;
             }
 
-            DateTime lastUpdated = con.SentRankings[listing.PlayerId];
             if (lastUpdated != listing.LastUpdated)
             {
                 con.SentRankings[listing.PlayerId] = lastUpdated;
@@ -5208,10 +5151,10 @@ namespace Server.MirEnv
 
         public int FindRank(List<RankCharacterInfo> Ranking, CharacterInfo info, byte type)
         {
-            var startindex = info.Rank[type];
-            if (startindex > 0) //if there's a previously known rank then the user can only have gone down in the ranking (or stayed the same)
+            var startIndex = info.Rank[type];
+            if (startIndex > 0) //if there's a previously known rank then the user can only have gone down in the ranking (or stayed the same)
             {
-                for (var i = startindex - 1; i < Ranking.Count; i++)
+                for (var i = startIndex - 1; i < Ranking.Count; i++)
                 {
                     if (Ranking[i].Name == info.Name)
                         return i;
@@ -5255,57 +5198,53 @@ namespace Server.MirEnv
         public void SetNewRank(RankCharacterInfo Rank, int Index, byte type)
         {
             Rank.LastUpdated = Now;
-            if (!(Rank.info is CharacterInfo Player)) return;
+            if (Rank.info is not CharacterInfo Player) return;
             Player.Rank[type] = Index;
         }
 
         public void RemoveRank(CharacterInfo info)
         {
-            List<RankCharacterInfo> Ranking;
-            var Rankindex = -1;
+            var rankIndex = -1;
             //first check overall top           
-            Ranking = RankTop;
-            Rankindex = FindRank(Ranking, info, 0);
-            if (Rankindex >= 0)
+            var ranking = RankTop;
+            rankIndex = FindRank(ranking, info, 0);
+            if (rankIndex >= 0)
             {
-                Ranking.RemoveAt(Rankindex);
-                for (var i = Rankindex; i < Ranking.Count(); i++)
+                ranking.RemoveAt(rankIndex);
+                for (var i = rankIndex; i < ranking.Count; i++)
                 {
-                    SetNewRank(Ranking[i], i, 0);
+                    SetNewRank(ranking[i], i, 0);
                 }
             }
 
             //next class based top
-            Ranking = RankTop;
-            Rankindex = FindRank(Ranking, info, 1);
-            if (Rankindex >= 0)
+            ranking = RankTop;
+            rankIndex = FindRank(ranking, info, 1);
+            if (rankIndex >= 0)
             {
-                Ranking.RemoveAt(Rankindex);
-                for (var i = Rankindex; i < Ranking.Count(); i++)
+                ranking.RemoveAt(rankIndex);
+                for (var i = rankIndex; i < ranking.Count; i++)
                 {
-                    SetNewRank(Ranking[i], i, 1);
+                    SetNewRank(ranking[i], i, 1);
                 }
             }
         }
 
         public void CheckRankUpdate(CharacterInfo info)
         {
-            List<RankCharacterInfo> Ranking;
-
             //first check overall top           
-
-            Ranking = RankTop;
-            if (!UpdateRank(Ranking, info, 0))
+            List<RankCharacterInfo>? ranking = RankTop;
+            if (!UpdateRank(ranking, info, 0))
             {
-                TryAddRank(Ranking, info, 0);
+                TryAddRank(ranking, info, 0);
             }
 
             //now check class top
 
-            Ranking = RankClass[(byte)info.Class];
-            if (!UpdateRank(Ranking, info, 1))
+            ranking = RankClass[(byte)info.Class];
+            if (!UpdateRank(ranking, info, 1))
             {
-                TryAddRank(Ranking, info, 1);
+                TryAddRank(ranking, info, 1);
             }
         }
 
@@ -5328,18 +5267,18 @@ namespace Server.MirEnv
 
         public void ReloadDrops()
         {
-            for (var i = 0; i < MonsterInfoList.Count; i++)
+            foreach (var monsterInfo in MonsterInfoList)
             {
-                string path = Path.Combine(Settings.DropPath, MonsterInfoList[i].Name + ".txt");
+                string path = Path.Combine(Settings.DropPath, monsterInfo.Name + ".txt");
 
-                if (!string.IsNullOrEmpty(MonsterInfoList[i].DropPath))
+                if (!string.IsNullOrEmpty(monsterInfo.DropPath))
                 {
-                    path = Path.Combine(Settings.DropPath, MonsterInfoList[i].DropPath + ".txt");
+                    path = Path.Combine(Settings.DropPath, monsterInfo.DropPath + ".txt");
                 }
 
-                MonsterInfoList[i].Drops.Clear();
+                monsterInfo.Drops.Clear();
 
-                DropInfo.Load(MonsterInfoList[i].Drops, MonsterInfoList[i].Name, path, 0, true);
+                DropInfo.Load(monsterInfo.Drops, monsterInfo.Name, path, 0, true);
             }
 
             FishingDrops.Clear();
@@ -5377,26 +5316,19 @@ namespace Server.MirEnv
             {
                 var lines = File.ReadAllLines(path);
 
-                for (var i = 0; i < lines.Length; i++)
+                foreach (string line in lines)
                 {
-                    if (lines[i].StartsWith(";") || string.IsNullOrWhiteSpace(lines[i])) continue;
-                    LineMessages.Add(lines[i]);
+                    if (line.StartsWith(';') || string.IsNullOrWhiteSpace(line)) continue;
+                    LineMessages.Add(line);
                 }
 
                 MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.LineMessagesReloaded));
             }
         }
 
-        private WorldMapIcon ValidateWorldMap()
+        private WorldMapIcon? ValidateWorldMap()
         {
-            foreach (WorldMapIcon wmi in Settings.WorldMapSetup.Icons)
-            {
-                MapInfo info = GetMapInfo(wmi.MapIndex);
-
-                if (info == null)
-                    return wmi;
-            }
-            return null;
+            return (from wmi in Settings.WorldMapSetup.Icons let info = GetMapInfo(wmi.MapIndex) where info == null select wmi).FirstOrDefault();
         }
 
         public void DeleteGuild(GuildObject guild)

@@ -84,7 +84,7 @@ namespace Server.MirObjects.Monsters
                     {
                         if (!ob.IsAttackTarget(this)) continue;
 
-                        if (Env.Random.Next(Settings.MagicResistWeight) >= ob.Stats[Stat.MagicResist])
+                        if (RandomProvider.Next(Settings.MagicResistWeight) >= ob.Stats[Stat.MagicResist])
                         {
                             int delay = Functions.MaxDistance(CurrentLocation, ob.CurrentLocation) * 50 + additionalDelay; //50 MS per Step
                             DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + delay, ob, damage, defenceType, true);

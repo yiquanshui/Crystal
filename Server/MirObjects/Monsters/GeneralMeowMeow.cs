@@ -90,7 +90,7 @@ namespace Server.MirObjects.Monsters
 
             if (!ranged)
             {
-                if (Env.Random.Next(9) != 0)
+                if (RandomProvider.Next(9) != 0)
                 {
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
                     int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
@@ -149,7 +149,7 @@ namespace Server.MirObjects.Monsters
                         var spellObj = new SpellObject
                         {
                             Spell = Spell.GeneralMeowMeowThunder,
-                            Value = Env.Random.Next(Stats[Stat.MinMC], Stats[Stat.MaxMC]),
+                            Value = RandomProvider.Next(Stats[Stat.MinMC], Stats[Stat.MaxMC]),
                             ExpireTime = Env.Time + 1000,
                             TickSpeed = 500,
                             Caster = this,
@@ -164,7 +164,7 @@ namespace Server.MirObjects.Monsters
                 }
             }
 
-            ThunderAttackTime = Env.Time + Math.Max(Env.Random.Next(2000), Env.Random.Next(4000));
+            ThunderAttackTime = Env.Time + Math.Max(RandomProvider.Next(2000), RandomProvider.Next(4000));
         }
 
         public override void Spawned()
@@ -211,7 +211,7 @@ namespace Server.MirObjects.Monsters
             for (int i = 0; i < count; i++)
             {
                 MonsterObject mob = null;
-                switch (Env.Random.Next(4))
+                switch (RandomProvider.Next(4))
                 {
                     case 0:
                         mob = GetMonster(Env.GetMonsterInfo(Settings.GeneralMeowMeowMob1));

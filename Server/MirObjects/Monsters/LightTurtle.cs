@@ -22,7 +22,7 @@ namespace Server.MirObjects.Monsters
 
             ShockTime = 0;
 
-            if (Env.Random.Next(3) > 0)
+            if (MirEnv.RandomProvider.Next(3) > 0)
             {
                 base.Attack();
             }

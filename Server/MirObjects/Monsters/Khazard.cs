@@ -73,7 +73,7 @@ namespace Server.MirObjects.Monsters
 
                 if (target == Target.CurrentLocation)
                 {
-                    if (Env.Random.Next(Settings.MagicResistWeight) < Target.Stats[Stat.MagicResist]) continue;
+                    if (MirEnv.RandomProvider.Next(Settings.MagicResistWeight) < Target.Stats[Stat.MagicResist]) continue;
                     MirDirection pushdir = Functions.DirectionFromPoint(Target.CurrentLocation, CurrentLocation);
                     Target.Pushed(this, pushdir, i);
                 }

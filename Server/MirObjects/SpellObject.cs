@@ -172,10 +172,10 @@ namespace Server.MirObjects
                         if (Caster != null && ((HumanObject)Caster).ActiveBlizzard == false) return;
                         if (!ob.IsAttackTarget(Caster)) return;
                         ob.Attacked(((HumanObject)Caster), Value, DefenceType.MAC, false);
-                        if (!ob.Dead && Env.Random.Next(8) == 0)
+                        if (!ob.Dead && RandomProvider.Next(8) == 0)
                             ob.ApplyPoison(new Poison
                             {
-                                Duration = 5 + Env.Random.Next(Caster.Stats[Stat.Freezing]),
+                                Duration = 5 + RandomProvider.Next(Caster.Stats[Stat.Freezing]),
                                 Owner = Caster,
                                 PType = PoisonType.Slow,
                                 TickSpeed = 2000,
@@ -262,7 +262,7 @@ namespace Server.MirObjects
 
                         ob.Struck(Value, DefenceType.MAC);
 
-                        if (Env.Random.Next(3) > 0)
+                        if (RandomProvider.Next(3) > 0)
                         {
                             ob.ApplyPoison(new Poison { PType = PoisonType.Paralysis, Duration = 5, TickSpeed = 1000 }, this);
                         }
@@ -336,7 +336,7 @@ namespace Server.MirObjects
 
                         ob.Struck(Value, DefenceType.MAC);
 
-                        if (Env.Random.Next(8) == 0)
+                        if (RandomProvider.Next(8) == 0)
                         {
                             ob.ApplyPoison(new Poison { PType = PoisonType.Slow, Duration = 5, TickSpeed = 1000 }, this);
                         }
@@ -398,7 +398,7 @@ namespace Server.MirObjects
                         ob.ApplyPoison(new Poison
                         {
                             Owner = Caster,
-                            Duration = ob.Race == ObjectType.Player ? 4 : 5 + Env.Random.Next(5),
+                            Duration = ob.Race == ObjectType.Player ? 4 : 5 + RandomProvider.Next(5),
                             PType = PoisonType.Slow,
                             TickSpeed = 1000,
                         }, Caster);

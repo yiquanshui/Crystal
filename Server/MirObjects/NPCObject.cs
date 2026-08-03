@@ -49,8 +49,8 @@ namespace Server.MirObjects
             Info = info;
             NameColour = Color.Lime;
 
-            Direction = (MirDirection)Env.Random.Next(3);
-            TurnTime = Env.Time + Env.Random.Next(100);
+            Direction = (MirDirection)RandomProvider.Next(3);
+            TurnTime = Env.Time + RandomProvider.Next(100);
 
             Env.NPCs.Add(this);
 
@@ -216,7 +216,7 @@ namespace Server.MirObjects
             if (Env.Time > TurnTime)
             {
                 TurnTime = Env.Time + TurnDelay;
-                Turn((MirDirection)Env.Random.Next(3));
+                Turn((MirDirection)RandomProvider.Next(3));
             }
 
             if (Env.Time > UsedGoodsTime)
@@ -257,7 +257,7 @@ namespace Server.MirObjects
             {
                 var nearby = FindNearby(4);
 
-                SpeechTime = Env.Time + (SpeechDelay * (nearby ? Env.Random.Next(1, 13) : 1));
+                SpeechTime = Env.Time + (SpeechDelay * (nearby ? RandomProvider.Next(1, 13) : 1));
 
                 if (nearby)
                 {
@@ -491,7 +491,7 @@ namespace Server.MirObjects
 
         public int GetWeight(RandomProvider rnd, int max)
         {
-            return rnd.Next(Weight, max + 100);
+            return RandomProvider.Next(Weight, max + 100);
         }
     }
 }

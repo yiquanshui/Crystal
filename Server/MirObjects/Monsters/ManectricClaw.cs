@@ -35,7 +35,7 @@ namespace Server.MirObjects.Monsters
 
             if(ranged || Env.Time > _thrustTime)
             {
-                if (ranged && Env.Random.Next(2) == 0)
+                if (ranged && RandomProvider.Next(2) == 0)
                 {
                     MoveTo(Target.CurrentLocation);
                     ActionTime = Env.Time + 300;
@@ -103,8 +103,8 @@ namespace Server.MirObjects.Monsters
                                 {
                                     if (target.Attacked(this, j <= 1 ? nearDamage : farDamage, DefenceType.MAC) > 0)
                                     {
-                                        PoisonTarget(target, 5, target.Race == ObjectType.Player ? 4 : 5 + Env.Random.Next(5), PoisonType.Slow, 1000);
-                                        PoisonTarget(target, 5, target.Race == ObjectType.Player ? 2 : 5 + Env.Random.Next(this.Stats[Stat.Freezing]), PoisonType.Frozen, 1000);
+                                        PoisonTarget(target, 5, target.Race == ObjectType.Player ? 4 : 5 + RandomProvider.Next(5), PoisonType.Slow, 1000);
+                                        PoisonTarget(target, 5, target.Race == ObjectType.Player ? 2 : 5 + RandomProvider.Next(this.Stats[Stat.Freezing]), PoisonType.Frozen, 1000);
                                     }
                                 }
                                 break;

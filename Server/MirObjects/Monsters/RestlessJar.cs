@@ -47,7 +47,7 @@ namespace Server.MirObjects.Monsters
 
                 var hpPercent = (HP * 100) / Stats[Stat.HP];
 
-                switch (Env.Random.Next(3))
+                switch (RandomProvider.Next(3))
                 {
                     case 0: //Spin
                     case 1:

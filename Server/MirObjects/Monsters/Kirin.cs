@@ -41,13 +41,13 @@ namespace Server.MirObjects.Monsters
             {
                 if (CanAttack)
                 {
-                    if (Env.Random.Next(5) == 0)
+                    if (RandomProvider.Next(5) == 0)
                         RangeAttack();
                 }
                 if (CurrentLocation == Target.CurrentLocation)
                 {
-                    MirDirection direction = (MirDirection)Env.Random.Next(8);
-                    int rotation = Env.Random.Next(2) == 0 ? 1 : -1;
+                    MirDirection direction = (MirDirection)RandomProvider.Next(8);
+                    int rotation = RandomProvider.Next(2) == 0 ? 1 : -1;
 
                     for (int d = 0; d < 8; d++)
                     {
@@ -62,7 +62,7 @@ namespace Server.MirObjects.Monsters
 
             if (!CanAttack) return;
 
-            if (Env.Random.Next(5) > 0)
+            if (RandomProvider.Next(5) > 0)
             {
                 if (InAttackRange())
                     Attack();
@@ -95,7 +95,7 @@ namespace Server.MirObjects.Monsters
             int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
             if (damage == 0) return;
 
-            if (Env.Random.Next(5) == 0)
+            if (RandomProvider.Next(5) == 0)
             {
                 Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 1 });
                 DelayedAction action = new DelayedAction(DelayedType.Damage, Env.Time + 500, Target, damage, DefenceType.AC);
@@ -166,14 +166,14 @@ namespace Server.MirObjects.Monsters
                                 {
                                     if (target.Attacked(this, Damage, DefenceType.MAC) > 0)
                                     {
-                                        if (Env.Random.Next(Settings.PoisonResistWeight) >= target.Stats[Stat.PoisonResist])
+                                        if (RandomProvider.Next(Settings.PoisonResistWeight) >= target.Stats[Stat.PoisonResist])
                                         {
-                                            if (Env.Random.Next(5) == 0)
+                                            if (RandomProvider.Next(5) == 0)
                                             {
                                                 target.ApplyPoison(new Poison
                                                 {
                                                     Owner = this,
-                                                    Duration = target.Race == ObjectType.Player ? 4 : 5 + Env.Random.Next(5),
+                                                    Duration = target.Race == ObjectType.Player ? 4 : 5 + RandomProvider.Next(5),
                                                     PType = PoisonType.Slow,
                                                     TickSpeed = 1000,
                                                 }, this);

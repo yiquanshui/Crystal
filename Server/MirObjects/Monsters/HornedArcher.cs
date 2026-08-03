@@ -20,7 +20,7 @@ namespace Server.MirObjects.Monsters
 
                 if (friends.Count > 0)
                 {
-                    var friend = friends[Env.Random.Next(friends.Count)];
+                    var friend = friends[MirEnv.RandomProvider.Next(friends.Count)];
 
                     int delay = Functions.MaxDistance(CurrentLocation, friend.CurrentLocation) * 50 + 500;
 

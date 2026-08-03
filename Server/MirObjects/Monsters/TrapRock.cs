@@ -62,7 +62,7 @@ namespace Server.MirObjects.Monsters
 
                 if (!Visible && visible && !Target.Dead && !Target.InTrapRock)
                 {
-                    SpawnCorner = (byte)(Env.Random.Next(4) * 2);
+                    SpawnCorner = (byte)(MirEnv.RandomProvider.Next(4) * 2);
                     if (Teleport(CurrentMap, Functions.PointMove(Target.CurrentLocation, (MirDirection)SpawnCorner, 1), false))
                     {
                         ActionTime = Env.Time + 1000;
@@ -98,7 +98,7 @@ namespace Server.MirObjects.Monsters
             ActionTime = Env.Time + 300;
             AttackTime = Env.Time + AttackSpeed;
 
-            if (Env.Random.Next(8) == 0 && !ChildRock)
+            if (MirEnv.RandomProvider.Next(8) == 0 && !ChildRock)
             {
                 Target.ApplyPoison(new Poison { PType = PoisonType.Paralysis, Duration = 3, TickSpeed = 1000 }, this, true);
             }

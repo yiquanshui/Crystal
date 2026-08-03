@@ -53,18 +53,18 @@ namespace Server.MirObjects.Monsters
         {
             if (Target == null) return;
             //remark: does this mean nobody gets teleported if the main target is standing closeby + does it mean it always try's to teleport the person with lowest x/y coords?)
-            if (Functions.MaxDistance(CurrentLocation, Target.CurrentLocation) > 3 && Env.Random.Next(10) == 0 && Env.Time >= RecallTime)
+            if (Functions.MaxDistance(CurrentLocation, Target.CurrentLocation) > 3 && RandomProvider.Next(10) == 0 && Env.Time >= RecallTime)
             {
                 RecallTime = Env.Time + 10000;
                 List<MapObject> targets = FindAllTargets(30, CurrentLocation);
-                if (targets.Count != 0 && Env.Random.Next(4) > 0)
+                if (targets.Count != 0 && RandomProvider.Next(4) > 0)
                 {
                     for (int i = 0; i < targets.Count; i++)
                     {
                         if (Functions.MaxDistance(CurrentLocation, targets[i].CurrentLocation) > 3)
                         {
-                            if (Env.Random.Next(Settings.MagicResistWeight) < targets[i].Stats[Stat.MagicResist]) continue;
-                            if (!targets[i].Teleport(CurrentMap, Functions.PointMove(CurrentLocation, (MirDirection)((byte)Env.Random.Next(7)), 1)))
+                            if (RandomProvider.Next(Settings.MagicResistWeight) < targets[i].Stats[Stat.MagicResist]) continue;
+                            if (!targets[i].Teleport(CurrentMap, Functions.PointMove(CurrentLocation, (MirDirection)((byte)RandomProvider.Next(7)), 1)))
                             targets[i].Teleport(CurrentMap, CurrentLocation);
                             return;
                         }

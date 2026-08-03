@@ -70,7 +70,7 @@ namespace Server.MirObjects.Monsters
             {
                 _notNear = false;
 
-                if (Env.Random.Next(2) > 0)
+                if (RandomProvider.Next(2) > 0)
                 {
                     // Fire Bombardment Spell
                     Broadcast(new S.ObjectAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, Type = 0 });
@@ -136,8 +136,8 @@ namespace Server.MirObjects.Monsters
         {
             if (Dead) return;
 
-            int count = Env.Random.Next(1, _rootCount);
-            int distance = Env.Random.Next(_rootSpreadMin, _rootSpreadMax);
+            int count = RandomProvider.Next(1, _rootCount);
+            int distance = RandomProvider.Next(_rootSpreadMin, _rootSpreadMax);
 
             for (int j = 0; j < CurrentMap.Players.Count; j++)
             {
@@ -147,10 +147,10 @@ namespace Server.MirObjects.Monsters
 
                 for (int i = 0; i < count; i++)
                 {
-                    Point location = new Point(playerLocation.X + Env.Random.Next(-distance, distance + 1),
-                                             playerLocation.Y + Env.Random.Next(-distance, distance + 1));
+                    Point location = new Point(playerLocation.X + RandomProvider.Next(-distance, distance + 1),
+                                             playerLocation.Y + RandomProvider.Next(-distance, distance + 1));
 
-                    if (Env.Random.Next(3) == 0)
+                    if (RandomProvider.Next(3) == 0)
                     {
                         location = playerLocation;
                         hit = true;
@@ -158,12 +158,12 @@ namespace Server.MirObjects.Monsters
 
                     if (!CurrentMap.ValidPoint(location)) continue;
 
-                    var start = Env.Random.Next(2000);
+                    var start = RandomProvider.Next(2000);
 
                     SpellObject spellObj = new SpellObject
                     {
                         Spell = Spell.TreeQueenRoot,
-                        Value = Env.Random.Next(Env.Random.Next(Stats[Stat.MinMC], Stats[Stat.MaxMC])),
+                        Value = RandomProvider.Next(RandomProvider.Next(Stats[Stat.MinMC], Stats[Stat.MaxMC])),
                         ExpireTime = Env.Time + 1500 + start,
                         TickSpeed = 2000,
                         Caster = this,
@@ -191,7 +191,7 @@ namespace Server.MirObjects.Monsters
 
             if (count == 0) return;
 
-            var target = CurrentMap.Players[Env.Random.Next(count)];
+            var target = CurrentMap.Players[RandomProvider.Next(count)];
 
             var location = target.CurrentLocation;
 
@@ -242,8 +242,8 @@ namespace Server.MirObjects.Monsters
 
             for (int i = 0; i < CurrentMap.Players.Count; i++)
             {
-                Point location = new Point(CurrentLocation.X + Env.Random.Next(-_groundrootSpread, _groundrootSpread + 1),
-                                         CurrentLocation.Y + Env.Random.Next(-_groundrootSpread, _groundrootSpread + 1));
+                Point location = new Point(CurrentLocation.X + RandomProvider.Next(-_groundrootSpread, _groundrootSpread + 1),
+                                         CurrentLocation.Y + RandomProvider.Next(-_groundrootSpread, _groundrootSpread + 1));
 
                 for (int y = location.Y - 2; y <= location.Y + 2; y++)
                 {
@@ -263,7 +263,7 @@ namespace Server.MirObjects.Monsters
 
                         int damage = GetAttackPower(Stats[Stat.MinDC], Stats[Stat.MaxDC]);
 
-                        var start = Env.Random.Next(4000);
+                        var start = RandomProvider.Next(4000);
 
                         SpellObject ob = new SpellObject
                         {
@@ -301,7 +301,7 @@ namespace Server.MirObjects.Monsters
 
             if (Env.Time > _rootSpawnTime)
             {
-                if (Env.Random.Next(4) > 0)
+                if (RandomProvider.Next(4) > 0)
                 {
                     SpawnRoots();
                 }
@@ -310,7 +310,7 @@ namespace Server.MirObjects.Monsters
                     SpawnMassRoots();
                 }
 
-                var next = Env.Random.Next(1, 4);
+                var next = RandomProvider.Next(1, 4);
 
                 _rootSpawnTime = Env.Time + (Settings.Second * (_notNear ? next : next * _nearMultiplier));
             }
@@ -319,7 +319,7 @@ namespace Server.MirObjects.Monsters
             {
                 SpawnGroundRoots();
 
-                var next = Env.Random.Next(2, 3);
+                var next = RandomProvider.Next(2, 3);
 
                 _groundRootSpawnTime = Env.Time + (Settings.Second * (_notNear ? next : next * _nearMultiplier));
             }

@@ -31,13 +31,13 @@ namespace Server.MirObjects.Monsters
             {
                 if (CanAttack)
                 {
-                    if (Env.Random.Next(5) == 0)
+                    if (RandomProvider.Next(5) == 0)
                         RangeAttack();
                 }
                 if (CurrentLocation == Target.CurrentLocation)
                 {
-                    MirDirection direction = (MirDirection)Env.Random.Next(8);
-                    int rotation = Env.Random.Next(2) == 0 ? 1 : -1;
+                    MirDirection direction = (MirDirection)RandomProvider.Next(8);
+                    int rotation = RandomProvider.Next(2) == 0 ? 1 : -1;
 
                     for (int d = 0; d < 8; d++)
                     {
@@ -52,7 +52,7 @@ namespace Server.MirObjects.Monsters
 
             if (!CanAttack) return;
 
-            if (Env.Random.Next(5) > 0)
+            if (RandomProvider.Next(5) > 0)
             {
                 if (InAttackRange())
                     Attack();
@@ -132,9 +132,9 @@ namespace Server.MirObjects.Monsters
 
             if (target.Attacked(this, damage, DefenceType.MAC) > 0)
             {
-                if (Env.Random.Next(Settings.PoisonResistWeight) >= target.Stats[Stat.PoisonResist])
+                if (RandomProvider.Next(Settings.PoisonResistWeight) >= target.Stats[Stat.PoisonResist])
                 {
-                    if (Env.Random.Next(3) == 0)
+                    if (RandomProvider.Next(3) == 0)
                         target.ApplyPoison(new Poison { PType = PoisonType.Frozen, Duration = 5, TickSpeed = 1000 }, this);
                 }
             }

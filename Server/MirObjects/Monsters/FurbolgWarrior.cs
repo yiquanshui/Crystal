@@ -54,7 +54,7 @@ namespace Server.MirObjects.Monsters
 
                 for (int i = 1; i <= 2; i++)
                 {
-                    if (Env.Random.Next(10) == 0)
+                    if (RandomProvider.Next(10) == 0)
                         isCrit = true;
 
                     if (isCrit)
@@ -101,7 +101,7 @@ namespace Server.MirObjects.Monsters
 
                 for (int i = 0; i < 6; i++)
                 {
-                    if (Env.Random.Next(10) == 0)
+                    if (RandomProvider.Next(10) == 0)
                         isCrit = true;
 
                     if (isCrit)

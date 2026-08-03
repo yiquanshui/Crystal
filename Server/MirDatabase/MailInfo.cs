@@ -18,7 +18,7 @@ namespace Server.MirEnv
 
         public string Message = string.Empty;
         public uint Gold = 0;
-        public List<UserItem> Items = new List<UserItem>();
+        public List<UserItem> Items = [];
 
         public DateTime DateSent, DateOpened;
 

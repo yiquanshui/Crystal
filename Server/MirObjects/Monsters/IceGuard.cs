@@ -50,7 +50,7 @@ namespace Server.MirObjects.Monsters
             }
             else
             {
-                if (Env.Random.Next(3) > 0)
+                if (MirEnv.RandomProvider.Next(3) > 0)
                 {
                     //Ice Attack
                     Broadcast(new S.ObjectRangeAttack { ObjectID = ObjectID, Direction = Direction, Location = CurrentLocation, TargetID = Target.ObjectID });

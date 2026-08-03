@@ -92,7 +92,7 @@ namespace Server.MirObjects.Monsters
             {
                 if (targets[i].Attacked(this, damage, defence) <= 0) continue;
 
-                if (Env.Random.Next(2) == 0)
+                if (RandomProvider.Next(2) == 0)
                 {
                     PoisonTarget(targets[i], 1, 5, PoisonType.Paralysis, 1000);
                     Broadcast(new S.ObjectEffect { ObjectID = targets[i].ObjectID, Effect = SpellEffect.FlamingMutantWeb, Time = 5000 });
