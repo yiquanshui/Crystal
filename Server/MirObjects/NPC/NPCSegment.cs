@@ -1,11 +1,11 @@
 using System.Drawing;
 ﻿using Server.MirDatabase;
-using Server.MirEnvir;
+using Server.MirEnv;
 using System.Globalization;
 using System.Numerics;
 using System.Text.RegularExpressions;
 using S = ServerPackets;
-using Timer = Server.MirEnvir.Timer;
+using Timer = Server.MirEnv.Timer;
 using Server.MirNetwork;
 using Server.Library.MirDatabase;
 

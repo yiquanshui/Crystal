@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using Server.MirEnvir;
+using Server.MirEnv;
 
 namespace Server.MirDatabase
 {

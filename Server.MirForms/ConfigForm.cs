@@ -1,4 +1,4 @@
-﻿using Server.MirEnvir;
+﻿using Server.MirEnv;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -43,7 +43,7 @@ namespace Server
             SaveDelayTextBox.Text = Settings.SaveDelay.ToString();
 
             ServerVersionLabel.Text = Application.ProductVersion;
-            DBVersionLabel.Text = MirEnvir.Env.LoadVersion.ToString() + ((MirEnvir.Env.LoadVersion < MirEnvir.Env.Version) ? " (Update needed)" : "");
+            DBVersionLabel.Text = MirEnv.Env.LoadVersion.ToString() + ((MirEnv.Env.LoadVersion < MirEnv.Env.Version) ? " (Update needed)" : "");
             maxConnectionsPerIP.Text = Settings.MaxIP.ToString();
             expRateInput.Value = Math.Round((decimal)Settings.ExpRate, 2);
             dropRateInput.Value = Math.Round((decimal)Settings.DropRate, 2);

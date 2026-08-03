@@ -1,5 +1,5 @@
 ﻿using Server.MirDatabase;
-using Server.MirEnvir;
+using Server.MirEnv;
 using Server.MirObjects;
 using System.Diagnostics;
 using System.Drawing.Text;

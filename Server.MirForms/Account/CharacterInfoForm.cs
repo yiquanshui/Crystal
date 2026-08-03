@@ -11,7 +11,7 @@ using System.Windows.Forms;
 using Server.Account;
 using Server.Database;
 using Server.MirDatabase;
-using Server.MirEnvir;
+using Server.MirEnv;
 using Server.MirForms.Systems;
 using Server.MirObjects;
 using Server.Systems;

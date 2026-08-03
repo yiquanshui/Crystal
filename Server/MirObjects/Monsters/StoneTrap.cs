@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 using Server.MirDatabase;
-using Server.MirEnvir;
+using Server.MirEnv;
 using S = ServerPackets;
 
 namespace Server.MirObjects.Monsters

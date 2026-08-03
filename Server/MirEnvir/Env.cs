@@ -13,7 +13,7 @@ using System.Numerics;
 using System.Text.RegularExpressions;
 using S = ServerPackets;
 
-namespace Server.MirEnvir
+namespace Server.MirEnv
 {
     public class MobThread
     {

@@ -1,4 +1,4 @@
-﻿using Server.MirEnvir;
+﻿using Server.MirEnv;
 using Shared.Extensions;
 
 namespace Server

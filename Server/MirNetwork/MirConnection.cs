@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Net.Sockets;
 using Server.MirDatabase;
-using Server.MirEnvir;
+using Server.MirEnv;
 using Server.MirObjects;
 using C = ClientPackets;
 using S = ServerPackets;

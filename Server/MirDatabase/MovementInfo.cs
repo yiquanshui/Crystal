@@ -1,5 +1,5 @@
 using System.Drawing;
-﻿using Server.MirEnvir;
+﻿using Server.MirEnv;
 
 namespace Server.MirDatabase
 {

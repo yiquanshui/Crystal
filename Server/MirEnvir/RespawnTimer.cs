@@ -1,4 +1,4 @@
-﻿namespace Server.MirEnvir
+﻿namespace Server.MirEnv
 {
     public class RespawnSave
     {

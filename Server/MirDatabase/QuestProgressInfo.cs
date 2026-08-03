@@ -1,5 +1,5 @@
 ﻿using Server.MirObjects;
-using Server.MirEnvir;
+using Server.MirEnv;
 
 namespace Server.MirDatabase
 {

@@ -1,5 +1,5 @@
 ﻿using Server.MirNetwork;
-using Server.MirEnvir;
+using Server.MirEnv;
 using Server.Utils;
 using C = ClientPackets;
 

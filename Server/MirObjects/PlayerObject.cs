@@ -1,11 +1,11 @@
 using System.Drawing;
 using C = ClientPackets;
 using Server.MirDatabase;
-using Server.MirEnvir;
+using Server.MirEnv;
 using Server.MirNetwork;
 using S = ServerPackets;
 using System.Text.RegularExpressions;
-using Timer = Server.MirEnvir.Timer;
+using Timer = Server.MirEnv.Timer;
 
 namespace Server.MirObjects
 {
@@ -14451,7 +14451,7 @@ namespace Server.MirObjects
 
         #endregion
 
-        public Server.MirEnvir.Timer GetTimer(string key)
+        public Server.MirEnv.Timer GetTimer(string key)
         {
             var timerKey = Name + "-" + key;
 

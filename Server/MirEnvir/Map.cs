@@ -4,7 +4,7 @@ using Server.MirObjects;
 using Shared;
 using S = ServerPackets;
 
-namespace Server.MirEnvir
+namespace Server.MirEnv
 {
     public class Map
     {

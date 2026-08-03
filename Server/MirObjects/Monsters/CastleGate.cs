@@ -1,6 +1,6 @@
 using System.Drawing;
 ﻿using Server.MirDatabase;
-using Server.MirEnvir;
+using Server.MirEnv;
 
 namespace Server.MirObjects.Monsters
 {

@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Text;
 using System.Net.Sockets;
-using Server.MirEnvir;
+using Server.MirEnv;
 
 namespace Server.MirNetwork
 {

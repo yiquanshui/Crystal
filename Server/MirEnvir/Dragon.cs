@@ -3,7 +3,7 @@ using System.Drawing;
 using Server.MirObjects;
 using Server.MirObjects.Monsters;
 
-namespace Server.MirEnvir
+namespace Server.MirEnv
 {
     public class Dragon
     {

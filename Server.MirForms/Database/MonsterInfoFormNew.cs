@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using Server.MirDatabase;
-using Server.MirEnvir;
+using Server.MirEnv;
 
 namespace Server.Database
 {

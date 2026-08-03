@@ -1,7 +1,7 @@
 ﻿using Server.MirForms.VisualMapInfo.Class;
 using Server.MirForms.VisualMapInfo.Control;
 using Microsoft.VisualBasic.PowerPacks;
-using Server.MirEnvir;
+using Server.MirEnv;
 using Server.MirDatabase;
 
 namespace Server.MirForms.VisualMapInfo

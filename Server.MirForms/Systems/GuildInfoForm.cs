@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using Server.Library.MirDatabase;
-using Server.MirEnvir;
+using Server.MirEnv;
 using Server.MirObjects;
 
 namespace Server

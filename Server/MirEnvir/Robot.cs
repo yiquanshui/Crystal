@@ -1,7 +1,7 @@
 ﻿using Server.MirObjects;
 using System.Text.RegularExpressions;
 
-namespace Server.MirEnvir
+namespace Server.MirEnv
 {
     public class Robot
     {

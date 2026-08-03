@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.VisualBasic;
-using Server.MirEnvir;
+using Server.MirEnv;
 
 namespace Server.Database
 {
