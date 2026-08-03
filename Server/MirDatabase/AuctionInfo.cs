@@ -4,28 +4,22 @@ namespace Server.MirDatabase
 {
     public class AuctionInfo
     {
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
 
-        public ulong AuctionID; 
+        public ulong AuctionID;
 
-        public UserItem Item;
+        public readonly UserItem Item;
         public DateTime ConsignmentDate;
-        public uint Price, CurrentBid;
+        public readonly uint Price;
+        public uint CurrentBid;
 
-        public int SellerIndex, CurrentBuyerIndex;
-        public CharacterInfo SellerInfo, CurrentBuyerInfo;
+        public int SellerIndex;
+        public int CurrentBuyerIndex;
+        public CharacterInfo? SellerInfo, CurrentBuyerInfo;
 
         public bool Expired, Sold;
 
-        public MarketItemType ItemType;
-
-        public AuctionInfo()
-        {
-            
-        }
+        public readonly MarketItemType ItemType;
 
 
         public AuctionInfo(CharacterInfo info, UserItem item, uint price, MarketItemType itemType)
@@ -44,11 +38,11 @@ namespace Server.MirDatabase
             }
         }
 
-        public AuctionInfo(BinaryReader reader, int version, int customversion)
+        public AuctionInfo(BinaryReader reader, int version, int customVersion)
         {
             AuctionID = reader.ReadUInt64();
 
-            Item = new UserItem(reader, version, customversion);
+            Item = new UserItem(reader, version, customVersion);
             ConsignmentDate = DateTime.FromBinary(reader.ReadInt64());
             Price = reader.ReadUInt32();
             SellerIndex = reader.ReadInt32();
@@ -88,6 +82,10 @@ namespace Server.MirDatabase
 
         private string GetSellerLabel(bool userMatch)
         {
+            if (SellerInfo == null)
+            {
+                return string.Empty;
+            }
             switch (ItemType)
             {
                 case MarketItemType.GameShop:
@@ -98,7 +96,7 @@ namespace Server.MirDatabase
                     return userMatch ? (Sold ? "Sold" : (Expired ? "Expired" : CurrentBid > Price ? "Bid Met" : "No Bid")) : SellerInfo.Name;
             }
 
-            return "";
+            return string.Empty;
         }
 
         public ClientAuction CreateClientAuction(bool userMatch)

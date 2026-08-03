@@ -48,7 +48,7 @@ namespace Server.MirDatabase
 
         public override string ToString()
         {
-            return string.Format("{0} -> Map :{1} - {2}", Source, MapIndex, Destination);
+            return $"{Source} -> Map :{MapIndex} - {Destination}";
         }
     }
 }

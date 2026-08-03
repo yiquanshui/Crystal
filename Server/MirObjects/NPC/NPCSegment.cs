@@ -9,7 +9,7 @@ using Timer = Server.MirEnv.Timer;
 using Server.MirNetwork;
 using Server.Library.MirDatabase;
 using Server.Library.MirDatabase.Conquest;
-using Server.MirDatabase.Conquest;
+using Server.Library.MirDatabase.Conquest;
 
 namespace Server.MirObjects
 {
@@ -1317,10 +1317,10 @@ namespace Server.MirObjects
                         Archer = Conquest.ArcherList.FirstOrDefault(x => x.Index == intVal2);
                         if (Archer == null) return GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.NotFound);
 
-                        if (Archer.Info.Name == "" || Archer.Info.Name == null)
+                        if (Archer.ArcherInfo.Name == "" || Archer.ArcherInfo.Name == null)
                             newValue = GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.ConquestGuard);
                         else
-                            newValue = Archer.Info.Name;
+                            newValue = Archer.ArcherInfo.Name;
 
                         if (Archer.GetRepairCost() == 0)
                             newValue += GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.StillAlive);
@@ -2614,7 +2614,7 @@ namespace Server.MirObjects
                                 break;
                             }
 
-                            GuildArcherInfo Archer = Conquest.ArcherList.FirstOrDefault(g => g.Info.Index == tempInt2);
+                            GuildArcherInfo Archer = Conquest.ArcherList.FirstOrDefault(g => g.ArcherInfo.Index == tempInt2);
                             if (Archer == null || Archer.GetRepairCost() == 0)
                             {
                                 failed = true;

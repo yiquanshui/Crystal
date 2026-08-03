@@ -1,4 +1,5 @@
-﻿using Server.MirDatabase;
+﻿using Server.Library.MirDatabase.Conquest;
+using Server.MirDatabase;
 using Server.MirEnv;
 
 namespace Server
@@ -8,12 +9,12 @@ namespace Server
         public Env Env => SMain.EditEnv;
 
         private ConquestInfo selectedConquest;
-        private ConquestArcherInfo selectedArcher;
-        private ConquestGateInfo selectedGate;
-        private ConquestWallInfo selectedWall;
-        private ConquestSiegeInfo selectedSiege;
-        private ConquestFlagInfo selectedFlag;
-        private ConquestFlagInfo selectedControlPoint;
+        private ArcherInfo selectedArcher;
+        private GateInfo selectedGate;
+        private WallInfo selectedWall;
+        private SiegeInfo selectedSiege;
+        private FlagInfo selectedFlag;
+        private FlagInfo selectedControlPoint;
 
         public ConquestInfoForm()
         {
@@ -329,7 +330,7 @@ namespace Server
         {       
             if (selectedConquest != null)
             {
-                 selectedConquest.ConquestGuards.Add(new ConquestArcherInfo { Location = new Point(0, 0), Name = "Guard", Index = ++selectedConquest.GuardIndex, MobIndex = 1, RepairCost = 1000 });
+                 selectedConquest.ConquestGuards.Add(new ArcherInfo { Location = new Point(0, 0), Name = "Guard", Index = ++selectedConquest.GuardIndex, MobIndex = 1, RepairCost = 1000 });
                  UpdateInterface();
             }    
         }
@@ -339,7 +340,7 @@ namespace Server
             if (ActiveControl != sender) return;
             if (Guards_listbox.SelectedIndex != -1)
             {
-                selectedArcher = (ConquestArcherInfo)Guards_listbox.SelectedItem;
+                selectedArcher = (ArcherInfo)Guards_listbox.SelectedItem;
                 UpdateArchers();
             }
             else
@@ -489,7 +490,7 @@ namespace Server
         {
             if (selectedConquest != null)
             {
-                selectedConquest.ConquestGates.Add(new ConquestGateInfo { Location = new Point(0, 0), Name = "Gate", Index = ++selectedConquest.GateIndex, MobIndex = 1, RepairCost = 1000 });
+                selectedConquest.ConquestGates.Add(new GateInfo { Location = new Point(0, 0), Name = "Gate", Index = ++selectedConquest.GateIndex, MobIndex = 1, RepairCost = 1000 });
                 UpdateInterface();
             }
         }
@@ -500,7 +501,7 @@ namespace Server
             if (ActiveControl != sender) return;
             if (Gates_listbox.SelectedIndex != -1)
             {
-                selectedGate = (ConquestGateInfo)Gates_listbox.SelectedItem;
+                selectedGate = (GateInfo)Gates_listbox.SelectedItem;
                 UpdateGates();
             }
             else
@@ -552,7 +553,7 @@ namespace Server
         {
             if (selectedConquest != null)
             {
-                selectedConquest.ConquestWalls.Add(new ConquestWallInfo { Location = new Point(0, 0), Name = "Wall", Index = ++selectedConquest.WallIndex, MobIndex = 1, RepairCost = 1000 });
+                selectedConquest.ConquestWalls.Add(new WallInfo { Location = new Point(0, 0), Name = "Wall", Index = ++selectedConquest.WallIndex, MobIndex = 1, RepairCost = 1000 });
                 UpdateInterface();
             }
         }
@@ -563,7 +564,7 @@ namespace Server
             if (ActiveControl != sender) return;
             if (Walls_listbox.SelectedIndex != -1)
             {
-                selectedWall = (ConquestWallInfo)Walls_listbox.SelectedItem;
+                selectedWall = (WallInfo)Walls_listbox.SelectedItem;
                 UpdateWalls();
             }
             else
@@ -786,7 +787,7 @@ namespace Server
         {
             if (selectedConquest == null) return;
             if (Guards_listbox.SelectedItem != null)
-                selectedConquest.ConquestGuards.Remove((ConquestArcherInfo)Guards_listbox.SelectedItem);
+                selectedConquest.ConquestGuards.Remove((ArcherInfo)Guards_listbox.SelectedItem);
 
             UpdateInterface();
         }
@@ -795,7 +796,7 @@ namespace Server
         {
             if (selectedConquest == null) return;
             if (Gates_listbox.SelectedItem != null)
-                selectedConquest.ConquestGates.Remove((ConquestGateInfo)Gates_listbox.SelectedItem);
+                selectedConquest.ConquestGates.Remove((GateInfo)Gates_listbox.SelectedItem);
 
             UpdateInterface();
         }
@@ -804,7 +805,7 @@ namespace Server
         {
             if (selectedConquest == null) return;
             if (Walls_listbox.SelectedItem != null)
-                selectedConquest.ConquestWalls.Remove((ConquestWallInfo)Walls_listbox.SelectedItem);
+                selectedConquest.ConquestWalls.Remove((WallInfo)Walls_listbox.SelectedItem);
 
             UpdateInterface();
         }
@@ -866,7 +867,7 @@ namespace Server
             if (ActiveControl != sender) return;
             if (Siege_listbox.SelectedIndex != -1)
             {
-                selectedSiege = (ConquestSiegeInfo)Siege_listbox.SelectedItem;
+                selectedSiege = (SiegeInfo)Siege_listbox.SelectedItem;
                 UpdateSiege();
             }
             else
@@ -877,7 +878,7 @@ namespace Server
         {
             if (selectedConquest != null)
             {
-                selectedConquest.ConquestSieges.Add(new ConquestSiegeInfo { Location = new Point(0, 0), Name = "Siege", Index = ++selectedConquest.SiegeIndex, MobIndex = 1, RepairCost = 1000 });
+                selectedConquest.ConquestSieges.Add(new SiegeInfo { Location = new Point(0, 0), Name = "Siege", Index = ++selectedConquest.SiegeIndex, MobIndex = 1, RepairCost = 1000 });
                 UpdateInterface();
             }
         }
@@ -886,7 +887,7 @@ namespace Server
         {
             if (selectedConquest == null) return;
             if (Siege_listbox.SelectedItem != null)
-                selectedConquest.ConquestSieges.Remove((ConquestSiegeInfo)Siege_listbox.SelectedItem);
+                selectedConquest.ConquestSieges.Remove((SiegeInfo)Siege_listbox.SelectedItem);
 
             UpdateInterface();
         }
@@ -959,7 +960,7 @@ namespace Server
         {
             if (selectedConquest == null) return;
             if (Flags_listbox.SelectedItem != null)
-                selectedConquest.ConquestFlags.Remove((ConquestFlagInfo)Flags_listbox.SelectedItem);
+                selectedConquest.ConquestFlags.Remove((FlagInfo)Flags_listbox.SelectedItem);
 
             UpdateInterface();
         }
@@ -969,7 +970,7 @@ namespace Server
             if (selectedConquest == null) return;
             if (selectedConquest != null)
             {
-                selectedConquest.ConquestFlags.Add(new ConquestFlagInfo { Location = new Point(0, 0), Name = "Flag", Index = ++selectedConquest.FlagIndex });
+                selectedConquest.ConquestFlags.Add(new FlagInfo { Location = new Point(0, 0), Name = "Flag", Index = ++selectedConquest.FlagIndex });
                 UpdateInterface();
             }
         }
@@ -1019,7 +1020,7 @@ namespace Server
             if (ActiveControl != sender) return;
             if (Flags_listbox.SelectedIndex != -1)
             {
-                selectedFlag = (ConquestFlagInfo)Flags_listbox.SelectedItem;
+                selectedFlag = (FlagInfo)Flags_listbox.SelectedItem;
                 UpdateFlags();
             }
             else
@@ -1048,7 +1049,7 @@ namespace Server
             if (ActiveControl != sender) return;
             if (Controls_listbox.SelectedIndex != -1)
             {
-                selectedControlPoint = (ConquestFlagInfo)Controls_listbox.SelectedItem;
+                selectedControlPoint = (FlagInfo)Controls_listbox.SelectedItem;
                 UpdateControlPoints();
             }
             else
@@ -1060,7 +1061,7 @@ namespace Server
             if (selectedConquest == null) return;
             if (selectedConquest != null)
             {
-                selectedConquest.ControlPoints.Add(new ConquestFlagInfo { Location = new Point(0, 0), Name = "Control Point", Index = ++selectedConquest.ControlPointIndex });
+                selectedConquest.ControlPoints.Add(new FlagInfo { Location = new Point(0, 0), Name = "Control Point", Index = ++selectedConquest.ControlPointIndex });
                 UpdateInterface();
             }
         }
@@ -1069,7 +1070,7 @@ namespace Server
         {
             if (selectedConquest == null) return;
             if (Controls_listbox.SelectedItem != null)
-                selectedConquest.ControlPoints.Remove((ConquestFlagInfo)Controls_listbox.SelectedItem);
+                selectedConquest.ControlPoints.Remove((FlagInfo)Controls_listbox.SelectedItem);
 
             UpdateInterface();
         }

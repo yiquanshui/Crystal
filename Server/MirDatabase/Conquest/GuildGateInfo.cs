@@ -7,17 +7,14 @@ namespace Server.Library.MirDatabase.Conquest;
 
 public class GuildGateInfo
 {
-    protected static Env Env
-    {
-        get { return Env.Main; }
-    }
+    protected static Env Env => Env.Main;
 
     public int Index;
     public int Health;
 
-    public ConquestGateInfo Info;
-    public ConquestObject Conquest;
-    public Gate Gate;
+    public GateInfo? Info;
+    public ConquestObject? Conquest;
+    public Gate? Gate;
 
 
     public GuildGateInfo() { }
@@ -45,9 +42,10 @@ public class GuildGateInfo
 
     public void Spawn(bool repair)
     {
-        if (Gate != null) Gate.Despawn();
+        Gate?.Despawn();
+        if (Info == null) return;
 
-        MonsterInfo monsterInfo = Env.GetMonsterInfo(Info.MobIndex);
+        MonsterInfo? monsterInfo = Env.GetMonsterInfo(Info.MobIndex);
 
         if (monsterInfo == null) return;
         if (monsterInfo.AI != 81) return;
@@ -59,7 +57,10 @@ public class GuildGateInfo
         Gate.Conquest = Conquest;
         Gate.GateIndex = Index;
 
-        Gate.Spawn(Conquest.ConquestMap, Info.Location);
+        if (Conquest != null)
+        {
+            Gate.Spawn(Conquest.ConquestMap, Info.Location);
+        }
 
         if (repair) Health = Gate.Stats[Stat.HP];
 

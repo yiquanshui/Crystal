@@ -7,12 +7,12 @@ public class GuildFlagInfo
 {
     public int Index;
 
-    public ConquestFlagInfo Info;
+    public required FlagInfo Info;
 
-    public ConquestObject Conquest;
-    public GuildObject Guild;
+    public required ConquestObject Conquest;
+    public GuildObject? Guild;
 
-    public NPCObject Flag;
+    public NPCObject Flag = null!;
 
     public GuildFlagInfo() { }
 

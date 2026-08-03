@@ -6,47 +6,41 @@ namespace Server.MirDatabase
 {
     public class GuildInfo
     {
-        public int GuildIndex = 0;
-        public string Name = "";
-        public byte Level = 0;
-        public byte SparePoints = 0;
-        public long Experience = 0;
-        public uint Gold = 0;
+        public int GuildIndex;
+        public string Name;
+        public byte Level;
+        public byte SparePoints;
+        public long Experience;
+        public uint Gold;
 
-        public Int32 Votes = 0;
+        public int Votes;
         public DateTime LastVoteAttempt;
-        public bool Voting = false;
+        public bool Voting;
 
-        public int Membercount = 0;
-        public List<GuildRank?> Ranks = [];
-        public GuildStorageItem[] StoredItems = new GuildStorageItem[112];
-        public List<GuildBuff> BuffList = new List<GuildBuff>();
-        public List<string> Notice = new List<string>();
+        public int Membercount;
+        public List<GuildRank> Ranks = [];
+        public GuildStorageItem?[] StoredItems = new GuildStorageItem[112];
+        public List<GuildBuff> BuffList = [];
+        public List<string> Notice = [];
 
-        public long MaxExperience = 0;
-        public int MemberCap = 0;
+        public long MaxExperience;
+        public int MemberCap;
 
         public ushort FlagImage = 1000;
         public Color FlagColour = Color.White;
 
-        public bool NeedSave = false;
+        public bool NeedSave;
 
         public DateTime GTRent = DateTime.MinValue;
         public DateTime GTBegin = DateTime.MinValue;
         public int GTIndex = -1;
-        public int GTKey = 0;
+        public int GTKey;
         public int GTPrice;
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
-        public bool HasGT
-        {
-            get
-            {
-                return GTRent > DateTime.Now;
-            }
-        }
+        protected static Env Env => Env.Main;
+
+        public bool HasGT => GTRent > DateTime.Now;
+
+
         public GuildInfo(PlayerObject owner, string name)
         {
             Name = name;
@@ -80,14 +74,14 @@ namespace Server.MirDatabase
 
         public GuildInfo(BinaryReader reader)
         {
-            int customversion = Env.LoadCustomVersion;
+            int customVersion = Env.LoadCustomVersion;
             int version = reader.ReadInt32();
             GuildIndex = version;
 
             if (version == int.MaxValue)
             {
                 version = reader.ReadInt32();
-                customversion = reader.ReadInt32();
+                customVersion = reader.ReadInt32();
                 GuildIndex = reader.ReadInt32();
             }
             else
@@ -110,9 +104,8 @@ namespace Server.MirDatabase
 
             for (int i = 0; i < rankCount; i++)
             {
-                int index = i;
-                Ranks.Add(new GuildRank(reader, true) { Index = index });
-                Membercount += Ranks[i].Members.Count;
+                Ranks.Add(new GuildRank(reader, true) { Index = i });
+                Membercount += Ranks[i]!.Members.Count;
             }
 
             int itemCount = reader.ReadInt32();
@@ -120,21 +113,21 @@ namespace Server.MirDatabase
             {
                 if (!reader.ReadBoolean()) continue;
 
-                GuildStorageItem Guilditem = new GuildStorageItem()
+                GuildStorageItem guildItem = new GuildStorageItem()
                 {
-                    Item = new UserItem(reader, version, customversion),
+                    Item = new UserItem(reader, version, customVersion),
                     UserId = reader.ReadInt64()
                 };
 
-                if (Env.BindItem(Guilditem.Item) && j < StoredItems.Length)
-                    StoredItems[j] = Guilditem;
+                if (Env.BindItem(guildItem.Item) && j < StoredItems.Length)
+                    StoredItems[j] = guildItem;
             }
 
             int buffCount = reader.ReadInt32();
             if (version < 61)
             {
                 for (int j = 0; j < buffCount; j++)
-                    new GuildBuffOld(reader);
+                    _ = new GuildBuffOld(reader);
             }
             else
             {
@@ -145,9 +138,9 @@ namespace Server.MirDatabase
                 }
             }
 
-            for (int j = 0; j < BuffList.Count; j++)
+            foreach (var buff in BuffList)
             {
-                BuffList[j].Info = Env.FindGuildBuffInfo(BuffList[j].Id);
+                buff.Info = Env.FindGuildBuffInfo(buff.Id);
             }
 
             int noticeCount = reader.ReadInt32();
@@ -213,35 +206,35 @@ namespace Server.MirDatabase
             writer.Write(Voting);
 
             writer.Write(rankCount);
-            for (int i = 0; i < Ranks.Count; i++)
+            foreach (var rank in Ranks)
             {
-                if (Ranks[i].Members.Count > 0)
+                if (rank.Members.Count > 0)
                 {
-                    Ranks[i].Save(writer, true);
+                    rank.Save(writer, true);
                 }
             }
 
             writer.Write(StoredItems.Length);
-            for (int i = 0; i < StoredItems.Length; i++)
+            foreach (var item in StoredItems)
             {
-                writer.Write(StoredItems[i] != null);
-                if (StoredItems[i] != null)
+                writer.Write(item != null);
+                if (item != null)
                 {
-                    StoredItems[i].Item.Save(writer);
-                    writer.Write(StoredItems[i].UserId);
+                    item.Item.Save(writer);
+                    writer.Write(item.UserId);
                 }
             }
 
             writer.Write(BuffList.Count);
-            for (int i = 0; i < BuffList.Count; i++)
+            foreach (var buff in BuffList)
             {
-                BuffList[i].Save(writer);
+                buff.Save(writer);
             }
 
             writer.Write(Notice.Count);
-            for (int i = 0; i < Notice.Count; i++)
+            foreach (string notice in Notice)
             {
-                writer.Write(Notice[i]);
+                writer.Write(notice);
             }
 
             writer.Write(FlagImage);

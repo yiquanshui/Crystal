@@ -217,7 +217,7 @@ public class GuildBuffInfo
 public class GuildBuff
 {
     public int Id;
-    public GuildBuffInfo Info;
+    public GuildBuffInfo? Info;
     public bool Active = false;
     public int ActiveTimeRemaining;
 

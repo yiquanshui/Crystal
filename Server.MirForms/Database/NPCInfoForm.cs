@@ -2,6 +2,7 @@
 using Server.MirEnv;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Server.Library.MirDatabase.Conquest;
 
 namespace Server
 {
@@ -81,7 +82,7 @@ namespace Server
             MaxLev_textbox.Text = info.MaxLev.ToString();
             Class_combo.Text = info.ClassRequired;
             ConquestHidden_combo.SelectedItem = Env.ConquestInfoList.FirstOrDefault(x => x.Index == info.Conquest);
-            Day_combo.Text = info.DayofWeek;
+            Day_combo.Text = info.DayOfWeek;
             TimeVisible_checkbox.Checked = info.TimeVisible;
             StartHour_combo.Text = info.HourStart.ToString();
             EndHour_combo.Text = info.HourEnd.ToString();
@@ -485,7 +486,7 @@ namespace Server
 
 
             for (int i = 0; i < _selectedNPCInfos.Count; i++)
-                _selectedNPCInfos[i].DayofWeek = temp;
+                _selectedNPCInfos[i].DayOfWeek = temp;
         }
 
         private void TimeVisible_checkbox_CheckedChanged(object sender, EventArgs e)

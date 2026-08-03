@@ -5,24 +5,18 @@ namespace Server.MirDatabase
 {
     public class RecipeInfo
     {
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
 
-        protected static MessageQueue MessageQueue
-        {
-            get { return MessageQueue.Instance; }
-        }
+        protected static MessageQueue MessageQueue => MessageQueue.Instance;
 
-        public UserItem Item;
-        public List<UserItem> Ingredients;
-        public List<UserItem> Tools;
+        public UserItem? Item;
+        public List<UserItem>? Ingredients;
+        public List<UserItem>? Tools;
 
-        public List<int> RequiredFlag = new List<int>();
+        public List<int> RequiredFlag = [];
         public ushort? RequiredLevel = null;
-        public List<int> RequiredQuest = new List<int>();
-        public List<MirClass> RequiredClass = new List<MirClass>();
+        public List<int> RequiredQuest = [];
+        public List<MirClass> RequiredClass = [];
         public MirGender? RequiredGender = null;
 
         public byte Chance = 100;
@@ -30,7 +24,7 @@ namespace Server.MirDatabase
 
         public RecipeInfo(string name)
         {
-            ItemInfo itemInfo = Env.GetItemInfo(name);
+            ItemInfo? itemInfo = Env.GetItemInfo(name);
             if (itemInfo == null)
             {
                 MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CouldNotFindItem), name));
@@ -44,142 +38,139 @@ namespace Server.MirDatabase
 
         private void LoadIngredients(string recipe)
         {
-            List<string> lines = File.ReadAllLines(Path.Combine(Settings.RecipePath, recipe + ".txt")).ToList();
+            List<string> lines = [.. File.ReadAllLines(Path.Combine(Settings.RecipePath, recipe + ".txt"))];
 
-            Tools = new List<UserItem>();
-            Ingredients = new List<UserItem>();
+            Tools = [];
+            Ingredients = [];
 
             var mode = "ingredients";
 
-            for (int i = 0; i < lines.Count; i++)
+            foreach (string line in lines.Where(line => !string.IsNullOrEmpty(line)))
             {
-                if (String.IsNullOrEmpty(lines[i])) continue;
-
-                if (lines[i].StartsWith("["))
+                if (line.StartsWith('['))
                 {
-                    mode = lines[i].Substring(1, lines[i].Length - 2).ToLower();
+                    mode = line.Substring(1, line.Length - 2).ToLower();
                     continue;
                 }
 
                 switch (mode)
                 {
                     case "recipe":
+                    {
+                        var data = line.Split([' '], StringSplitOptions.RemoveEmptyEntries);
+
+                        if (data.Length < 2) continue;
+
+                        switch (data[0].ToLower())
                         {
-                            var data = lines[i].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            case "amount":
+                                Item.Count = ushort.Parse(data[1]);
+                                break;
+                            case "chance":
+                                Chance = byte.Parse(data[1]);
 
-                            if (data.Length < 2) continue;
-
-                            switch (data[0].ToLower())
-                            {
-                                case "amount":
-                                    Item.Count = ushort.Parse(data[1]);
-                                    break;
-                                case "chance":
-                                    Chance = byte.Parse(data[1]);
-
-                                    if (Chance > 100)
-                                    {
-                                        Chance = 100;
-                                    }
-                                    break;
-                                case "gold":
-                                    Gold = uint.Parse(data[1]);
-                                    break;
-                                default:
-                                    break;
-                            }
+                                if (Chance > 100)
+                                {
+                                    Chance = 100;
+                                }
+                                break;
+                            case "gold":
+                                Gold = uint.Parse(data[1]);
+                                break;
+                            default:
+                                break;
                         }
+                    }
                         break;
                     case "tools":
+                    {
+                        var data = line.Split([' '], StringSplitOptions.RemoveEmptyEntries);
+
+                        ItemInfo? info = Env.GetItemInfo(data[0]);
+
+                        if (info == null)
                         {
-                            var data = lines[i].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                            ItemInfo info = Env.GetItemInfo(data[0]);
-
-                            if (info == null)
-                            {
-                                MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CouldNotFindToolRecipe), lines[i], recipe));
-                                continue;
-                            }
-
-                            UserItem tool = Env.CreateShopItem(info, 0);
-
-                            Tools.Add(tool);
+                            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CouldNotFindToolRecipe), line, recipe));
+                            continue;
                         }
+
+                        UserItem tool = Env.CreateShopItem(info, 0);
+                        Tools.Add(tool);
+                    }
                         break;
                     case "ingredients":
+                    {
+                        var data = line.Split([' '], StringSplitOptions.RemoveEmptyEntries);
+
+                        ItemInfo? info = Env.GetItemInfo(data[0]);
+
+                        if (info == null)
                         {
-                            var data = lines[i].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                            ItemInfo info = Env.GetItemInfo(data[0]);
-
-                            if (info == null)
-                            {
-                                MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CouldNotFindIngredientRecipe), lines[i], recipe));
-                                continue;
-                            }
-
-                            UserItem ingredient = Env.CreateShopItem(info, 0);
-
-                            ushort count = 1;
-                            if (data.Length >= 2)
-                                ushort.TryParse(data[1], out count);
-
-                            if (data.Length >= 3)
-                                ushort.TryParse(data[2], out ingredient.CurrentDura);
-
-                            ingredient.Count = count > info.StackSize ? info.StackSize : count;
-
-                            Ingredients.Add(ingredient);
+                            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CouldNotFindIngredientRecipe), line, recipe));
+                            continue;
                         }
+
+                        UserItem ingredient = Env.CreateShopItem(info, 0);
+
+                        ushort count = 1;
+                        if (data.Length >= 2)
+                            _ = ushort.TryParse(data[1], out count);
+
+                        if (data.Length >= 3)
+                            _ = ushort.TryParse(data[2], out ingredient.CurrentDura);
+
+                        ingredient.Count = count > info.StackSize ? info.StackSize : count;
+
+                        Ingredients.Add(ingredient);
+                    }
                         break;
                     case "criteria":
+                    {
+                        var data = line.Split([' '], StringSplitOptions.RemoveEmptyEntries);
+
+                        if (data.Length < 2) continue;
+
+                        try
                         {
-                            var data = lines[i].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                            if (data.Length < 2) continue;
-
-                            try
+                            switch (data[0].ToLower())
                             {
-                                switch (data[0].ToLower())
-                                {
-                                    case "level":
-                                        RequiredLevel = ushort.Parse(data[1]);
-                                        break;
-                                    case "class":
-                                        if (Enum.TryParse<MirClass>(data[1], true, out MirClass cls))
-                                        {
-                                            RequiredClass.Add(cls);
-                                        }
-                                        else
-                                        {
-                                            RequiredClass.Add((MirClass)byte.Parse(data[1]));
-                                        }
-                                        break;
-                                    case "gender":
-                                        if (Enum.TryParse<MirGender>(data[1], true, out MirGender gender))
-                                        {
-                                            RequiredGender = gender;
-                                        }
-                                        else
-                                        {
-                                            RequiredGender = (MirGender)byte.Parse(data[1]);
-                                        }
-                                        break;
-                                    case "flag":
-                                        RequiredFlag.Add(int.Parse(data[1]));
-                                        break;
-                                    case "quest":
-                                        RequiredQuest.Add(int.Parse(data[1]));
-                                        break;
-                                }
-                            }
-                            catch
-                            {
-                                MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CouldNotParseOption), data[0], data[1]));
-                                continue;
+                                case "level":
+                                    RequiredLevel = ushort.Parse(data[1]);
+                                    break;
+                                case "class":
+                                    if (Enum.TryParse<MirClass>(data[1], true, out MirClass cls))
+                                    {
+                                        RequiredClass.Add(cls);
+                                    }
+                                    else
+                                    {
+                                        RequiredClass.Add((MirClass)byte.Parse(data[1]));
+                                    }
+                                    break;
+                                case "gender":
+                                    if (Enum.TryParse<MirGender>(data[1], true, out MirGender gender))
+                                    {
+                                        RequiredGender = gender;
+                                    }
+                                    else
+                                    {
+                                        RequiredGender = (MirGender)byte.Parse(data[1]);
+                                    }
+                                    break;
+                                case "flag":
+                                    RequiredFlag.Add(int.Parse(data[1]));
+                                    break;
+                                case "quest":
+                                    RequiredQuest.Add(int.Parse(data[1]));
+                                    break;
                             }
                         }
+                        catch
+                        {
+                            MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.CouldNotParseOption), data[0], data[1]));
+                            continue;
+                        }
+                    }
                         break;
                 }
             }
@@ -203,23 +194,13 @@ namespace Server.MirDatabase
 
             if (RequiredFlag.Count > 0)
             {
-                foreach (var flag in RequiredFlag)
+                if (RequiredFlag.Any(flag => !player.CharacterInfo.Flags[flag]))
                 {
-                     if(!player.CharacterInfo.Flags[flag])
-                        return false;
+                    return false;
                 }
             }
 
-            if (RequiredQuest.Count > 0)
-            {
-                foreach (var quest in RequiredQuest)
-                {
-                    if (!player.CharacterInfo.CompletedQuests.Contains(quest))
-                        return false;
-                }
-            }
-
-            return true;
+            return RequiredQuest.Count <= 0 || RequiredQuest.All(quest => player.CharacterInfo.CompletedQuests.Contains(quest));
         }
 
         public ClientRecipeInfo CreateClientRecipeInfo()
@@ -228,14 +209,12 @@ namespace Server.MirDatabase
             {
                 Gold = Gold,
                 Chance = Chance,
-                Item = Item.Clone(),
-                Tools = Tools.Select(x => x).ToList(),
-                Ingredients = Ingredients.Select(x => x).ToList()
+                Item = Item?.Clone(),
+                Tools = [.. Tools!.Select(x => x)],
+                Ingredients = [.. Ingredients!.Select(x => x)]
             };
 
             return clientInfo;
         }
     }
 }
-
-

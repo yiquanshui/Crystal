@@ -7,19 +7,16 @@ namespace Server.Library.MirDatabase.Conquest;
 
 public class GuildWallInfo
 {
-    protected static Env Env
-    {
-        get { return Env.Main; }
-    }
+    protected static Env Env => Env.Main;
 
     public int Index;
     public int Health;
 
-    public ConquestWallInfo Info;
+    public WallInfo? Info;
 
-    public ConquestObject Conquest;
+    public ConquestObject? Conquest;
 
-    public Wall Wall;
+    public Wall? Wall;
 
 
     public GuildWallInfo() { }
@@ -41,14 +38,15 @@ public class GuildWallInfo
     {
         if (Wall != null) Health = Wall.HP;
         writer.Write(Index);
-        writer.Write(Wall.Health);
+        writer.Write(Health);
     }
 
     public void Spawn(bool repair)
     {
-        if (Wall != null) Wall.Despawn();
+        Wall?.Despawn();
+        if (Info == null) return;
 
-        MonsterInfo monsterInfo = Env.GetMonsterInfo(Info.MobIndex);
+        MonsterInfo? monsterInfo = Env.GetMonsterInfo(Info.MobIndex);
 
         if (monsterInfo == null) return;
 
@@ -61,7 +59,8 @@ public class GuildWallInfo
         Wall.Conquest = Conquest;
         Wall.WallIndex = Index;
 
-        Wall.Spawn(Conquest.ConquestMap, Info.Location);
+        if (Conquest != null)
+            Wall.Spawn(Conquest.ConquestMap, Info.Location);
 
         if (repair) Health = Wall.Stats[Stat.HP];
 
@@ -81,7 +80,7 @@ public class GuildWallInfo
 
         if (Wall.Stats[Stat.HP] == Wall.HP) return cost;
 
-        if (Info.RepairCost != 0)
+        if (Info != null && Info.RepairCost != 0)
         {
             cost = Info.RepairCost / (Wall.Stats[Stat.HP] / (Wall.Stats[Stat.HP] - Wall.HP));
         }

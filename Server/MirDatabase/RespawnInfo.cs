@@ -6,10 +6,7 @@ namespace Server.MirDatabase
 {
     public class RespawnInfo
     {
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
 
         public int MonsterIndex;
         public Point Location;
@@ -52,19 +49,17 @@ namespace Server.MirDatabase
             }
         }
 
-        public static RespawnInfo FromText(string text)
+        public static RespawnInfo? FromText(string text)
         {
-            string[] data = text.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+            string[] data = text.Split([','], StringSplitOptions.RemoveEmptyEntries);
 
             if (data.Length < 7) return null;
 
             RespawnInfo info = new RespawnInfo();
 
-            int x,y ;
-
             if (!TryParse(data[0], out info.MonsterIndex)) return null;
-            if (!TryParse(data[1], out x)) return null;
-            if (!TryParse(data[2], out y)) return null;
+            if (!TryParse(data[1], out int x)) return null;
+            if (!TryParse(data[2], out int y)) return null;
 
             info.Location = new Point(x, y);
 
@@ -103,18 +98,8 @@ namespace Server.MirDatabase
         public override string ToString()
         {
             var monsterName = Env.MonsterInfoList.Find(o => o.Index == MonsterIndex)?.Name ?? "Unknown";
-            return string.Format("Monster: {0} - {1} - {2} - {3} - {4} - {5} - {6} - {7} - {8} - {9} - {10}",
-                MonsterIndex,
-                monsterName,
-                Functions.PointToString(Location),
-                Count,
-                Spread,
-                Delay,
-                Direction,
-                RandomDelay,
-                RespawnIndex,
-                SaveRespawnTime,
-                RespawnTicks);
+            return
+                $"Monster: {MonsterIndex} - {monsterName} - {Functions.PointToString(Location)} - {Count} - {Spread} - {Delay} - {Direction} - {RandomDelay} - {RespawnIndex} - {SaveRespawnTime} - {RespawnTicks}";
         }
     }
 

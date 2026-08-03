@@ -5,10 +5,7 @@ namespace Server.MirDatabase
 {
     public class NPCInfo
     {
-        protected static Env EditEnv
-        {
-            get { return Env.Edit; }
-        }
+        protected static Env EditEnv => Env.Edit;
 
         public int Index;
 
@@ -27,8 +24,8 @@ namespace Server.MirDatabase
         public byte MinuteEnd = 1;
         public short MinLev = 0;
         public short MaxLev = 0;
-        public string DayofWeek = "";
-        public string ClassRequired = "";
+        public string DayOfWeek = string.Empty;
+        public string ClassRequired = string.Empty;
         public bool Sabuk = false;
         public int FlagNeeded = 0;
         public int Conquest;
@@ -37,8 +34,8 @@ namespace Server.MirDatabase
         public bool CanTeleportTo;
         public bool ConquestVisible = true;
 
-        public List<int> CollectQuestIndexes = new List<int>();
-        public List<int> FinishQuestIndexes = new List<int>();
+        public List<int> CollectQuestIndexes = [];
+        public List<int> FinishQuestIndexes = [];
 
         public NPCInfo() { }
         public NPCInfo(BinaryReader reader)
@@ -79,7 +76,7 @@ namespace Server.MirDatabase
                 MinuteEnd = reader.ReadByte();
                 MinLev = reader.ReadInt16();
                 MaxLev = reader.ReadInt16();
-                DayofWeek = reader.ReadString();
+                DayOfWeek = reader.ReadString();
                 ClassRequired = reader.ReadString();
                 if (Env.LoadVersion >= 66)
                     Conquest = reader.ReadInt32();
@@ -106,13 +103,13 @@ namespace Server.MirDatabase
             writer.Write(Index);
             writer.Write(MapIndex);
 
-            writer.Write(CollectQuestIndexes.Count());
-            for (int i = 0; i < CollectQuestIndexes.Count; i++)
-                writer.Write(CollectQuestIndexes[i]);
+            writer.Write(CollectQuestIndexes.Count);
+            foreach (int questIndex in CollectQuestIndexes)
+                writer.Write(questIndex);
 
-            writer.Write(FinishQuestIndexes.Count());
-            for (int i = 0; i < FinishQuestIndexes.Count; i++)
-                writer.Write(FinishQuestIndexes[i]);
+            writer.Write(FinishQuestIndexes.Count);
+            foreach (int questIndex in FinishQuestIndexes)
+                writer.Write(questIndex);
 
             writer.Write(FileName);
             writer.Write(Name);
@@ -129,7 +126,7 @@ namespace Server.MirDatabase
             writer.Write(MinuteEnd);
             writer.Write(MinLev);
             writer.Write(MaxLev);
-            writer.Write(DayofWeek);
+            writer.Write(DayOfWeek);
             writer.Write(ClassRequired);
             writer.Write(Conquest);
             writer.Write(FlagNeeded);
@@ -142,11 +139,11 @@ namespace Server.MirDatabase
 
         public static void FromText(string text)
         {
-            string[] data = text.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] data = text.Split([','], StringSplitOptions.RemoveEmptyEntries);
 
             if (data.Length < 6) return;
 
-            NPCInfo info;
+            NPCInfo? info;
             bool isNew = false;
             if (!int.TryParse(data[0], out var index))
             {
@@ -159,7 +156,8 @@ namespace Server.MirDatabase
             }
             info.FileName = data[1];
 
-            info.MapIndex = EditEnv.MapInfoList.Where(d => d.FileName == data[2]).FirstOrDefault().Index;
+            //TODO 
+            info.MapIndex = EditEnv.MapInfoList.FirstOrDefault(d => d.FileName == data[2])!.Index;
 
             if (!int.TryParse(data[3], out int x)) return;
             if (!int.TryParse(data[4], out int y)) return;
@@ -187,9 +185,8 @@ namespace Server.MirDatabase
         }
         public string ToText()
         {
-            return string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18}", Index,
-                FileName, EditEnv.MapInfoList.Where(d => d.Index == MapIndex).FirstOrDefault().FileName, Location.X, Location.Y, Name, Image, Rate, ShowOnBigMap, BigMapIcon, CanTeleportTo, ConquestVisible,
-                MinLev, MaxLev, TimeVisible, HourStart, MinuteStart, HourEnd, MinuteEnd);
+            return
+                $"{Index},{FileName},{EditEnv.MapInfoList.FirstOrDefault(d => d.Index == MapIndex)?.FileName},{Location.X},{Location.Y},{Name},{Image},{Rate},{ShowOnBigMap},{BigMapIcon},{CanTeleportTo},{ConquestVisible},{MinLev},{MaxLev},{TimeVisible},{HourStart},{MinuteStart},{HourEnd},{MinuteEnd}";
         }
 
         public override string ToString()
@@ -202,35 +199,30 @@ namespace Server.MirDatabase
             get
             {
                 string s = Name;
-                if (s.Contains("_"))
+                if (s.Contains('_'))
                 {
                     string[] splitName = s.Split('_');
-                    s = splitName[splitName.Length - 1];
+                    s = splitName[^1];
                 }
                 return s;
             }
         }
 
-        public ClientNPCInfo ClientInformation
-        {
-            get
+        public ClientNPCInfo ClientInformation =>
+            new()
             {
-                return new ClientNPCInfo
-                {
-                    ObjectID = 0,
-                    Index = Index,
-                    FileName = FileName,
-                    Name = Name,
-                    MapIndex = MapIndex,
-                    Location = Location,
-                    Image = Image,
-                    Rate = Rate,
-                    ShowOnBigMap = ShowOnBigMap,
-                    BigMapIcon = BigMapIcon,
-                    Icon = BigMapIcon,
-                    CanTeleportTo = CanTeleportTo
-                };
-            }
-        }
+                ObjectID = 0,
+                Index = Index,
+                FileName = FileName,
+                Name = Name,
+                MapIndex = MapIndex,
+                Location = Location,
+                Image = Image,
+                Rate = Rate,
+                ShowOnBigMap = ShowOnBigMap,
+                BigMapIcon = BigMapIcon,
+                Icon = BigMapIcon,
+                CanTeleportTo = CanTeleportTo
+            };
     }
 }

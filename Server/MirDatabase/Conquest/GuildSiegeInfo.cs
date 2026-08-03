@@ -7,17 +7,14 @@ namespace Server.Library.MirDatabase.Conquest;
 
 public class GuildSiegeInfo
 {
-    protected static Env Env
-    {
-        get { return Env.Main; }
-    }
+    protected static Env Env => Env.Main;
 
     public int Index;
     public int Health;
 
-    public ConquestSiegeInfo Info;
-    public ConquestObject Conquest;
-    public Gate Gate;
+    public SiegeInfo? Info;
+    public ConquestObject? Conquest;
+    public Gate? Gate;
 
     public GuildSiegeInfo() { }
 
@@ -44,9 +41,10 @@ public class GuildSiegeInfo
 
     public void Spawn()
     {
-        if (Gate != null) Gate.Despawn();
+        Gate?.Despawn();
+        if (Info == null) return;
 
-        MonsterInfo monsterInfo = Env.GetMonsterInfo(Info.MobIndex);
+        MonsterInfo? monsterInfo = Env.GetMonsterInfo(Info.MobIndex);
 
         if (monsterInfo == null) return;
         if (monsterInfo.AI != 72) return;
@@ -64,6 +62,7 @@ public class GuildSiegeInfo
 
         Gate.Conquest = Conquest;
         Gate.GateIndex = Index;
+        if (Gate == null || Conquest == null) return;
 
         Gate.Spawn(Conquest.ConquestMap, Info.Location);
 
@@ -87,7 +86,7 @@ public class GuildSiegeInfo
 
         if (Gate.Stats[Stat.HP] == Gate.HP) return cost;
 
-        if (Info.RepairCost != 0)
+        if (Info != null && Info.RepairCost != 0)
         {
             cost = Info.RepairCost / (Gate.Stats[Stat.HP] / (Gate.Stats[Stat.HP] - Gate.HP));
         }

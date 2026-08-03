@@ -15,18 +15,12 @@ namespace Server.MirEnv
         public long DeLevelTime;
         public bool Loaded;
 
-        private static Env Env
-        {
-            get { return Env.Main; }
-        }
+        private static Env Env => Env.Main;
 
-        protected static MessageQueue MessageQueue
-        {
-            get { return MessageQueue.Instance; }
-        }
+        protected static MessageQueue MessageQueue => MessageQueue.Instance;
 
-        private readonly Point[] BodyLocations = new[]
-        {
+        private readonly Point[] BodyLocations =
+        [
             new Point(-3, -1),
             new Point(-3, -0),
             new Point(-2, -3),
@@ -50,12 +44,12 @@ namespace Server.MirEnv
             new Point(1, 2),
             new Point(1, 3),
             new Point(2, 1),
-            new Point(2, 2),
-        };
+            new Point(2, 2)
+        ];
 
 
         public DragonInfo Info;
-        public MonsterObject LinkedMonster;
+        public MonsterObject? LinkedMonster;
 
         public Dragon(DragonInfo info)
         {
@@ -65,7 +59,7 @@ namespace Server.MirEnv
         {
             try
             {
-                MonsterInfo info = Env.GetMonsterInfo(Info.MonsterName);
+                MonsterInfo? info = Env.GetMonsterInfo(Info.MonsterName);
                 if (info == null)
                 {
                     MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.FailedLoadDragonBadMonsterName) + Info.MonsterName);
@@ -73,7 +67,7 @@ namespace Server.MirEnv
                 }
                 LinkedMonster = MonsterObject.GetMonster(info);
 
-                Map map = Env.GetMapByNameAndInstance(Info.MapFileName);
+                Map? map = Env.GetMapByNameAndInstance(Info.MapFileName);
                 if (map == null)
                 {
                     MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.FailedToLoadDragonBadMapName) + Info.MapFileName);
@@ -90,21 +84,17 @@ namespace Server.MirEnv
                 {
                     if (LinkedMonster is EvilMir mob)
                     {
-                        if (mob != null)
-                        {
-                            mob.DragonLink = true;
-                        }
+                        mob.DragonLink = true;
                     }
-                    MonsterInfo bodyinfo = Env.GetMonsterInfo(Info.BodyName);
-                    if (bodyinfo != null)
+                    MonsterInfo? bodyInfo = Env.GetMonsterInfo(Info.BodyName);
+                    if (bodyInfo != null)
                     {
-                        MonsterObject bodymob;
-                        Point spawnlocation = Point.Empty;
+                        Point spawnLocation = Point.Empty;
                         for (int i = 0; i <= BodyLocations.Length - 1; i++)
                         {
-                            bodymob = MonsterObject.GetMonster(bodyinfo);
-                            spawnlocation = new Point(LinkedMonster.CurrentLocation.X + BodyLocations[i].X, LinkedMonster.CurrentLocation.Y + BodyLocations[i].Y);
-                            if (bodymob != null) bodymob.Spawn(LinkedMonster.CurrentMap, spawnlocation);
+                            var bodyMob = MonsterObject.GetMonster(bodyInfo);
+                            spawnLocation = new Point(LinkedMonster.CurrentLocation.X + BodyLocations[i].X, LinkedMonster.CurrentLocation.Y + BodyLocations[i].Y);
+                            bodyMob.Spawn(LinkedMonster.CurrentMap!, spawnLocation);
                         }
                     }
 
@@ -121,17 +111,19 @@ namespace Server.MirEnv
             MessageQueue.Enqueue(GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.FailedToLoadDragon));
             return false;
         }
-        public void GainExp(int ammount)
+        
+        public void GainExp(int amount)
         {
-            if (ammount <= 0) return;
+            if (amount <= 0) return;
 
-            Info.Experience += ammount;
+            Info.Experience += amount;
             if (Info.Experience >= Info.Exps[Math.Min(11, Info.Level - 1)])
             {
                 Info.Experience -= Info.Exps[Math.Min(11, Info.Level - 1)];
                 LevelUp();
             }
         }
+        
         public void LevelUp()
         {
             Drop(Info.Level);//i would suggest having the max level drop be empty or 'trash' > that way you stop ppl from exploiting it
@@ -140,6 +132,7 @@ namespace Server.MirEnv
             if (Info.Level == Globals.MaxDragonLevel)
                 DeLevelTime = Env.Time + (6 * DeLevelDelay);
         }
+        
         public void LevelDown()
         {
             if (Info.Level > 1)
@@ -148,17 +141,17 @@ namespace Server.MirEnv
                 Info.Experience = 0;
             }
         }
+        
         public void Drop(byte level)
         {
             if (level > Info.Drops.Length) return;
             if (Info.Drops[level - 1] == null) return;
+            
             if (LinkedMonster == null) return;
-            List<DragonInfo.DropInfo> droplist = new List<DragonInfo.DropInfo>(Info.Drops[level - 1]);
+            List<DragonInfo.DropInfo> droplist = new List<DragonInfo.DropInfo>(Info.Drops[level - 1]!);
 
-            for (int i = 0; i < droplist.Count; i++)
+            foreach (var drop in droplist)
             {
-                DragonInfo.DropInfo drop = droplist[i];
-
                 int rate = (int)(drop.Chance / Settings.DropRate); if (rate < 1) rate = 1;
                 if (RandomProvider.Next(rate) != 0) continue;
 
@@ -172,16 +165,18 @@ namespace Server.MirEnv
                 }
                 else
                 {
-                    UserItem item = Env.CreateDropItem(drop.Item);
+                    UserItem? item = Env.CreateDropItem(drop.Item);
                     if (item == null) continue;
                     if (!DropItem(item)) return;
                 }
             }
         }
+        
         protected bool DropItem(UserItem item)
         {
-            Point droplocation = new Point(DropArea.Left + (DropArea.Width / 2), DropArea.Top);
-            ItemObject ob = new ItemObject(this.LinkedMonster, item, droplocation)
+            if (LinkedMonster == null) throw new InvalidOperationException("LinkedMonster is null");
+            Point dropLocation = new Point(DropArea.Left + (DropArea.Width / 2), DropArea.Top);
+            ItemObject ob = new ItemObject(this.LinkedMonster, item, dropLocation)
             {
                 Owner = this.LinkedMonster.EXPOwner,
                 OwnerTime = Env.Time + Settings.Minute,
@@ -192,14 +187,15 @@ namespace Server.MirEnv
 
         protected bool DropGold(uint gold)
         {
+            if (LinkedMonster == null) throw new InvalidOperationException("LinkedMonster is null");
             if (this.LinkedMonster.EXPOwner != null && this.LinkedMonster.EXPOwner.CanGainGold(gold))
             {
                 this.LinkedMonster.EXPOwner.WinGold(gold);
                 return true;
             }
 
-            Point droplocation = new Point(DropArea.Left + (DropArea.Width / 2), DropArea.Top);
-            ItemObject ob = new ItemObject(this.LinkedMonster, gold, droplocation)
+            Point dropLocation = new Point(DropArea.Left + (DropArea.Width / 2), DropArea.Top);
+            ItemObject ob = new ItemObject(this.LinkedMonster, gold, dropLocation)
             {
                 Owner = this.LinkedMonster.EXPOwner,
                 OwnerTime = Env.Time + Settings.Minute,

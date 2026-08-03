@@ -1,8 +1,7 @@
 using System.Drawing;
 using Server.Library.MirDatabase.Conquest;
-﻿using Server.MirEnv;
+using Server.MirEnv;
 using Server.MirDatabase;
-using Server.MirDatabase.Conquest;
 using GuildInfo = Server.Library.MirDatabase.Conquest.GuildInfo;
 
 namespace Server.MirObjects
@@ -58,7 +57,7 @@ namespace Server.MirObjects
             set { GuildInfo.ControlPoints = value; }
         }
 
-        public GuildObject Guild;
+        public GuildObject? Guild;
 
         public Map ConquestMap;
         public Map PalaceMap;
@@ -96,19 +95,19 @@ namespace Server.MirObjects
 
                 if (tempArcher != null)
                 {
-                    tempArcher.Info = Info.ConquestGuards[j];
+                    tempArcher.ArcherInfo = Info.ConquestGuards[j];
                     tempArcher.Conquest = this;
                 }
                 else
                 {
-                    GuildInfo.ArcherList.Add(new GuildArcherInfo { Info = Info.ConquestGuards[j], Alive = true, Index = Info.ConquestGuards[j].Index, Conquest = this });
+                    GuildInfo.ArcherList.Add(new GuildArcherInfo { ArcherInfo = Info.ConquestGuards[j], Alive = true, Index = Info.ConquestGuards[j].Index, Conquest = this });
                 }
             }
 
             //Remove archers that have been removed from DB
             for (var j = 0; j < GuildInfo.ArcherList.Count; j++)
             {
-                if (GuildInfo.ArcherList[j].Info == null)
+                if (GuildInfo.ArcherList[j].ArcherInfo == null)
                 {
                     GuildInfo.ArcherList.Remove(GuildInfo.ArcherList[j]);
                 }

@@ -5,7 +5,7 @@ namespace Server.MirObjects.Monsters
 {
     public class Wall : MonsterObject
     {
-        public ConquestObject Conquest;
+        public ConquestObject? Conquest;
         public int WallIndex;
 
         protected internal Wall(MonsterInfo info) : base(info)

@@ -229,7 +229,7 @@ namespace Server.MirObjects
             {
                 VisTime = Env.Time + (Settings.Minute);
 
-                if (Info.DayofWeek != "" && Info.DayofWeek != Env.Now.DayOfWeek.ToString())
+                if (Info.DayOfWeek != "" && Info.DayOfWeek != Env.Now.DayOfWeek.ToString())
                 {
                     if (Visible) Hide();
                 }

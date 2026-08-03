@@ -5,12 +5,9 @@ namespace Server.MirDatabase
 {
     public class MagicInfo
     {
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
 
-        public string Name;
+        public string Name = string.Empty;
         public Spell Spell;
         public byte BaseCost, LevelCost, Icon;
         public byte Level1, Level2, Level3;
@@ -87,40 +84,31 @@ namespace Server.MirDatabase
 
     public class UserMagic
     {
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
 
-        public Spell Spell;
-        public MagicInfo Info;
+        public readonly Spell Spell;
+        public readonly MagicInfo Info;
 
         public byte Level, Key;
         public ushort Experience;
         public bool IsTempSpell;
         public long CastTime;
 
-        private MagicInfo GetMagicInfo(Spell spell)
+        private static MagicInfo? GetMagicInfo(Spell spell)
         {
-            for (int i = 0; i < Env.MagicInfoList.Count; i++)
-            {
-                MagicInfo info = Env.MagicInfoList[i];
-                if (info.Spell != spell) continue;
-                return info;
-            }
-            return null;
+            return Env.MagicInfoList.FirstOrDefault(info => info.Spell == spell);
         }
 
         public UserMagic(Spell spell)
         {
             Spell = spell;
             
-            Info = GetMagicInfo(Spell);
+            Info = GetMagicInfo(Spell) ?? throw new NullReferenceException("MagicInfo is null");
         }
         public UserMagic(BinaryReader reader, int version, int customVersion)
         {
             Spell = (Spell) reader.ReadByte();
-            Info = GetMagicInfo(Spell);
+            Info = GetMagicInfo(Spell) ?? throw new NullReferenceException("MagicInfo is null");
 
             Level = reader.ReadByte();
             Key = reader.ReadByte();

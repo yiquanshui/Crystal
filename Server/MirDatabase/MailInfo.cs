@@ -4,44 +4,32 @@ namespace Server.MirEnv
 {
     public class MailInfo
     {
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
 
         public ulong MailID;
 
-        public string Sender;
+        public string Sender = string.Empty;
 
         public int RecipientIndex;
         public CharacterInfo? RecipientInfo;
 
         public string Message = string.Empty;
-        public uint Gold = 0;
+        public uint Gold;
         public List<UserItem> Items = [];
 
         public DateTime DateSent, DateOpened;
 
-        public bool Sent
-        {
-            get { return DateSent > DateTime.MinValue; }
-        }
+        public bool Sent => DateSent > DateTime.MinValue;
 
-        public bool Opened
-        {
-            get { return DateOpened > DateTime.MinValue; }
-        }
+        public bool Opened => DateOpened > DateTime.MinValue;
 
         public bool Locked;
 
         public bool Collected;
 
-        public bool Parcel //parcel if item contains gold or items.
-        {
-            get { return Gold > 0 || Items.Count > 0; }
-        }
+        public bool Parcel => Gold > 0 || Items.Count > 0; //parcel if item contains gold or items.
 
-        public bool CanReply;
+        public readonly bool CanReply;
 
         public MailInfo(int recipientIndex, bool canReply = false)
         {
@@ -51,7 +39,7 @@ namespace Server.MirEnv
             CanReply = canReply;
         }
 
-        public MailInfo(BinaryReader reader, int version, int customversion)
+        public MailInfo(BinaryReader reader, int version, int customVersion)
         {
             MailID = reader.ReadUInt64();
             Sender = reader.ReadString();
@@ -63,7 +51,7 @@ namespace Server.MirEnv
 
             for (int i = 0; i < count; i++)
             {
-                UserItem item = new UserItem(reader, version, customversion);
+                UserItem item = new UserItem(reader, version, customVersion);
                 if (Env.BindItem(item))
                     Items.Add(item);
             }
@@ -85,8 +73,8 @@ namespace Server.MirEnv
             writer.Write(Gold);
 
             writer.Write(Items.Count);
-            for (int i = 0; i < Items.Count; i++)
-                Items[i].Save(writer);
+            foreach (var item in Items)
+                item.Save(writer);
 
             writer.Write(DateSent.ToBinary());
             writer.Write(DateOpened.ToBinary());
@@ -127,10 +115,7 @@ namespace Server.MirEnv
                 }
             }
 
-            if (RecipientInfo == null)
-            {
-                RecipientInfo = Env.GetCharacterInfo(RecipientIndex);
-            }
+            RecipientInfo ??= Env.GetCharacterInfo(RecipientIndex) ?? throw new NullReferenceException();
 
             RecipientInfo.Mail.Add(this); //add to players inbox
 

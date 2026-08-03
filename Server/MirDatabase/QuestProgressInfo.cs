@@ -5,42 +5,31 @@ namespace Server.MirDatabase
 {
     public class QuestProgressInfo
     {
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
 
-        public PlayerObject Owner;
+        public PlayerObject? Owner;
 
         public int Index;
 
-        public QuestInfo Info;
+        public QuestInfo? Info;
 
         public DateTime StartDateTime = DateTime.MinValue;
         public DateTime EndDateTime = DateTime.MaxValue;
 
-        public List<QuestKillTaskProgress> KillTaskCount = new List<QuestKillTaskProgress>();
-        public List<QuestItemTaskProgress> ItemTaskCount = new List<QuestItemTaskProgress>();
-        public List<QuestFlagTaskProgress> FlagTaskSet = new List<QuestFlagTaskProgress>();
+        public List<QuestKillTaskProgress> KillTaskCount = [];
+        public List<QuestItemTaskProgress> ItemTaskCount = [];
+        public List<QuestFlagTaskProgress> FlagTaskSet = [];
 
-        public List<string> TaskList = new List<string>();
+        public List<string> TaskList = [];
 
         public bool IsOrphan { get; private set; }
         
-        public bool Taken
-        {
-            get { return StartDateTime > DateTime.MinValue; }
-        }
+        public bool Taken => StartDateTime > DateTime.MinValue;
 
-        public bool Completed
-        {
-            get { return EndDateTime < DateTime.MaxValue; }
-        }
+        public bool Completed => EndDateTime < DateTime.MaxValue;
 
-        public bool New
-        {
-            get { return StartDateTime > Env.Now.AddDays(-1); }
-        }
+        public bool New => StartDateTime > Env.Now.AddDays(-1);
+
 
         public QuestProgressInfo(int index)
         {
@@ -194,10 +183,8 @@ namespace Server.MirDatabase
                         Count = reader.ReadInt32()
                     };
 
-                    foreach (var task in Info.KillTasks)
+                    foreach (var task in Info.KillTasks.Where(task => task.Monster.Index == progress.MonsterID))
                     {
-                        if (task.Monster.Index != progress.MonsterID) continue;
-
                         progress.Info = task;
                         KillTaskCount.Add(progress);
                         break;
@@ -213,10 +200,8 @@ namespace Server.MirDatabase
                         Count = reader.ReadInt32()
                     };
 
-                    foreach (var task in Info.ItemTasks)
+                    foreach (var task in Info.ItemTasks.Where(task => task.Item.Index == progress.ItemID))
                     {
-                        if (task.Item.Index != progress.ItemID) continue;
-
                         progress.Info = task;
                         ItemTaskCount.Add(progress);
                         break;
@@ -232,10 +217,8 @@ namespace Server.MirDatabase
                         State = reader.ReadBoolean()
                     };
 
-                    foreach (var task in Info.FlagTasks)
+                    foreach (var task in Info.FlagTasks.Where(task => task.Number == progress.Number))
                     {
-                        if (task.Number != progress.Number) continue;
-
                         progress.Info = task;
                         FlagTaskSet.Add(progress);
                         break;
@@ -296,24 +279,24 @@ namespace Server.MirDatabase
             writer.Write(EndDateTime.ToBinary());
 
             writer.Write(KillTaskCount.Count);
-            for (int i = 0; i < KillTaskCount.Count; i++)
+            foreach (var killTask in KillTaskCount)
             {
-                writer.Write(KillTaskCount[i].MonsterID);
-                writer.Write(KillTaskCount[i].Count);
+                writer.Write(killTask.MonsterID);
+                writer.Write(killTask.Count);
             }
 
             writer.Write(ItemTaskCount.Count);
-            for (int i = 0; i < ItemTaskCount.Count; i++)
+            foreach (var itemTask in ItemTaskCount)
             {
-                writer.Write(ItemTaskCount[i].ItemID);
-                writer.Write(ItemTaskCount[i].Count);
+                writer.Write(itemTask.ItemID);
+                writer.Write(itemTask.Count);
             }
 
             writer.Write(FlagTaskSet.Count);
-            for (int i = 0; i < FlagTaskSet.Count; i++)
+            foreach (var flagTask in FlagTaskSet)
             {
-                writer.Write(FlagTaskSet[i].Number);
-                writer.Write(FlagTaskSet[i].State);
+                writer.Write(flagTask.Number);
+                writer.Write(flagTask.State);
             }
         }
 
@@ -322,34 +305,16 @@ namespace Server.MirDatabase
         {
             UpdateTasks();
 
-            bool canComplete = true;
-
-            for (int j = 0; j < KillTaskCount.Count; j++)
-            {
-                if (KillTaskCount[j].Complete) continue;
-
-                canComplete = false;
-            }
-
-            for (int j = 0; j < ItemTaskCount.Count; j++)
-            {
-                if (ItemTaskCount[j].Complete) continue;
-
-                canComplete = false;
-            }
-
-            for (int j = 0; j < FlagTaskSet.Count; j++)
-            {
-                if (FlagTaskSet[j].Complete) continue;
-
-                canComplete = false;
-            }
+            bool canComplete = KillTaskCount.All(task => task.Complete);
+            canComplete &= ItemTaskCount.All(task => task.Complete);
+            canComplete &= FlagTaskSet.All(task => task.Complete);
 
             if (!canComplete) return false;
 
             if (!Completed)
             {
                 EndDateTime = Env.Now;
+                if (Info == null || Owner == null) throw new InvalidOperationException("Quest Info or Owner is null when trying to complete quest.");
 
                 if (Info.TimeLimitInSeconds > 0)
                 {
@@ -384,38 +349,36 @@ namespace Server.MirDatabase
 
         public void ProcessKill(MonsterInfo mInfo)
         {
-            if (Info.KillTasks.Count < 1) return;
+            if (Info!.KillTasks.Count < 1) return;
 
-            for (int i = 0; i < KillTaskCount.Count; i++)
+            foreach (var taks in KillTaskCount.Where(taks => mInfo.Name.StartsWith(taks.Info.Monster.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                if (!mInfo.Name.StartsWith(KillTaskCount[i].Info.Monster.Name, StringComparison.OrdinalIgnoreCase)) continue;
-                KillTaskCount[i].Count++;
-
+                taks.Count++;
                 return;
             }
         }
 
-        public void ProcessItem(UserItem[] inventory)
+        public void ProcessItem(UserItem?[] inventory)
         {
-            for (int i = 0; i < ItemTaskCount.Count; i++)
+            foreach (var task in ItemTaskCount)
             {
                 var count = inventory.Where(item => item != null).
-                    Where(item => item.Info.Name == ItemTaskCount[i].Info.Item.Name).
+                    Where(item => item.Info.Name == task.Info.Item.Name).
                     Aggregate<UserItem, int>(0, (current, item) => current + item.Count);
 
-                ItemTaskCount[i].Count = count;
+                task.Count = count;
             }
         }
 
         public void ProcessFlag(bool[] Flags)
         {
-            for (int i = 0; i < FlagTaskSet.Count; i++)
+            foreach (var task in FlagTaskSet)
             {
                 for (int j = 0; j < Flags.Length - 1000; j++)
                 {
-                    if (FlagTaskSet[i].Number != j || !Flags[j]) continue;
+                    if (task.Number != j || !Flags[j]) continue;
 
-                    FlagTaskSet[i].State = Flags[j];
+                    task.State = Flags[j];
                     break;
                 }
             }
@@ -427,7 +390,7 @@ namespace Server.MirDatabase
 
         public void UpdateTasks()
         {
-            TaskList = new List<string>();
+            TaskList = [];
 
             UpdateKillTasks();
             UpdateItemTasks();
@@ -437,17 +400,13 @@ namespace Server.MirDatabase
 
         public void UpdateKillTasks()
         {
+            if (Info ==  null) return;
+            
             if(Info.KillMessage.Length > 0 && Info.KillTasks.Count > 0) 
             {
-                bool allComplete = true;
-                for (int i = 0; i < KillTaskCount.Count; i++)
-                {
-                    if (KillTaskCount[i].Complete) continue;
+                bool allComplete = KillTaskCount.All(task => task.Complete);
 
-                    allComplete = false;
-                }
-
-                TaskList.Add(string.Format("{0} {1}", Info.KillMessage, allComplete ? GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TaskCompleted) : ""));
+                TaskList.Add($"{Info.KillMessage} {(allComplete ? GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TaskCompleted) : "")}");
                 return;
             }
 
@@ -460,24 +419,19 @@ namespace Server.MirDatabase
                 }
                 else
                 {
-                    TaskList.Add(string.Format("{0} {1}", Info.KillTasks[i].Message, KillTaskCount[i].Complete ? GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TaskCompleted) : ""));
+                    TaskList.Add($"{Info.KillTasks[i].Message} {(KillTaskCount[i].Complete ? GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TaskCompleted) : "")}");
                 }
             }
         }
 
         public void UpdateItemTasks()
         {
+            if (Info ==  null) return;
+            
             if (Info.ItemMessage.Length > 0 && Info.ItemTasks.Count > 0)
             {
-                bool allComplete = true;
-                for (int i = 0; i < ItemTaskCount.Count; i++)
-                {
-                    if (ItemTaskCount[i].Complete) continue;
-
-                    allComplete = false;
-                }
-                
-                TaskList.Add(string.Format("{0} {1}", Info.ItemMessage, allComplete ? GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TaskCompleted) : ""));
+                bool allComplete = ItemTaskCount.All(task => task.Complete);
+                TaskList.Add($"{Info.ItemMessage} {(allComplete ? GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TaskCompleted) : "")}");
                 return;
             }
 
@@ -490,42 +444,36 @@ namespace Server.MirDatabase
                 }
                 else
                 {
-                    TaskList.Add(string.Format("{0} {1}", Info.ItemTasks[i].Message, ItemTaskCount[i].Complete ? GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TaskCompleted) : ""));
+                    TaskList.Add($"{Info.ItemTasks[i].Message} {(ItemTaskCount[i].Complete ? GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TaskCompleted) : "")}");
                 }
             }
         }
 
         public void UpdateFlagTasks()
         {
+            if (Info ==  null) return;
+            
             if (Info.FlagMessage.Length > 0)
             {
-                bool allComplete = true;
-                for (int i = 0; i < FlagTaskSet.Count; i++)
-                {
-                    if (FlagTaskSet[i].State) continue;
-
-                    allComplete = false;
-                }
+                bool allComplete = FlagTaskSet.All(task => task.Complete);
                 
-                TaskList.Add(string.Format("{0} {1}", Info.FlagMessage, allComplete ? GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TaskCompleted) : ""));
+                TaskList.Add($"{Info.FlagMessage} {(allComplete ? GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TaskCompleted) : "")}");
                 return;
             }
 
             for (int i = 0; i < FlagTaskSet.Count; i++)
             {
-                if (string.IsNullOrEmpty(Info.FlagTasks[i].Message))
-                {
-                    TaskList.Add(GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ActivateFlag), Info.FlagTasks[i].Number, FlagTaskSet[i].Complete ? GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TaskCompleted) : ""));
-                }
-                else
-                {
-                    TaskList.Add(string.Format("{0} {1}", Info.FlagTasks[i].Message, FlagTaskSet[i].Complete ? GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TaskCompleted) : ""));
-                }
+                TaskList.Add(string.IsNullOrEmpty(Info.FlagTasks[i].Message)
+                    ? GameLanguage.ServerTextMap.GetLocalization((ServerTextKeys.ActivateFlag), Info.FlagTasks[i].Number,
+                        FlagTaskSet[i].Complete ? GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TaskCompleted) : "")
+                    : $"{Info.FlagTasks[i].Message} {(FlagTaskSet[i].Complete ? GameLanguage.ServerTextMap.GetLocalization(ServerTextKeys.TaskCompleted) : "")}");
             }
         }
 
         public void UpdateGotoTask()
         {
+            if (Info ==  null) return;
+            
             if (Info.GotoMessage.Length <= 0 || !Completed) return;
             
             TaskList.Add(Info.GotoMessage);
@@ -537,7 +485,7 @@ namespace Server.MirDatabase
 
         public void SetTimer()
         {
-            if (Owner == null)
+            if (Owner == null || Info == null)
             {
                 return;
             }
@@ -560,7 +508,7 @@ namespace Server.MirDatabase
 
         public void RemoveTimer()
         {
-            if (Owner == null)
+            if (Owner == null || Info == null)
             {
                 return;
             }
@@ -588,28 +536,28 @@ namespace Server.MirDatabase
 
     public class QuestKillTaskProgress
     {
-        public int MonsterID { get; set; }
+        public int MonsterID { get; init; }
         public int Count { get; set; }
-        public QuestKillTask Info { get; set; }
+        public QuestKillTask? Info { get; set; }
 
-        public bool Complete { get { return Info != null && Count >= Info.Count; } }
+        public bool Complete => Info != null && Count >= Info.Count;
     }
 
     public class QuestItemTaskProgress
     {
-        public int ItemID { get; set; }
+        public int ItemID { get; init; }
         public int Count { get; set; }
-        public QuestItemTask Info { get; set; }
+        public QuestItemTask? Info { get; set; }
 
-        public bool Complete { get { return Info != null && Count >= Info.Count; } }
+        public bool Complete => Info != null && Count >= Info.Count;
     }
 
     public class QuestFlagTaskProgress
     {
-        public int Number { get; set; }
+        public int Number { get; init; }
         public bool State { get; set; }
-        public QuestFlagTask Info { get; set; }
+        public QuestFlagTask? Info { get; set; }
 
-        public bool Complete { get { return Info != null && State == true; } }
+        public bool Complete => Info != null && State == true;
     }
 }

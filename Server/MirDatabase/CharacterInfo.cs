@@ -10,14 +10,14 @@ namespace Server.MirDatabase
         protected static Env Env => Env.Main;
 
         public int Index;
-        public string Name;
+        public string Name = string.Empty;
         public ushort Level;
         public MirClass Class;
         public MirGender Gender;
         public byte Hair;
         public int GuildIndex = -1;
 
-        public string CreationIP;
+        public string CreationIP = string.Empty;
         public DateTime CreationDate;
 
         public bool Banned;
@@ -262,7 +262,7 @@ namespace Server.MirDatabase
             {
                 QuestProgressInfo quest = new QuestProgressInfo(reader, version, customVersion);
 
-                if (quest == null || quest.Info == null || quest.IsOrphan)
+                if (quest.Info == null || quest.IsOrphan)
                 {
                     Console.WriteLine($"[Load] Skipped orphan QuestProgress (Index={quest?.Index}) for character: {Name}");
                     continue;

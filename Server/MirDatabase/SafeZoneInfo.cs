@@ -7,7 +7,7 @@ using System.Drawing;
         public ushort Size;
         public bool StartPoint;
 
-        public MapInfo Info;
+        public MapInfo? Info;
 
         public SafeZoneInfo() { }
 
@@ -28,7 +28,7 @@ using System.Drawing;
 
         public override string ToString()
         {
-            return string.Format("Map: {0}- {1}", Functions.PointToString(Location), StartPoint);
+            return $"Map: {Functions.PointToString(Location)}- {StartPoint}";
         }
     }
 }

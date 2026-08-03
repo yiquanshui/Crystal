@@ -5,20 +5,14 @@ namespace Server.MirDatabase
 {
     public class DragonInfo
     {
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
 
-        protected static MessageQueue MessageQueue
-        {
-            get { return MessageQueue.Instance; }
-        }
+        protected static MessageQueue MessageQueue => MessageQueue.Instance;
 
         public bool Enabled;
         public string MapFileName, MonsterName, BodyName;
         public Point Location, DropAreaTop, DropAreaBottom;
-        public List<DropInfo>[] Drops = new List<DropInfo>[Globals.MaxDragonLevel];
+        public readonly List<DropInfo>?[] Drops = new List<DropInfo>?[Globals.MaxDragonLevel];
         public long[] Exps = new long[Globals.MaxDragonLevel - 1];
 
         public byte Level;

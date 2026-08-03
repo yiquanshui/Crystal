@@ -114,27 +114,23 @@ namespace Server.MirDatabase
             writer.Write(Experience);
 
             writer.Write(Inventory.Length);
-            for (int i = 0; i < Inventory.Length; i++)
+            foreach (var item in Inventory)
             {
-                writer.Write(Inventory[i] != null);
-                if (Inventory[i] == null) continue;
-
-                Inventory[i].Save(writer);
+                writer.Write(item != null);
+                item?.Save(writer);
             }
 
             writer.Write(Equipment.Length);
-            for (int i = 0; i < Equipment.Length; i++)
+            foreach (var equip in Equipment)
             {
-                writer.Write(Equipment[i] != null);
-                if (Equipment[i] == null) continue;
-
-                Equipment[i].Save(writer);
+                writer.Write(equip != null);
+                equip?.Save(writer);
             }
 
             writer.Write(Magics.Count);
-            for (int i = 0; i < Magics.Count; i++)
+            foreach (var magic in Magics)
             {
-                Magics[i].Save(writer);
+                magic.Save(writer);
             }
 
             writer.Write(AutoPot);
@@ -153,19 +149,14 @@ namespace Server.MirDatabase
             return Inventory.Length;
         }
 
-        public ClientHeroInformation ClientInformation
-        {
-            get
+        public ClientHeroInformation ClientInformation =>
+            new()
             {
-                return new ClientHeroInformation()
-                {
-                    Index = Index,
-                    Name = Name,
-                    Level = Math.Max((ushort)1, Level),
-                    Class = Class,
-                    Gender = Gender
-                };
-            }
-        }
+                Index = Index,
+                Name = Name,
+                Level = Math.Max((ushort)1, Level),
+                Class = Class,
+                Gender = Gender
+            };
     }
 }

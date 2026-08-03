@@ -5,15 +5,9 @@ namespace Server.MirDatabase
 {
     public class MapInfo
     {
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
 
-        protected static Env EditEnv
-        {
-            get { return Env.Edit; }
-        }
+        protected static Env EditEnv => Env.Edit;
 
         public int Index;
         public string FileName = string.Empty, Title = string.Empty;
@@ -31,12 +25,12 @@ namespace Server.MirDatabase
         public string NoReconnectMap = string.Empty;
         public int FireDamage, LightningDamage;
 
-        public List<SafeZoneInfo> SafeZones = new List<SafeZoneInfo>();
-        public List<MovementInfo> Movements = new List<MovementInfo>();
-        public List<RespawnInfo> Respawns = new List<RespawnInfo>();
-        public List<NPCInfo> NPCs = new List<NPCInfo>();
-        public List<MineZone> MineZones = new List<MineZone>();
-        public List<Point> ActiveCoords = new List<Point>();
+        public List<SafeZoneInfo> SafeZones = [];
+        public List<MovementInfo> Movements = [];
+        public List<RespawnInfo> Respawns = [];
+        public List<NPCInfo> NPCs = [];
+        public List<MineZone> MineZones = [];
+        public List<Point> ActiveCoords = [];
         public WeatherSetting WeatherParticles = WeatherSetting.None;
 
         public MapInfo()
@@ -133,16 +127,16 @@ namespace Server.MirDatabase
             writer.Write(BigMap);
             writer.Write(SafeZones.Count);
 
-            for (int i = 0; i < SafeZones.Count; i++)
-                SafeZones[i].Save(writer);
+            foreach (var zone in SafeZones)
+                zone.Save(writer);
 
             writer.Write(Respawns.Count);
-            for (int i = 0; i < Respawns.Count; i++)
-                Respawns[i].Save(writer);
+            foreach (var respawn in Respawns)
+                respawn.Save(writer);
 
             writer.Write(Movements.Count);
-            for (int i = 0; i < Movements.Count; i++)
-                Movements[i].Save(writer);
+            foreach (var movement in Movements)
+                movement.Save(writer);
 
             writer.Write(NoTeleport);
             writer.Write(NoReconnect);
@@ -163,8 +157,10 @@ namespace Server.MirDatabase
             writer.Write(LightningDamage);
             writer.Write(MapDarkLight);
             writer.Write(MineZones.Count);
-            for (int i = 0; i < MineZones.Count; i++)
-                MineZones[i].Save(writer);
+            
+            foreach (var mineZone in MineZones)
+                mineZone.Save(writer);
+
             writer.Write(MineIndex);
 
             writer.Write(NoMount);
@@ -176,7 +172,7 @@ namespace Server.MirDatabase
             writer.Write(NoTownTeleport);
             writer.Write(NoReincarnation);
 
-            writer.Write((UInt16)WeatherParticles);
+            writer.Write((ushort)WeatherParticles);
 
             writer.Write(GT);
             writer.Write(GTIndex);
@@ -196,11 +192,9 @@ namespace Server.MirDatabase
 
         public void CreateMap()
         {
-            for (int j = 0; j < Env.NPCInfoList.Count; j++)
+            foreach (var npcInfo in Env.NPCInfoList.Where(npcInfo => npcInfo.MapIndex == Index))
             {
-                if (Env.NPCInfoList[j].MapIndex != Index) continue;
-
-                NPCs.Add(Env.NPCInfoList[j]);
+                NPCs.Add(npcInfo);
             }
 
             Map map = new Map(this);
@@ -209,9 +203,8 @@ namespace Server.MirDatabase
 
             Env.MapList.Add(map);
 
-            for (int i = 0; i < SafeZones.Count; i++)
-                if (SafeZones[i].StartPoint)
-                    Env.StartPoints.Add(SafeZones[i]);
+            foreach (var safeZone in SafeZones.Where(safeZone => safeZone.StartPoint))
+                Env.StartPoints.Add(safeZone);
         }
 
         public void CreateSafeZone()
@@ -226,7 +219,7 @@ namespace Server.MirDatabase
 
         public override string ToString()
         {
-            return string.Format("{0}: {1}", Index, Title);
+            return $"{Index}: {Title}";
         }
 
         public void CreateNPCInfo()
@@ -241,7 +234,7 @@ namespace Server.MirDatabase
 
         public static void FromText(string text)
         {
-            string[] data = text.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] data = text.Split([','], StringSplitOptions.RemoveEmptyEntries);
 
             if (data.Length < 8) return;
 
@@ -251,12 +244,11 @@ namespace Server.MirDatabase
             if (!ushort.TryParse(data[2], out info.MiniMap)) return;
 
             if (!Enum.TryParse(data[3], out info.Light)) return;
-            int sziCount, miCount, riCount, npcCount;
 
-            if (!int.TryParse(data[4], out sziCount)) return;
-            if (!int.TryParse(data[5], out miCount)) return;
-            if (!int.TryParse(data[6], out riCount)) return;
-            if (!int.TryParse(data[7], out npcCount)) return;
+            if (!int.TryParse(data[4], out int sziCount)) return;
+            if (!int.TryParse(data[5], out int miCount)) return;
+            if (!int.TryParse(data[6], out int riCount)) return;
+            if (!int.TryParse(data[7], out int npcCount)) return;
 
 
             int start = 8;
@@ -264,10 +256,9 @@ namespace Server.MirDatabase
             for (int i = 0; i < sziCount; i++)
             {
                 SafeZoneInfo temp = new SafeZoneInfo { Info = info };
-                int x, y;
 
-                if (!int.TryParse(data[start + (i * 4)], out x)) return;
-                if (!int.TryParse(data[start + 1 + (i * 4)], out y)) return;
+                if (!int.TryParse(data[start + (i * 4)], out int x)) return;
+                if (!int.TryParse(data[start + 1 + (i * 4)], out int y)) return;
                 if (!ushort.TryParse(data[start + 2 + (i * 4)], out temp.Size)) return;
                 if (!bool.TryParse(data[start + 3 + (i * 4)], out temp.StartPoint)) return;
 
@@ -281,10 +272,9 @@ namespace Server.MirDatabase
             for (int i = 0; i < miCount; i++)
             {
                 MovementInfo temp = new MovementInfo();
-                int x, y;
 
-                if (!int.TryParse(data[start + (i * 5)], out x)) return;
-                if (!int.TryParse(data[start + 1 + (i * 5)], out y)) return;
+                if (!int.TryParse(data[start + (i * 5)], out int x)) return;
+                if (!int.TryParse(data[start + 1 + (i * 5)], out int y)) return;
                 temp.Source = new Point(x, y);
 
                 if (!int.TryParse(data[start + 2 + (i * 5)], out temp.MapIndex)) return;
@@ -301,11 +291,10 @@ namespace Server.MirDatabase
             for (int i = 0; i < riCount; i++)
             {
                 RespawnInfo temp = new RespawnInfo();
-                int x, y;
 
                 if (!int.TryParse(data[start + (i * 7)], out temp.MonsterIndex)) return;
-                if (!int.TryParse(data[start + 1 + (i * 7)], out x)) return;
-                if (!int.TryParse(data[start + 2 + (i * 7)], out y)) return;
+                if (!int.TryParse(data[start + 1 + (i * 7)], out int x)) return;
+                if (!int.TryParse(data[start + 2 + (i * 7)], out int y)) return;
 
                 temp.Location = new Point(x, y);
 
@@ -324,25 +313,27 @@ namespace Server.MirDatabase
 
             for (int i = 0; i < npcCount; i++)
             {
-                NPCInfo temp = new NPCInfo { FileName = data[start + (i * 6)], Name = data[start + 1 + (i * 6)] };
-                int x, y;
 
-                if (!int.TryParse(data[start + 2 + (i * 6)], out x)) return;
-                if (!int.TryParse(data[start + 3 + (i * 6)], out y)) return;
+                if (!int.TryParse(data[start + 2 + (i * 6)], out int x)) return;
+                if (!int.TryParse(data[start + 3 + (i * 6)], out int y)) return;
+                if (!ushort.TryParse(data[start + 4 + (i * 6)], out ushort Rate)) return;
+                if (!ushort.TryParse(data[start + 5 + (i * 6)], out ushort Image)) return;
 
-                temp.Location = new Point(x, y);
-
-                if (!ushort.TryParse(data[start + 4 + (i * 6)], out temp.Rate)) return;
-                if (!ushort.TryParse(data[start + 5 + (i * 6)], out temp.Image)) return;
+                NPCInfo temp = new NPCInfo
+                {
+                    FileName = data[start + (i * 6)], Name = data[start + 1 + (i * 6)],
+                    Location = new Point(x, y),
+                    Rate = Rate,
+                    Image = Image,
+                };
 
                 info.NPCs.Add(temp);
             }
 
-
-
             info.Index = ++EditEnv.MapIndex;
             EditEnv.MapInfoList.Add(info);
         }
+        
         public static string GetMapTitleByIndex(int index) // For Players Online tab
         {
             var mapInfo = Env.MapInfoList.FirstOrDefault(m => m.Index == index);

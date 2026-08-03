@@ -9,8 +9,8 @@ using System.Drawing;
         public byte HitRate = 25;
         public byte DropRate = 10;
         public byte TotalSlots = 100;
-        public List<MineDrop> Drops = new List<MineDrop>();
-        private bool DropsSet = false;
+        public List<MineDrop> Drops = [];
+        private bool DropsSet;
 
         public MineSet(byte mineType = 0)
         {
@@ -36,13 +36,11 @@ using System.Drawing;
         public void SetDrops(List<ItemInfo> items)
         {
             if (DropsSet) return;
-            for (int i = 0; i < Drops.Count; i++)
+            foreach (var drop in Drops)
             {
-                for (int j = 0; j < items.Count; j++)
+                foreach (var item in items.Where(item => string.Compare(item.Name.Replace(" ", ""), drop.ItemName, StringComparison.OrdinalIgnoreCase) == 0))
                 {
-                    ItemInfo info = items[j];
-                    if (String.Compare(info.Name.Replace(" ", ""), Drops[i].ItemName, StringComparison.OrdinalIgnoreCase) != 0) continue;
-                    Drops[i].Item = info;
+                    drop.Item = item;
                     break;
                 }
             }
@@ -54,18 +52,18 @@ using System.Drawing;
     {
         public byte StonesLeft = 0;
         public long LastRegenTick = 0;
-        public MineSet Mine;
+        public MineSet? Mine;
     }
 
     public class MineDrop
     {
-        public string ItemName;
-        public ItemInfo Item;
-        public byte MinSlot = 0;
-        public byte MaxSlot = 0;
+        public string ItemName = string.Empty;
+        public ItemInfo? Item;
+        public byte MinSlot;
+        public byte MaxSlot;
         public byte MinDura = 1;
         public byte MaxDura = 1;
-        public byte BonusChance = 0;
+        public byte BonusChance;
         public byte MaxBonusDura = 1;
     }
 
@@ -95,7 +93,7 @@ using System.Drawing;
         }
         public override string ToString()
         {
-            return string.Format("Mine: {0}- {1}", Functions.PointToString(Location), Mine);
+            return $"Mine: {Functions.PointToString(Location)}- {Mine}";
         }
     }
 }

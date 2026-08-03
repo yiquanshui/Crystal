@@ -72,7 +72,7 @@ public class ClientRecipeInfo
 {
     public uint Gold;
     public byte Chance;
-    public UserItem Item;
+    public UserItem? Item;
     public List<UserItem> Tools = new List<UserItem>();
     public List<UserItem> Ingredients = new List<UserItem>();
 

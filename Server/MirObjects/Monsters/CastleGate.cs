@@ -6,7 +6,7 @@ namespace Server.MirObjects.Monsters
 {
     public abstract class CastleGate : MonsterObject
     {
-        public ConquestObject Conquest;
+        public ConquestObject? Conquest;
         public int GateIndex;
 
         public bool Closed;

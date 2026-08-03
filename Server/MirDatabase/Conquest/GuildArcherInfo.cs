@@ -1,24 +1,22 @@
-﻿using Server.MirEnv;
+﻿using Server.MirDatabase;
+using Server.MirEnv;
 using Server.MirObjects;
 using Server.MirObjects.Monsters;
 
-namespace Server.MirDatabase.Conquest;
+namespace Server.Library.MirDatabase.Conquest;
 
 public class GuildArcherInfo
 {
-    protected static Env Env
-    {
-        get { return Env.Main; }
-    }
+    protected static Env Env => Env.Main;
 
     public int Index;
     public bool Alive;
 
-    public ConquestArcherInfo Info;
+    public ArcherInfo? Info;
 
-    public ConquestObject Conquest;
+    public ConquestObject? Conquest;
 
-    public ConquestArcher ArcherMonster;
+    public ConquestArcher? ArcherMonster;
 
 
     public GuildArcherInfo() { }
@@ -28,6 +26,14 @@ public class GuildArcherInfo
         Index = reader.ReadInt32();
         Alive = reader.ReadBoolean();
     }
+
+
+    public ArcherInfo? ArcherInfo
+    {
+        get => Info;
+        set => Info = value;
+    }
+
 
     public void Save(BinaryWriter writer)
     {
@@ -48,7 +54,12 @@ public class GuildArcherInfo
     {
         if (Revive) Alive = true;
 
-        MonsterInfo monsterInfo = Env.GetMonsterInfo(Info.MobIndex);
+        if (ArcherInfo == null || Conquest == null)
+        {
+            return;
+        }
+
+        MonsterInfo? monsterInfo = Env.GetMonsterInfo(ArcherInfo.MobIndex);
 
         if (monsterInfo == null) return;
         if (monsterInfo.AI != 80) return;
@@ -62,11 +73,11 @@ public class GuildArcherInfo
 
         if (Alive)
         {
-            ArcherMonster.Spawn(Conquest.ConquestMap, Info.Location);
+            ArcherMonster.Spawn(Conquest.ConquestMap, ArcherInfo.Location);
         }
         else
         {
-            ArcherMonster.Spawn(Conquest.ConquestMap, Info.Location);
+            ArcherMonster.Spawn(Conquest.ConquestMap, ArcherInfo.Location);
             ArcherMonster.Die();
             ArcherMonster.DeadTime = Env.Time;
         }
@@ -78,7 +89,7 @@ public class GuildArcherInfo
 
         if (ArcherMonster == null || ArcherMonster.Dead)
         {
-            cost = Info.RepairCost;
+            cost = ArcherInfo!.RepairCost;
         }
 
         return cost;

@@ -4397,9 +4397,9 @@ namespace Server.MirEnv
             return item;
         }
 
-        public static UserItem? CreateShopItem(ItemInfo? info, ulong id)
+        public static UserItem CreateShopItem(ItemInfo info, ulong id)
         {
-            if (info == null) return null;
+            // if (info == null) return null;
 
             var item = new UserItem(info)
             {

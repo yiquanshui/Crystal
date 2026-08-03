@@ -4,12 +4,9 @@ namespace Server.MirDatabase
 {
     public class IntelligentCreatureInfo
     {
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
 
-        public static List<IntelligentCreatureInfo> Creatures = new List<IntelligentCreatureInfo>();
+        public static readonly List<IntelligentCreatureInfo> Creatures;
 
         public IntelligentCreatureType PetType;
 
@@ -27,49 +24,116 @@ namespace Server.MirDatabase
 
         static IntelligentCreatureInfo()
         {
-            new IntelligentCreatureInfo { PetType = IntelligentCreatureType.BabyPig, Icon = 500, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 3, MinimalFullness = 4000 };
-            new IntelligentCreatureInfo { PetType = IntelligentCreatureType.Chick, Icon = 501, MousePickupEnabled = true, MousePickupRange = 11, AutoPickupEnabled = true, AutoPickupRange = 7, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 7, CanProduceBlackStone = true };
-            new IntelligentCreatureInfo { PetType = IntelligentCreatureType.Kitten, Icon = 502, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 3, MinimalFullness = 6000 };
-            new IntelligentCreatureInfo { PetType = IntelligentCreatureType.BabySkeleton, Icon = 503, MousePickupEnabled = true, MousePickupRange = 11, AutoPickupEnabled = true, AutoPickupRange = 7, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 7, CanProduceBlackStone = true };
-            new IntelligentCreatureInfo { PetType = IntelligentCreatureType.Baekdon, Icon = 504, MousePickupEnabled = true, MousePickupRange = 11, AutoPickupEnabled = true, AutoPickupRange = 7, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 7, CanProduceBlackStone = true };
-            new IntelligentCreatureInfo { PetType = IntelligentCreatureType.Wimaen, Icon = 505, MousePickupEnabled = true, MousePickupRange = 7, AutoPickupEnabled = true, AutoPickupRange = 5, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 5, MinimalFullness = 5000 };
-            new IntelligentCreatureInfo { PetType = IntelligentCreatureType.BlackKitten, Icon = 506, MousePickupEnabled = true, MousePickupRange = 7, AutoPickupEnabled = true, AutoPickupRange = 5, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 5, MinimalFullness = 5000 };
-            new IntelligentCreatureInfo { PetType = IntelligentCreatureType.BabyDragon, Icon = 507, MousePickupEnabled = true, MousePickupRange = 7, AutoPickupEnabled = true, AutoPickupRange = 5, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 5, MinimalFullness = 7000 };
-            new IntelligentCreatureInfo { PetType = IntelligentCreatureType.OlympicFlame, Icon = 508, MousePickupEnabled = true, MousePickupRange = 11, AutoPickupEnabled = true, AutoPickupRange = 11, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 11, CanProduceBlackStone = true };
-            new IntelligentCreatureInfo { PetType = IntelligentCreatureType.BabySnowMan, Icon = 509, MousePickupEnabled = true, MousePickupRange = 11, AutoPickupEnabled = true, AutoPickupRange = 11, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 11, CanProduceBlackStone = true };
-            new IntelligentCreatureInfo { PetType = IntelligentCreatureType.Frog, Icon = 510, MousePickupEnabled = true, MousePickupRange = 11, AutoPickupEnabled = true, AutoPickupRange = 11, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 11, CanProduceBlackStone = true };
-            new IntelligentCreatureInfo { PetType = IntelligentCreatureType.BabyMonkey, Icon = 511, MousePickupEnabled = true, MousePickupRange = 11, AutoPickupEnabled = true, AutoPickupRange = 11, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 11, CanProduceBlackStone = true };
-            new IntelligentCreatureInfo { PetType = IntelligentCreatureType.AngryBird, Icon = 512, MousePickupEnabled = true, MousePickupRange = 11, AutoPickupEnabled = true, AutoPickupRange = 11, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 11, CanProduceBlackStone = true };
-            new IntelligentCreatureInfo { PetType = IntelligentCreatureType.Foxey, Icon = 513, MousePickupEnabled = true, MousePickupRange = 11, AutoPickupEnabled = true, AutoPickupRange = 11, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 11, CanProduceBlackStone = true };
-            new IntelligentCreatureInfo { PetType = IntelligentCreatureType.MedicalRat, Icon = 514, MousePickupEnabled = true, MousePickupRange = 11, AutoPickupEnabled = true, AutoPickupRange = 11, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 11, CanProduceBlackStone = true };
+            Creatures =
+            [
+                new IntelligentCreatureInfo
+                {
+                    PetType = IntelligentCreatureType.BabyPig, Icon = 500, SemiAutoPickupEnabled = true,
+                    SemiAutoPickupRange = 3, MinimalFullness = 4000
+                },
+                new IntelligentCreatureInfo
+                {
+                    PetType = IntelligentCreatureType.Chick, Icon = 501, MousePickupEnabled = true, MousePickupRange = 11, 
+                    AutoPickupEnabled = true, AutoPickupRange = 7, SemiAutoPickupEnabled = true,
+                    SemiAutoPickupRange = 7, CanProduceBlackStone = true
+                },
+                new IntelligentCreatureInfo
+                {
+                    PetType = IntelligentCreatureType.Kitten, Icon = 502, SemiAutoPickupEnabled = true, SemiAutoPickupRange = 3, 
+                    MinimalFullness = 6000
+                },
+                new IntelligentCreatureInfo
+                {
+                    PetType = IntelligentCreatureType.BabySkeleton, Icon = 503, MousePickupEnabled = true, MousePickupRange = 11, 
+                    AutoPickupEnabled = true, AutoPickupRange = 7,
+                    SemiAutoPickupEnabled = true, SemiAutoPickupRange = 7, CanProduceBlackStone = true
+                },
+                new IntelligentCreatureInfo
+                {
+                    PetType = IntelligentCreatureType.Baekdon, Icon = 504, MousePickupEnabled = true, MousePickupRange = 11, 
+                    AutoPickupEnabled = true, AutoPickupRange = 7,
+                    SemiAutoPickupEnabled = true, SemiAutoPickupRange = 7, CanProduceBlackStone = true
+                },
+                new IntelligentCreatureInfo
+                {
+                    PetType = IntelligentCreatureType.Wimaen, Icon = 505, MousePickupEnabled = true, MousePickupRange = 7, 
+                    AutoPickupEnabled = true, AutoPickupRange = 5, SemiAutoPickupEnabled = true,
+                    SemiAutoPickupRange = 5, MinimalFullness = 5000
+                },
+                new IntelligentCreatureInfo
+                {
+                    PetType = IntelligentCreatureType.BlackKitten, Icon = 506, MousePickupEnabled = true, MousePickupRange = 7, 
+                    AutoPickupEnabled = true, AutoPickupRange = 5,
+                    SemiAutoPickupEnabled = true, SemiAutoPickupRange = 5, MinimalFullness = 5000
+                },
+                new IntelligentCreatureInfo
+                {
+                    PetType = IntelligentCreatureType.BabyDragon, Icon = 507, MousePickupEnabled = true, MousePickupRange = 7, 
+                    AutoPickupEnabled = true, AutoPickupRange = 5,
+                    SemiAutoPickupEnabled = true, SemiAutoPickupRange = 5, MinimalFullness = 7000
+                },
+                new IntelligentCreatureInfo
+                {
+                    PetType = IntelligentCreatureType.OlympicFlame, Icon = 508, MousePickupEnabled = true, MousePickupRange = 11, 
+                    AutoPickupEnabled = true, AutoPickupRange = 11,
+                    SemiAutoPickupEnabled = true, SemiAutoPickupRange = 11, CanProduceBlackStone = true
+                },
+                new IntelligentCreatureInfo
+                {
+                    PetType = IntelligentCreatureType.BabySnowMan, Icon = 509, MousePickupEnabled = true, MousePickupRange = 11, 
+                    AutoPickupEnabled = true, AutoPickupRange = 11,
+                    SemiAutoPickupEnabled = true, SemiAutoPickupRange = 11, CanProduceBlackStone = true
+                },
+                new IntelligentCreatureInfo
+                {
+                    PetType = IntelligentCreatureType.Frog, Icon = 510, MousePickupEnabled = true, MousePickupRange = 11, 
+                    AutoPickupEnabled = true, AutoPickupRange = 11, SemiAutoPickupEnabled = true,
+                    SemiAutoPickupRange = 11, CanProduceBlackStone = true
+                },
+                new IntelligentCreatureInfo
+                {
+                    PetType = IntelligentCreatureType.BabyMonkey, Icon = 511, MousePickupEnabled = true, MousePickupRange = 11, 
+                    AutoPickupEnabled = true, AutoPickupRange = 11,
+                    SemiAutoPickupEnabled = true, SemiAutoPickupRange = 11, CanProduceBlackStone = true
+                },
+                new IntelligentCreatureInfo
+                {
+                    PetType = IntelligentCreatureType.AngryBird, Icon = 512, MousePickupEnabled = true, MousePickupRange = 11, 
+                    AutoPickupEnabled = true, AutoPickupRange = 11,
+                    SemiAutoPickupEnabled = true, SemiAutoPickupRange = 11, CanProduceBlackStone = true
+                },
+                new IntelligentCreatureInfo
+                {
+                    PetType = IntelligentCreatureType.Foxey, Icon = 513, MousePickupEnabled = true, MousePickupRange = 11, 
+                    AutoPickupEnabled = true, AutoPickupRange = 11, SemiAutoPickupEnabled = true,
+                    SemiAutoPickupRange = 11, CanProduceBlackStone = true
+                },
+                new IntelligentCreatureInfo
+                {
+                    PetType = IntelligentCreatureType.MedicalRat, Icon = 514, MousePickupEnabled = true, MousePickupRange = 11, 
+                    AutoPickupEnabled = true, AutoPickupRange = 11,
+                    SemiAutoPickupEnabled = true, SemiAutoPickupRange = 11, CanProduceBlackStone = true
+                }
+            ];
         }
 
-        public IntelligentCreatureInfo()
-        {
-            Creatures.Add(this);
-        }
+        // public IntelligentCreatureInfo()
+        // {
+        //     Creatures.Add(this);
+        // }
 
-        public static IntelligentCreatureInfo GetCreatureInfo(IntelligentCreatureType petType)
+        public static IntelligentCreatureInfo? GetCreatureInfo(IntelligentCreatureType petType)
         {
-            for (int i = 0; i < Creatures.Count; i++)
-            {
-                IntelligentCreatureInfo info = Creatures[i];
-                if (info.PetType != petType) continue;
-                return info;
-            }
-            return null;
+            return Creatures.FirstOrDefault(info => info.PetType == petType);
         }
     }
 
     public class UserIntelligentCreature
     {
-        protected static Env Env
-        {
-            get { return Env.Main; }
-        }
+        protected static Env Env => Env.Main;
 
         public IntelligentCreatureType PetType;
-        public IntelligentCreatureInfo Info;
+        public IntelligentCreatureInfo? Info;
         public IntelligentCreatureItemFilter Filter;
 
         public IntelligentCreaturePickupMode petMode = IntelligentCreaturePickupMode.SemiAutomatic;
